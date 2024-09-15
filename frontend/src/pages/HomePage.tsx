@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
 import { usePocket } from "../contexts/PocketContext";
-import { Collections, StudentsResponse, TeachersResponse } from "../types/pocketbase";
-import { TexpandUser } from "../types/extend";
 import { Link } from "react-router-dom";
 
 export const HomePage = () => {
