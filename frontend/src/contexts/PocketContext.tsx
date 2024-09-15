@@ -92,7 +92,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudent>>({
-                // filter: `student.teacher.user.id = "${userId}" && start_at >= "2024-09-01" && start_at < "2024-10-01"`,
                 filter: `student.teacher.user.id = "${userId}" && start_at >= "${start}" && start_at < "${end}"`,
                 expand: "student",
             });
