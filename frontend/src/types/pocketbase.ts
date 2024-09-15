@@ -41,17 +41,14 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type ClassLogsRecord = {
-	class_mins?: number
+	completed?: boolean
+	cp_class_mins?: number
+	cp_students_price?: number
+	cp_teacher?: RecordIdString
+	cp_teachers_price?: number
 	finish_at?: IsoDateString
-	finished?: boolean
-	memo?: string
-	monthly_package?: RecordIdString
 	start_at?: IsoDateString
-	started?: boolean
 	student: RecordIdString
-	students_price?: number
-	teacher: RecordIdString
-	teachers_price?: number
 	topic?: string
 }
 

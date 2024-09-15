@@ -10,8 +10,8 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import { Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
-import { TexpandUser } from "../types/extend";
+import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
+import { TexpandStudent, TexpandUser } from "../types/extend";
 
 interface DecodedToken {
     exp: number;
@@ -27,6 +27,7 @@ interface PocketContextType {
     pb: TypedPocketBase;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
+    fetchClassLogsData: () => Promise<ClassLogsResponse<TexpandStudent>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -77,6 +78,20 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setStudents(res)
     }, [pb]);
 
+    const fetchClassLogsData = async () => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getFullList<ClassLogsResponse<TexpandStudent>>({
+                filter: `student.teacher.user.id = "${userId}" && start_at >= "2024-09-01" && start_at < "2024-10-01"`,
+                expand: "student",
+            });
+        return res
+    };
+
     const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
         await pb.collection(Collections.Users).authWithPassword(email, password);
     }, [pb]);
@@ -98,7 +113,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
-        <PocketContext.Provider value={{ login, logout, user, token, pb, teacher, students }}>
+        <PocketContext.Provider value={{ login, logout, user, token, pb, teacher, students, fetchClassLogsData }}>
             {children}
         </PocketContext.Provider>
     );
