@@ -30,7 +30,7 @@ export const ClassPlanner = () => {
         student: "",
         start_date: new Date().toISOString().slice(0, 10),
         finish_date: new Date().toISOString().slice(0, 10),
-        routine: constants.dayNames.map((_, i) => {
+        routine: constants.DAY_NAMES.map((_, i) => {
             return {
                 weekday_index: i,
                 start_at: "",
@@ -48,7 +48,7 @@ export const ClassPlanner = () => {
         )
 
         if (errorRoutines.length > 0) {
-            const errorDays = errorRoutines.map(e => constants.dayNames[e.weekday_index]).join(", ")
+            const errorDays = errorRoutines.map(e => constants.DAY_NAMES[e.weekday_index]).join(", ")
             alert("Fix class times for " + errorDays)
             return;
         }
@@ -142,7 +142,7 @@ export const ClassPlanner = () => {
                     </select>
                     {data.routine.map((routine, i) => (
                         <div className="flex gap-5 p-3 rounded bg-base-100 items-center" key={i}>
-                            <div className="w-20 flex-shrink-0">{constants.dayNames[i]}</div>
+                            <div className="w-20 flex-shrink-0">{constants.DAY_NAMES[i]}</div>
                             <input
                                 type="time"
                                 value={routine.start_at}
