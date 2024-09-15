@@ -4,10 +4,14 @@
   "main": "index.js",
   "scripts": {
     "typegen": "npx pocketbase-typegen --db ./pb_data/data.db --out frontend/src/types/pocketbase.ts",
-    "start": "pocketbase serve"
+    "start": "pocketbase serve",
+    "dev": "nodemon --watch pb_hooks --ext js,json --exec npm run start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
 }

@@ -10,15 +10,13 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import ms from "ms";
-import { TypedPocketBase } from "../types/pocketbase";
+import { Collections, TypedPocketBase } from "../types/pocketbase";
 
 interface DecodedToken {
     exp: number;
 }
 
-const fiveMinutesInMs = ms("5 minutes");
-const twoMinutesInMs = ms("2 minutes");
+const oneMinInMs = 60000;
 
 interface PocketContextType {
     login: ({ email, password }: { email: string; password: string }) => Promise<void>;
@@ -43,7 +41,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     }, [pb]);
 
     const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
-        await pb.collection("users").authWithPassword(email, password);
+        await pb.collection(Collections.Users).authWithPassword(email, password);
     }, [pb]);
 
     const logout = useCallback(() => {
@@ -54,13 +52,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         if (!pb.authStore.isValid) return;
         const decoded = jwtDecode<DecodedToken>(token!); 
         const tokenExpiration = decoded.exp ?? 0;
-        const expirationWithBuffer = (tokenExpiration + fiveMinutesInMs) / 1000;
+        const expirationWithBuffer = (tokenExpiration + 5 * oneMinInMs) / 1000;
         if (Date.now() / 1000 < expirationWithBuffer) {
-            await pb.collection("users").authRefresh();
+            await pb.collection(Collections.Users).authRefresh();
         }
     }, [pb, token]);
 
-    useInterval(refreshSession, token ? twoMinutesInMs : null);
+    useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
         <PocketContext.Provider value={{ login, logout, user, pb }}>

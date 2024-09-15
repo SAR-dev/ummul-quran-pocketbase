@@ -18,7 +18,7 @@ export const SignIn = () => {
         email: data.email,
         password: data.password
       });
-      navigate("/protected");
+      navigate("/");
     },
     [login]
   );
@@ -27,8 +27,8 @@ export const SignIn = () => {
     <section>
       <h2>Sign In</h2>
       <form onSubmit={handleOnSubmit}>
-        <input placeholder="Email" type="email" onChange={e => setData({...data, email: e.target.value})} />
-        <input placeholder="Password" type="password" onChange={e => setData({...data, password: e.target.value})} />
+        <input placeholder="Email" type="email" value={data.email} onChange={e => setData({...data, email: e.target.value})} />
+        <input placeholder="Password" type="password" value={data.password} onChange={e => setData({...data, password: e.target.value})} />
         <button type="submit">Login</button>
         <Link to="/">Go to Sign Up</Link>
       </form>
