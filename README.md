@@ -1,1 +1,0 @@
-# pocketbase-auth-example
