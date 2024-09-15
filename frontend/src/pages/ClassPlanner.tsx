@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
 import { constants } from '../constants';
 
