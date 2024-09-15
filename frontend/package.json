@@ -13,6 +13,7 @@
   "dependencies": {
     "@heroicons/react": "^2.1.5",
     "@types/ms": "^0.7.34",
+    "axios": "^1.7.7",
     "jwt-decode": "^4.0.0",
     "pocketbase": "^0.21.5",
     "react": "^18.3.1",

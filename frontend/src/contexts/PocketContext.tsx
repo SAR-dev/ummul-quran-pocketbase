@@ -23,6 +23,7 @@ interface PocketContextType {
     login: ({ email, password }: { email: string; password: string }) => Promise<void>;
     logout: () => void;
     user?: AuthModel;
+    token: string | null;
     pb: TypedPocketBase;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
@@ -97,7 +98,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
-        <PocketContext.Provider value={{ login, logout, user, pb, teacher, students }}>
+        <PocketContext.Provider value={{ login, logout, user, token, pb, teacher, students }}>
             {children}
         </PocketContext.Provider>
     );

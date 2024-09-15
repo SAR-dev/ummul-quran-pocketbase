@@ -9,8 +9,8 @@ interface DataType {
         start_at: string;
         finish_at: string;
     }[];
-    start_date: Date;
-    finish_date: Date;
+    start_date: string;
+    finish_date: string;
 }
 
 interface RoutinePayloadType {
@@ -20,16 +20,16 @@ interface RoutinePayloadType {
         start_at: string;
         finish_at: string | null;
     }[];
-    start_date: Date;
-    finish_date: Date;
+    start_date: string;
+    finish_date: string;
 }
 
 export const ClassPlanner = () => {
-    const { students } = usePocket()
+    const { students, token } = usePocket()
     const [data, setData] = useState<DataType>({
         student: "",
-        start_date: new Date(),
-        finish_date: new Date(),
+        start_date: new Date().toISOString().slice(0, 10),
+        finish_date: new Date().toISOString().slice(0, 10),
         routine: constants.dayNames.map((_, i) => {
             return {
                 weekday_index: i,
@@ -53,8 +53,18 @@ export const ClassPlanner = () => {
             return;
         }
 
-        if (data.finish_date.getTime() <= data.start_date.getTime()) {
+        const start_date = new Date(data.start_date)
+        const finish_date = new Date(data.finish_date)
+        const yesterday_date = new Date(new Date().setDate(new Date().getDate() - 1))
+
+        if ((finish_date.getTime() <= start_date.getTime()) || start_date.getTime() < yesterday_date.getTime()) {
             alert("Fix date range.")
+            return;
+        }
+
+        const days_difference = (finish_date.getTime() - start_date.getTime()) / (1000 * 3600 * 24);
+        if (days_difference > 366) {
+            alert("You can create routine for maximum 1 year")
             return;
         }
 
@@ -66,7 +76,23 @@ export const ClassPlanner = () => {
             start_date: data.start_date,
             finish_date: data.finish_date
         }
-        console.log(payload)
+
+        fetch(`${import.meta.env.VITE_API_URL}/api/class-logs/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ?? ""
+            },
+            body: JSON.stringify(payload),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => console.log('Success:', data))
+            .catch(error => console.error('Error:', error));
     };
 
     const handleStartTimeChange = ({ start_at, weekday_index }: { start_at: string, weekday_index: number }) => {
@@ -140,16 +166,16 @@ export const ClassPlanner = () => {
                     <input
                         type="date"
                         className='input input-bordered w-48'
-                        value={data.start_date.toISOString().slice(0, 10)}
+                        value={data.start_date}
                         min={(new Date()).toISOString().slice(0, 10)}
-                        onChange={e => setData({ ...data, start_date: new Date(e.target.value) })}
+                        onChange={e => setData({ ...data, start_date: e.target.value })}
                     />
                     <input
                         type="date"
                         className='input input-bordered w-48'
-                        value={data.finish_date.toISOString().slice(0, 10)}
+                        value={data.finish_date}
                         min={(new Date()).toISOString().slice(0, 10)}
-                        onChange={e => setData({ ...data, finish_date: new Date(e.target.value) })}
+                        onChange={e => setData({ ...data, finish_date: e.target.value })}
                     />
                     <button type="submit" className="btn btn-primary w-32">Submit</button>
                 </form>
