@@ -7,11 +7,12 @@ import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	ClassLogs = "class_logs",
-	Packages = "packages",
+	MonthlyPackages = "monthly_packages",
 	StudentPackages = "student_packages",
 	Students = "students",
 	TeacherPackages = "teacher_packages",
 	Teachers = "teachers",
+	Timezones = "timezones",
 	Users = "users",
 }
 
@@ -44,6 +45,7 @@ export type ClassLogsRecord = {
 	finish_at?: IsoDateString
 	finished?: boolean
 	memo?: string
+	monthly_package?: RecordIdString
 	start_at?: IsoDateString
 	started?: boolean
 	student: RecordIdString
@@ -53,75 +55,82 @@ export type ClassLogsRecord = {
 	topic?: string
 }
 
-export type PackagesRecord = {
+export type MonthlyPackagesRecord = {
 	class_mins: number
+	memo?: string
 	name: string
 	students_price: number
 	teachers_price: number
 }
 
 export type StudentPackagesRecord = {
-	package: RecordIdString
+	monthly_package: RecordIdString
 	price: number
 	student: RecordIdString
 }
 
 export type StudentsRecord = {
 	class_link?: string
-	mobile?: string
+	mobile_no?: string
+	nickname: string
 	teacher: RecordIdString
+	timezone?: RecordIdString
 	user: RecordIdString
-	utc?: number
-	whatsapp_no: string
 }
 
 export type TeacherPackagesRecord = {
-	package: RecordIdString
+	monthly_package: RecordIdString
 	price: number
 	teacher: RecordIdString
 }
 
 export type TeachersRecord = {
-	email?: string
-	mobile: string
+	mobile_no: string
+	nickname: string
+	timezone?: RecordIdString
 	user: RecordIdString
-	utc?: number
-	whatsapp_no: string
+}
+
+export type TimezonesRecord = {
+	name: string
+	offset?: number
 }
 
 export type UsersRecord = {
 	avatar?: string
-	name?: string
 }
 
 // Response types include system fields and match responses from the PocketBase API
 export type ClassLogsResponse<Texpand = unknown> = Required<ClassLogsRecord> & BaseSystemFields<Texpand>
-export type PackagesResponse<Texpand = unknown> = Required<PackagesRecord> & BaseSystemFields<Texpand>
+export type MonthlyPackagesResponse<Texpand = unknown> = Required<MonthlyPackagesRecord> & BaseSystemFields<Texpand>
 export type StudentPackagesResponse<Texpand = unknown> = Required<StudentPackagesRecord> & BaseSystemFields<Texpand>
 export type StudentsResponse<Texpand = unknown> = Required<StudentsRecord> & BaseSystemFields<Texpand>
 export type TeacherPackagesResponse<Texpand = unknown> = Required<TeacherPackagesRecord> & BaseSystemFields<Texpand>
 export type TeachersResponse<Texpand = unknown> = Required<TeachersRecord> & BaseSystemFields<Texpand>
+export type TimezonesResponse<Texpand = unknown> = Required<TimezonesRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
 	class_logs: ClassLogsRecord
-	packages: PackagesRecord
+	monthly_packages: MonthlyPackagesRecord
 	student_packages: StudentPackagesRecord
 	students: StudentsRecord
 	teacher_packages: TeacherPackagesRecord
 	teachers: TeachersRecord
+	timezones: TimezonesRecord
 	users: UsersRecord
 }
 
 export type CollectionResponses = {
 	class_logs: ClassLogsResponse
-	packages: PackagesResponse
+	monthly_packages: MonthlyPackagesResponse
 	student_packages: StudentPackagesResponse
 	students: StudentsResponse
 	teacher_packages: TeacherPackagesResponse
 	teachers: TeachersResponse
+	timezones: TimezonesResponse
 	users: UsersResponse
 }
 
@@ -130,10 +139,11 @@ export type CollectionResponses = {
 
 export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'class_logs'): RecordService<ClassLogsResponse>
-	collection(idOrName: 'packages'): RecordService<PackagesResponse>
+	collection(idOrName: 'monthly_packages'): RecordService<MonthlyPackagesResponse>
 	collection(idOrName: 'student_packages'): RecordService<StudentPackagesResponse>
 	collection(idOrName: 'students'): RecordService<StudentsResponse>
 	collection(idOrName: 'teacher_packages'): RecordService<TeacherPackagesResponse>
 	collection(idOrName: 'teachers'): RecordService<TeachersResponse>
+	collection(idOrName: 'timezones'): RecordService<TimezonesResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }
