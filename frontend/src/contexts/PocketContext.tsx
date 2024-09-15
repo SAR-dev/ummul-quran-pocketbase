@@ -27,7 +27,7 @@ interface PocketContextType {
     pb: TypedPocketBase;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
-    fetchClassLogsData: () => Promise<ClassLogsResponse<TexpandStudent>[]>
+    fetchClassLogsData: ({ start, end }:{ start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudent>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -78,7 +78,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setStudents(res)
     }, [pb]);
 
-    const fetchClassLogsData = async () => {
+    const fetchClassLogsData = async ({
+        start, 
+        end
+    }:{
+        start: string, 
+        end: string
+    }) => {
         const userId = user?.id;
         if (!userId) {
             return [];
@@ -86,7 +92,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudent>>({
-                filter: `student.teacher.user.id = "${userId}" && start_at >= "2024-09-01" && start_at < "2024-10-01"`,
+                // filter: `student.teacher.user.id = "${userId}" && start_at >= "2024-09-01" && start_at < "2024-10-01"`,
+                filter: `student.teacher.user.id = "${userId}" && start_at >= "${start}" && start_at < "${end}"`,
                 expand: "student",
             });
         return res

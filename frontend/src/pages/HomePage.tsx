@@ -10,7 +10,13 @@ export const HomePage = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetchClassLogsData().then(res => {
+    const cd = new Date();
+    const nd = new Date(new Date().setMonth(new Date().getMonth() + 1));
+
+    const start = `${cd.getFullYear()}-${String(cd.getMonth() + 1).padStart(2, '0')}-01`;
+    const end = `${nd.getFullYear()}-${String(nd.getMonth() + 1).padStart(2, '0')}-01`;
+
+    fetchClassLogsData({ start, end }).then(res => {
       setClassLogs(res)
     })
   }, [user])
