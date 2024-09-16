@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
-import { constants } from '../constants';
+import { constants } from '../stores/constantStore';
 
 interface DataType {
     student: string;

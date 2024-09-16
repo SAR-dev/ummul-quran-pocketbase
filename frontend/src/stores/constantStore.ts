@@ -9,4 +9,5 @@ export const constants = {
         TIME: new RegExp(/^([01]\d|2[0-3]):([0-5]\d)$/),
         DATE: new RegExp(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/),
     },
+    THEME_STORE_KEY: "theme",
 };

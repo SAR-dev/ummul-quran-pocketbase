@@ -24,10 +24,9 @@ interface PocketContextType {
     logout: () => void;
     user?: AuthModel;
     token: string | null;
-    pb: TypedPocketBase;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
-    fetchClassLogsData: ({ start, end }:{ start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudent>[]>
+    fetchClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudent>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -60,6 +59,12 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .getFirstListItem<TeachersResponse<TexpandUser>>(`user.id = "${userId}"`, {
                 expand: "user",
             });
+
+        // if signed in user is not teacher log user out
+        if (res == null) {
+            logout()
+            return;
+        }
         setTeacher(res)
     }, [pb]);
 
@@ -79,10 +84,10 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     }, [pb]);
 
     const fetchClassLogsData = async ({
-        start, 
+        start,
         end
-    }:{
-        start: string, 
+    }: {
+        start: string,
         end: string
     }) => {
         const userId = user?.id;
@@ -119,7 +124,15 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
-        <PocketContext.Provider value={{ login, logout, user, token, pb, teacher, students, fetchClassLogsData }}>
+        <PocketContext.Provider value={{
+            login,
+            logout,
+            user,
+            token,
+            teacher,
+            students,
+            fetchClassLogsData
+        }}>
             {children}
         </PocketContext.Provider>
     );
