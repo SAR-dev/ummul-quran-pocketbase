@@ -19,19 +19,17 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
         'Saturday',
     ];
 
-    const formatDateToPayloadText = date_text => {
-        const date = new Date(date_text);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-        const day = String(date.getUTCDate()).padStart(2, '0');
-
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-        const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
-
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}Z`;
-    };
+    const formatDateToCustomString = (date) => {
+        const isoString = date.toISOString(); // "2013-10-07T08:23:19.120Z"
+        const formattedDate = isoString.replace('T', ' ').replace('Z', ''); // "2013-10-07 08:23:19.120"
+        
+        const offset = -date.getTimezoneOffset();
+        const sign = offset >= 0 ? '+' : '-';
+        const absOffsetHours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+        const absOffsetMinutes = String(Math.abs(offset) % 60).padStart(2, '0');
+      
+        return `${formattedDate}${sign}${absOffsetHours}:${absOffsetMinutes}`;
+      }
 
     const getDatesByWeekday = ({
         start_date,
@@ -39,6 +37,7 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
         weekday_index,
         start_at,
         finish_at,
+        offset_hh_mm
     }) => {
         const result = [];
         let currentDate = new Date(start_date);
@@ -49,22 +48,8 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
 
             if (weekday_index === dayIndex) {
                 result.push({
-                    start_at: formatDateToPayloadText(
-                        currentDate.setHours(
-                            start_at?.split(':')[0] ?? 0,
-                            start_at?.split(':')[1] ?? 0,
-                            0,
-                            0
-                        )
-                    ),
-                    finish_at: formatDateToPayloadText(
-                        currentDate.setHours(
-                            finish_at?.split(':')[0] ?? 0,
-                            finish_at?.split(':')[1] ?? 0,
-                            0,
-                            0
-                        )
-                    ),
+                    start_at: `${currentDate.toISOString().slice(0, 10)} ${start_at}:00.000${offset_hh_mm}`,
+                    finish_at: `${currentDate.toISOString().slice(0, 10)} ${finish_at}:00.000${offset_hh_mm}`,
                 });
             }
             currentDate.setDate(currentDate.getDate() + 1);
@@ -107,6 +92,7 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
             weekday_index: routine.weekday_index,
             start_at: routine.start_at,
             finish_at: routine.finish_at,
+            offset_hh_mm: payload.offset_hh_mm
         })
     );
 
@@ -122,7 +108,7 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
             record.set("start_at", data.start_at)
             record.set("finish_at", data.finish_at)
 
-            if(checkData == null) checkData = record;
+            if (checkData == null) checkData = record;
 
             txDao.saveRecord(record)
         }

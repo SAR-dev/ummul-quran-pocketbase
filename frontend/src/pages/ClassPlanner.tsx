@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
 import { constants } from '../stores/constantStore';
+import { getTimeOffset } from '../helpers';
 
 interface DataType {
     student: string;
@@ -22,6 +23,7 @@ interface RoutinePayloadType {
     }[];
     start_date: string;
     finish_date: string;
+    offset_hh_mm: string;
 }
 
 export const ClassPlanner = () => {
@@ -74,7 +76,8 @@ export const ClassPlanner = () => {
                 return { ...c, finish_at: c.finish_at.length > 0 ? c.finish_at : null }
             }),
             start_date: data.start_date,
-            finish_date: data.finish_date
+            finish_date: data.finish_date,
+            offset_hh_mm: getTimeOffset()
         }
 
         fetch(`${import.meta.env.VITE_API_URL}/api/class-logs/create`, {

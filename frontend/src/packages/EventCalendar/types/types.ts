@@ -3,10 +3,11 @@ export enum CalendarViewTypes {
 }
 
 export interface CalendarDataType {
-    id: number;
+    id: number | string;
     title: string;
     start_at: string;
-    end_at: string;
+    finish_at?: string;
+    completed?: boolean;
 }
 
 export interface TimeRangeType {

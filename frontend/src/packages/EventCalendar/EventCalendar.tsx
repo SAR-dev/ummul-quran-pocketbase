@@ -4,52 +4,15 @@ import { CalendarDataType, CalendarViewTypes } from "./types/types"
 import MonthView from "./components/MonthView"
 import WeekView from "./components/WeekView"
 import DayView from "./components/DayView"
-import { PrinterIcon, SignalIcon } from "@heroicons/react/24/outline"
+import { CalculatorIcon, PrinterIcon, SignalIcon } from "@heroicons/react/24/outline"
+import { Link } from "react-router-dom"
+import { useLocalStorage } from "usehooks-ts"
 
-const data: CalendarDataType[] = [
-  {
-    id: 1,
-    title: "Team Meeting",
-    start_at: "2024-09-09T10:00:00+09:00",
-    end_at: "2024-09-09T11:30:00+09:00"
-  },
-  {
-    id: 2,
-    title: "Project Designing",
-    start_at: "2024-09-10T10:00:00+09:00",
-    end_at: "2024-09-10T12:00:00+09:00"
-  },
-  {
-    id: 3,
-    title: "Project Deadline",
-    start_at: "2024-09-11T15:00:00+09:00",
-    end_at: "2024-09-11T16:00:00+09:00"
-  },
-  {
-    id: 4,
-    title: "Client Presentation",
-    start_at: "2024-09-09T09:30:00+09:00",
-    end_at: "2024-09-09T10:30:00+09:00"
-  },
-  {
-    id: 5,
-    title: "Workshop",
-    start_at: "2024-09-11T14:00:00+09:00",
-    end_at: "2024-09-11T17:00:00+09:00"
-  },
-  {
-    id: 6,
-    title: "Monthly Review",
-    start_at: "2024-09-25T11:00:00+09:00",
-    end_at: "2024-09-25T12:00:00+09:00"
-  }
-]
-
-const EventCalendar = () => {
+const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [date, setDate] = useState(new Date().getDate())
-  const [view, setView] = useState<CalendarViewTypes>(CalendarViewTypes.MONTH)
+  const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
 
   return (
     <div>
@@ -116,6 +79,10 @@ const EventCalendar = () => {
           <PrinterIcon className="h-4 w-4" />
           Print Receipt
         </button>
+        <Link to="/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
+          <CalculatorIcon className="h-4 w-4" />
+          Class Planner
+        </Link>
       </div>
     </div>
   )

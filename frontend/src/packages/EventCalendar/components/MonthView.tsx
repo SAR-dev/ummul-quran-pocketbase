@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../helpers/calendar"
 import { CalendarDataType } from "../types/types";
+import classNames from "classnames";
 
 const MonthView = ({
     year,
@@ -19,7 +20,7 @@ const MonthView = ({
     );
 
     const countEventsByYearMonthDate = (weekNo: number, weekDayIndex: number) => {
-        if(!Object.keys(weeksByYearAndMonth).includes(weekNo.toString())) return;
+        if (!Object.keys(weeksByYearAndMonth).includes(weekNo.toString())) return;
         const d = weeksByYearAndMonth[weekNo][weekDayIndex]
         if (!d) return;
         const count = data.filter(e => isMatchingDate({
@@ -32,11 +33,23 @@ const MonthView = ({
     }
 
     const getDateOfBox = (weekNo: number, weekDayIndex: number) => {
-        if(!Object.keys(weeksByYearAndMonth).includes(weekNo.toString())) return '';
+        if (!Object.keys(weeksByYearAndMonth).includes(weekNo.toString())) return '';
         const d = weeksByYearAndMonth[weekNo][weekDayIndex]
         if (!d) return '';
         return d;
     }
+
+    const datesWithClassCount = useMemo(
+        () => weeks.flatMap(weekNo => weekdays.map((weekday) => {
+            return {
+                weekNo: weekNo,
+                weekdayIndex: weekday.index,
+                date: getDateOfBox(weekNo, weekday.index),
+                count: countEventsByYearMonthDate(weekNo, weekday.index)
+            }
+        })),
+        [weeksByYearAndMonth, data]
+    );
 
     return (
         <div className="flex flex-col relative border-y border-base-300 divide-y divide-base-300">
@@ -50,11 +63,15 @@ const MonthView = ({
             {weeks.map((weekNo) => (
                 <div className="w-full grid grid-cols-7 border-l border-base-300 text-sm font-medium" key={weekNo}>
                     {weekdays.map((weekday, i) => (
-                        <div className={`h-20 relative flex flex-col gap-1 justify-center items-center w-full bg-base-100 border-r border-base-300 ${getDateOfBox(weekNo, weekday.index) == date ? "bg-info/30" : ""}`} key={i}>
-                            {getDateOfBox(weekNo, weekday.index)}
+                        <div className={`h-20 relative flex flex-col gap-1 justify-center items-center w-full bg-base-100 border-r border-base-300 ${getDateOfBox(weekNo, weekday.index) == date ? "bg-warning/50" : ""}`} key={i}>
+                            {datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.date}
                             <div className="w-full flex items-center justify-center">
-                                <div className="h-6 w-6 flex justify-center items-center bg-warning text-warning-content rounded-full mb-1">
-                                    {countEventsByYearMonthDate(weekNo, weekday.index) ?? "-"}
+                                <div className={classNames({
+                                    "h-6 w-6 flex justify-center items-center rounded-full mb-1": true,
+                                    "bg-warning text-warning-content": !!datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.count ,
+                                    "bg-base-300": !datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.count 
+                                })}>
+                                    {datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.count ?? "-"}
                                 </div>
                             </div>
                         </div>

@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { months, getWeekday, formatTimestampToTime, filterDayViewData } from "../helpers/calendar"
 import { CalendarDataType, TimeRangeEventsType } from "../types/types"
 import { stringToColor } from "../helpers/color";
+import { ClockIcon, UserIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const DayView = ({
     year,
@@ -15,7 +17,7 @@ const DayView = ({
     data: CalendarDataType[]
 }) => {
     const timeRangeEvents: TimeRangeEventsType[] = useMemo(
-        () => filterDayViewData({year, month, date, data}),
+        () => filterDayViewData({ year, month, date, data }),
         [year, month, date, data]
     );
 
@@ -35,11 +37,20 @@ const DayView = ({
                     <div className="w-[8rem] flex-shrink-0 h-auto py-2 flex justify-center items-start bg-base-100 border-r border-base-300">
                         {timeRangeEvent.start}
                     </div>
-                    <div className="w-auto h-auto flex flex-col justify-center gap-1 w-full bg-base-100 p-2">
+                    <div className="w-auto h-auto min-h-12 flex gap-3 gap-1 w-full bg-base-100 p-2">
                         {timeRangeEvent.events.map((e, i) => (
-                            <div className="flex gap-2 items-center text-xs" key={i}>
-                                <div className="h-3 w-3 rounded-full flex-shrink-0" style={{backgroundColor: `${stringToColor(e.title)}`}}></div>
-                                <div>{formatTimestampToTime(e.start_at)} - {formatTimestampToTime(e.end_at)} {e.title}</div>
+                            <div className="w-fit flex gap-3 items-center text-sm py-1 px-3 rounded" style={{ backgroundColor: `${stringToColor(e.title, .3)}` }} key={i}>
+                                <div className="flex gap-1 items-center">
+                                    <ClockIcon className="h-4 w-4" />
+                                    {formatTimestampToTime(e.start_at)} - {formatTimestampToTime(e.finish_at)}
+                                </div>
+                                <div className="flex gap-1 items-center">
+                                    <UserIcon className="h-4 w-4" />
+                                    {e.title}
+                                </div>
+                                {e.completed && (
+                                    <CheckCircleIcon className="h-4 w-4" />
+                                )}
                             </div>
                         ))}
                     </div>

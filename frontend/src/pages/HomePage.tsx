@@ -1,20 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePocket } from "../contexts/PocketContext";
 import { Link } from "react-router-dom";
 import { ClassLogsResponse } from "../types/pocketbase";
-import { TexpandStudent } from "../types/extend";
+import { TexpandStudentWithPackage } from "../types/extend";
 import { constants } from "../stores/constantStore";
 import NavLayout from "../layouts/NavLayout";
 import EventCalendar from "../packages/EventCalendar/EventCalendar";
+import { CalendarDataType } from "../packages/EventCalendar/types/types";
 
 export const HomePage = () => {
   const { logout, user, teacher, students, fetchClassLogsData } = usePocket();
-  const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudent>[]>([])
+  const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
+  const [todayClassLogs, setTodayClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(2024)
   const [month, setMonth] = useState((new Date()).getMonth() + 1)
 
   useEffect(() => {
     if (!user) return;
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    fetchClassLogsData({
+      start: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`,
+      end: `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`
+    })
+      .then(res => {
+        setTodayClassLogs(res)
+      })
+
     const cd = new Date(year, month - 1, 1);
     const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
 
@@ -27,14 +41,24 @@ export const HomePage = () => {
       })
   }, [user, year, month])
 
+  const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
+    return classLogs
+      .map(log => ({
+        id: log.id,
+        title: log.expand?.student.nickname ?? "",
+        start_at: log.start_at,
+        end_at: log.finish_at,
+        completed: log.completed
+      }));
+  }, [classLogs]);
 
   return (
     <NavLayout>
       <div className="grid grid-cols-1 md:grid-cols-4 w-full">
         <div className="col-span-1 md:col-span-3">
           <div className="p-5 md:p-16 w-full grid grid-cols-1 gap-10">
-            {/* <ClassList /> */}
-            <EventCalendar />
+            {/* <ClassLis /> */}
+            <EventCalendar data={sortedClassLogs} />
             {/* <StudentList /> */}
           </div>
         </div>

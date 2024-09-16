@@ -11,7 +11,7 @@ import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
 import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
-import { TexpandStudent, TexpandUser } from "../types/extend";
+import { TexpandStudent, TexpandStudentWithPackage, TexpandUser } from "../types/extend";
 
 interface DecodedToken {
     exp: number;
@@ -26,7 +26,7 @@ interface PocketContextType {
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
-    fetchClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudent>[]>
+    fetchClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -96,9 +96,9 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         }
         const res = await pb
             .collection(Collections.ClassLogs)
-            .getFullList<ClassLogsResponse<TexpandStudent>>({
+            .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
                 filter: `student.teacher.user.id = "${userId}" && start_at >= "${start}" && start_at < "${end}"`,
-                expand: "student",
+                expand: "student, student.monthly_package",
             });
         return res
     };

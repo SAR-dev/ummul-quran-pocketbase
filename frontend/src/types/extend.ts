@@ -1,9 +1,17 @@
-import { StudentsResponse, UsersResponse } from "./pocketbase"
+import { MonthlyPackagesResponse, StudentsResponse, UsersResponse } from "./pocketbase"
 
 export type TexpandUser = {
   user: UsersResponse
 }
 
 export type TexpandStudent = {
-  user: StudentsResponse
+  student: StudentsResponse
 }
+
+export type TexpandStudentWithPackage = {
+  student: StudentsResponse & {
+    expand: {
+      monthly_package: MonthlyPackagesResponse;
+    };
+  };
+};
