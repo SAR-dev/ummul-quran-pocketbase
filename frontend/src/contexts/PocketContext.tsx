@@ -10,8 +10,8 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
-import { TexpandStudent, TexpandStudentWithPackage, TexpandUser } from "../types/extend";
+import { Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
+import { TexpandUser } from "../types/extend";
 
 interface DecodedToken {
     exp: number;
@@ -20,13 +20,13 @@ interface DecodedToken {
 const oneMinInMs = 60000;
 
 interface PocketContextType {
+    pb: TypedPocketBase;
     login: ({ email, password }: { email: string; password: string }) => Promise<void>;
     logout: () => void;
     user?: AuthModel;
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
-    fetchClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -83,26 +83,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setStudents(res)
     }, [pb]);
 
-    const fetchClassLogsData = async ({
-        start,
-        end
-    }: {
-        start: string,
-        end: string
-    }) => {
-        const userId = user?.id;
-        if (!userId) {
-            return [];
-        }
-        const res = await pb
-            .collection(Collections.ClassLogs)
-            .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
-                filter: `student.teacher.user.id = "${userId}" && start_at >= "${start}" && start_at < "${end}"`,
-                expand: "student, student.monthly_package",
-            });
-        return res
-    };
-
     const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
         await pb.collection(Collections.Users).authWithPassword(email, password);
     }, [pb]);
@@ -125,13 +105,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <PocketContext.Provider value={{
+            pb,
             login,
             logout,
             user,
             token,
             teacher,
-            students,
-            fetchClassLogsData
+            students
         }}>
             {children}
         </PocketContext.Provider>
