@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePocket } from "../contexts/PocketContext";
 import { Link } from "react-router-dom";
-import { ClassLogsResponse, Collections } from "../types/pocketbase";
+import { ClassLogsResponse } from "../types/pocketbase";
 import { TexpandStudentWithPackage } from "../types/extend";
 import { constants } from "../stores/constantStore";
 import NavLayout from "../layouts/NavLayout";

@@ -4,7 +4,7 @@ routerAdd("GET", "/api/hello/:name", (c) => {
     return c.json(200, { "message": "Hello " + name })
 })
 
-routerAdd("POST", "/api/class-logs/create", (c) => {
+routerAdd("POST", "/api/class-logs/create-by-routine", (c) => {
     const payload = $apis.requestInfo(c).data
 
     // helpers
@@ -18,8 +18,6 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
         'Friday',
         'Saturday',
     ];
-
-    const dateToUtc = (date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()} ${date.getUTCHours()}:${date.getUTCMinutes()}:00.000Z`
 
     const getDatesByWeekday = ({
         start_date,
@@ -86,6 +84,75 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
         })
     );
 
+    const collection = $app.dao().findCollectionByNameOrId("class_logs")
+
+    $app.dao().runInTransaction((txDao) => {
+        let checkData = null;
+
+        for (let data of payloads) {
+            const record = new Record(collection)
+
+            record.set("student", payload.student)
+            record.set("start_at", data.start_at)
+            record.set("finish_at", data.finish_at)
+
+            if (checkData == null) checkData = record;
+
+            txDao.saveRecord(record)
+        }
+
+        const teacherByStudent = $app.dao().findFirstRecordByData("students", "id", payload.student).get("teacher")
+        const teacherByAuth = $app.dao().findFirstRecordByData("teachers", "user", c.get("authRecord").get("id")).get("id")
+
+        const canAccess = teacherByStudent == teacherByAuth
+        if (!canAccess) {
+            throw new ForbiddenError()
+        }
+    })
+
+    return c.json(200, { "message": "Class log created" })
+})
+
+routerAdd("POST", "/api/class-logs/create-by-dates", (c) => {
+    const payload = $apis.requestInfo(c).data
+
+    // helpers
+
+    const getDate = ({
+        date,
+        start_at,
+        finish_at,
+        offset_hh_mm
+    }) => {
+        const currentDate = new Date(date)
+        return {
+            start_at: `${currentDate.toISOString().slice(0, 10)} ${start_at}:00.000${offset_hh_mm}`,
+            finish_at: `${currentDate.toISOString().slice(0, 10)} ${finish_at}:00.000${offset_hh_mm}`,
+        };
+    };
+
+    // validation start
+
+    const errorRoutines = payload.routine.filter(routine =>
+        Number(routine.finish_at?.replace(":", "")) != 0 &&
+        (Number(routine.finish_at?.replace(":", "")) < Number(routine.start_at.replace(":", "")))
+    )
+
+    if (errorRoutines.length > 0) {
+        const errorDays = errorRoutines.map(e => dayNames[e.weekday_index]).join(", ")
+        throw new ForbiddenError("Fix class times for " + errorDays)
+    }
+
+    // validation finish
+
+    const payloads = payload.routine.flatMap(routine =>
+        getDate({
+            date: routine.date,
+            start_at: routine.start_at,
+            finish_at: routine.finish_at,
+            offset_hh_mm: payload.offset_hh_mm
+        })
+    );
     const collection = $app.dao().findCollectionByNameOrId("class_logs")
 
     $app.dao().runInTransaction((txDao) => {
