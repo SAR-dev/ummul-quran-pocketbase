@@ -19,17 +19,7 @@ routerAdd("POST", "/api/class-logs/create", (c) => {
         'Saturday',
     ];
 
-    const formatDateToCustomString = (date) => {
-        const isoString = date.toISOString(); // "2013-10-07T08:23:19.120Z"
-        const formattedDate = isoString.replace('T', ' ').replace('Z', ''); // "2013-10-07 08:23:19.120"
-        
-        const offset = -date.getTimezoneOffset();
-        const sign = offset >= 0 ? '+' : '-';
-        const absOffsetHours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
-        const absOffsetMinutes = String(Math.abs(offset) % 60).padStart(2, '0');
-      
-        return `${formattedDate}${sign}${absOffsetHours}:${absOffsetMinutes}`;
-      }
+    const dateToUtc = (date) => `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()} ${date.getUTCHours()}:${date.getUTCMinutes()}:00.000Z`
 
     const getDatesByWeekday = ({
         start_date,

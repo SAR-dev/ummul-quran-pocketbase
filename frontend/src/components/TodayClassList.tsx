@@ -3,8 +3,8 @@ import { ClassLogsResponse } from '../types/pocketbase'
 import { TexpandStudentWithPackage } from '../types/extend'
 import { usePocket } from '../contexts/PocketContext';
 
-export const TodayClassList = ({ fetchClassLogsData }: { fetchClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]> }) => {
-    const { user, pb } = usePocket();
+export const TodayClassList = () => {
+    const { user, getClassLogsData } = usePocket();
     const [todayClassLogs, setTodayClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
 
     useEffect(() => {
@@ -14,16 +14,16 @@ export const TodayClassList = ({ fetchClassLogsData }: { fetchClassLogsData: ({ 
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
 
-        fetchClassLogsData({
+        getClassLogsData({
             start: `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`,
             end: `${tomorrow.getFullYear()}-${tomorrow.getMonth() + 1}-${tomorrow.getDate()}`
         })
-        .then(res => {
-            setTodayClassLogs(res)
-        })
-    }, [pb])
+            .then(res => {
+                setTodayClassLogs(res)
+            })
+    }, [])
 
     return (
-        <div></div>
+        <div>{todayClassLogs.length}</div>
     )
 }

@@ -331,3 +331,5 @@ export const filterWeekViewData = ({
         };
     });
 }
+
+export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.000Z`

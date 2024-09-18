@@ -10,51 +10,10 @@ import { CalendarDataType } from "../packages/EventCalendar/types/types";
 import { TodayClassList } from "../components/TodayClassList";
 
 export const HomePage = () => {
-  const { logout, user, teacher, students, pb } = usePocket();
+  const { logout, user, teacher, students, getClassLogsData } = usePocket();
   const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(2024)
   const [month, setMonth] = useState((new Date()).getMonth() + 1)
-
-  function formatDateToCustomString(date: Date) {
-    date.setHours(0, 0, 0, 0);
-    const pad = (num: number, size: number) => String(num).padStart(size, '0');
-
-    // Date components
-    const year = date.getUTCFullYear();
-    const month = pad(date.getUTCMonth() + 1, 2); // Months are zero-based
-    const day = pad(date.getUTCDate(), 2);
-
-    // Time components
-    const hours = pad(date.getUTCHours(), 2);
-    const minutes = pad(date.getUTCMinutes(), 2);
-    const seconds = pad(date.getUTCSeconds(), 2);
-    const milliseconds = pad(date.getUTCMilliseconds(), 3);
-    const microseconds = pad(Number(milliseconds) * 1000, 6); // Convert to microseconds
-
-    // UTC Offset (always Z for UTC)
-    const timezone = 'Z';
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${microseconds}${timezone}`;
-  }
-
-  const fetchClassLogsData = async ({ start, end }: { start: string, end: string }) => {
-    const userId = user?.id;
-    if (!userId) {
-      return [];
-    }
-
-    const startUTC = formatDateToCustomString(new Date(start));
-    const endUTC = formatDateToCustomString(new Date(end));
-
-    const res = await pb
-      .collection(Collections.ClassLogs)
-      .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
-        filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}"`,
-        expand: "student, student.monthly_package",
-        requestKey: `${userId}${startUTC}${endUTC}`
-      });
-    return res
-  };
 
   useEffect(() => {
     if (!user) return;
@@ -62,7 +21,7 @@ export const HomePage = () => {
     const cd = new Date(year, month - 1, 1);
     const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
 
-    fetchClassLogsData({
+    getClassLogsData({
       start: `${cd.getFullYear()}-${cd.getMonth() + 1}-01`,
       end: `${nd.getFullYear()}-${nd.getMonth() + 1}-01`
     })
@@ -87,7 +46,7 @@ export const HomePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 w-full">
         <div className="col-span-1 md:col-span-3">
           <div className="p-5 md:p-16 w-full grid grid-cols-1 gap-10">
-            <TodayClassList fetchClassLogsData={fetchClassLogsData} />
+            <TodayClassList />
             <EventCalendar data={sortedClassLogs} />
             {/* <StudentList /> */}
           </div>

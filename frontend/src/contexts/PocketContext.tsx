@@ -10,8 +10,9 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import { Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
-import { TexpandUser } from "../types/extend";
+import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
+import { TexpandStudentWithPackage, TexpandUser } from "../types/extend";
+import { dateToUtc } from "../packages/EventCalendar/helpers/calendar";
 
 interface DecodedToken {
     exp: number;
@@ -27,6 +28,7 @@ interface PocketContextType {
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
+    getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -101,6 +103,30 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [pb, token]);
 
+    function formatDateToCustomString(date: Date) {
+        date.setHours(0, 0, 0, 0);
+        return dateToUtc(date)
+    }
+
+    const getClassLogsData = useCallback(async ({ start, end }: { start: string, end: string }) => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+
+        const startUTC = formatDateToCustomString(new Date(start));
+        const endUTC = formatDateToCustomString(new Date(end));
+
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
+                filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}"`,
+                expand: "student, student.monthly_package",
+                requestKey: `${userId}${startUTC}${endUTC}`
+            });
+        return res
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -111,7 +137,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             user,
             token,
             teacher,
-            students
+            students,
+            getClassLogsData
         }}>
             {children}
         </PocketContext.Provider>
