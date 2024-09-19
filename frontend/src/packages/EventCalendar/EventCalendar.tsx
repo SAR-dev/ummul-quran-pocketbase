@@ -15,7 +15,7 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
 
   return (
-    <div>
+    <div className='card border border-base-300 p-5'>
       <div className="w-full flex justify-between items-center mb-3">
         <div className="flex gap-3">
           <select

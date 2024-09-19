@@ -121,7 +121,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
                 filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}"`,
-                expand: "student, student.monthly_package",
+                expand: "student, student.user, student.monthly_package",
                 requestKey: `${userId}${startUTC}${endUTC}`
             });
         return res

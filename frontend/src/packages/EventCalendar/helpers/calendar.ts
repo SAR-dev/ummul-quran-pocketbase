@@ -333,3 +333,12 @@ export const filterWeekViewData = ({
 }
 
 export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.000Z`
+
+export const getTimeIn12HourFormat = (val: string) => {
+    const date = new Date(val);
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`
+
+}

@@ -12,6 +12,7 @@ export type TexpandStudentWithPackage = {
   student: StudentsResponse & {
     expand: {
       monthly_package: MonthlyPackagesResponse;
+      user: UsersResponse;
     };
   };
 };
