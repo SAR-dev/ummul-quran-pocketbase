@@ -35,6 +35,9 @@ export const HomePage = () => {
       .map(log => ({
         id: log.id,
         title: log.expand?.student.nickname ?? "",
+        student: log.expand?.student.nickname ?? "",
+        student_mobile: log.expand?.student.mobile_no ?? "",
+        class_mins: log.expand?.student.expand.monthly_package.class_mins ?? 0,
         start_at: log.start_at,
         end_at: log.finish_at,
         completed: log.completed
