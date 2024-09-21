@@ -29,8 +29,8 @@ interface PocketContextType {
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
     timeZones: TimezonesResponse[];
-    getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
-    getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>
+    getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -161,7 +161,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             students,
             timeZones,
             getClassLogsData,
-            getClassLogDataById
+            getClassLogDataById,
         }}>
             {children}
         </PocketContext.Provider>

@@ -183,27 +183,83 @@ routerAdd("POST", "/api/class-logs/create-by-dates", (c) => {
 })
 
 routerAdd("POST", "/api/class-logs/start", (c) => {
+    const payload = $apis.requestInfo(c).data
+
+    const id = payload.id
+    if (!id) throw ForbiddenError();
+
+    // helpers
+
+    function getCurrentTime() {
+        const now = new Date();
+        const date = now.toISOString().slice(0, 10); // "YYYY-MM-DD"
+        const time = now.toISOString().slice(11, 23); // "HH:mm:ss.SSS"
+        return `${date} ${time}Z`;
+    }
+
+    const record = $app.dao().findRecordById("class_logs", id)
+
     $app.dao().runInTransaction((txDao) => {
+        record.set("started", true)
+        record.set("start_at", getCurrentTime())
+
+        txDao.saveRecord(record)
+
+        const teacherByStudent = $app.dao().findFirstRecordByData("students", "id", record.get("student")).get("teacher")
+        const teacherByAuth = $app.dao().findFirstRecordByData("teachers", "user", c.get("authRecord").get("id")).get("id")
+
+        const canAccess = teacherByStudent == teacherByAuth
+        if (!canAccess) {
+            throw new ForbiddenError()
+        }
 
     })
 
     return c.json(200, { "message": "Class log started" })
 })
 
-routerAdd("POST", "/api/class-logs/update", (c) => {
+routerAdd("POST", "/api/class-logs/finish", (c) => {
+    const payload = $apis.requestInfo(c).data
+
+    const id = payload.id
+    if (!id) throw ForbiddenError();
+
+    // helpers
+
+    function getCurrentTime() {
+        const now = new Date();
+        const date = now.toISOString().slice(0, 10); // "YYYY-MM-DD"
+        const time = now.toISOString().slice(11, 23); // "HH:mm:ss.SSS"
+        return `${date} ${time}Z`;
+    }
+
+    const record = $app.dao().findRecordById("class_logs", id)
+
+    const student = $app.dao().findRecordById("students", record.get("student"))
+    const monthly_package = $app.dao().findRecordById("monthly_packages", student.get("monthly_package"))
+    
     $app.dao().runInTransaction((txDao) => {
+        record.set("cp_teacher", student.get("teacher"))
+        record.set("cp_class_mins", monthly_package.get("class_mins"))
+        record.set("cp_teachers_price", monthly_package.get("teachers_price"))
+        record.set("cp_students_price", monthly_package.get("students_price"))
+        record.set("started", true)
+        record.set("completed", true)
+        record.set("finish_at", getCurrentTime())
+
+        txDao.saveRecord(record)
+
+        const teacherByStudent = $app.dao().findFirstRecordByData("students", "id", record.get("student")).get("teacher")
+        const teacherByAuth = $app.dao().findFirstRecordByData("teachers", "user", c.get("authRecord").get("id")).get("id")
+
+        const canAccess = teacherByStudent == teacherByAuth
+        if (!canAccess) {
+            throw new ForbiddenError()
+        }
 
     })
 
-    return c.json(200, { "message": "Class log started" })
-})
-
-routerAdd("POST", "/api/class-logs/complete", (c) => {
-    $app.dao().runInTransaction((txDao) => {
-
-    })
-
-    return c.json(200, { "message": "Class log started" })
+    return c.json(200, { "message": "Class log finished" })
 })
 
 
