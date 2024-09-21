@@ -21,13 +21,10 @@ export const HomePage = () => {
     const cd = new Date(year, month - 1, 1);
     const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
 
-    getClassLogsData({
-      start: `${cd.getFullYear()}-${cd.getMonth() + 1}-01`,
-      end: `${nd.getFullYear()}-${nd.getMonth() + 1}-01`
-    })
-      .then(res => {
-        setClassLogs(res)
-      })
+    const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
+    const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
+
+    getClassLogsData({ start, end }).then(res => setClassLogs(res))
   }, [user, year, month])
 
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {

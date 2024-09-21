@@ -340,5 +340,12 @@ export const getTimeIn12HourFormat = (val: string) => {
     const minutes = date.getMinutes()
     const ampm = hours >= 12 ? 'PM' : 'AM'
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`
-
 }
+
+export const getDateFromString = (dateString: string): string => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = months[date.getMonth()].shortName
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${day} ${month}, ${year}`;
+};

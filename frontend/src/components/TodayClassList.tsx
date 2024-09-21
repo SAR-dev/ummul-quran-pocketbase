@@ -6,6 +6,7 @@ import { CheckCircleIcon, BellAlertIcon, ShieldExclamationIcon } from '@heroicon
 import { ArrowRightIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
 import { getTimeIn12HourFormat } from '../packages/EventCalendar/helpers/calendar';
 import WhatsAppIcon from "../assets/whatsapp.png"
+import { Link } from 'react-router-dom';
 
 export const TodayClassList = () => {
     const { user, getClassLogsData } = usePocket();
@@ -41,7 +42,7 @@ export const TodayClassList = () => {
                                 <CheckCircleIcon className='w-5 h-5 text-success' />
                             ) : (
                                 <>
-                                    {(new Date(e.start_at)) > (new Date()) ? (
+                                    {(new Date(e.start_at)) < (new Date()) ? (
                                         <ShieldExclamationIcon className='w-5 h-5 text-warning' />
                                     ) : (
                                         <svg className="inline w-5 h-5 text-base-100 animate-spin fill-info" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -71,9 +72,9 @@ export const TodayClassList = () => {
                             <button className="btn btn-sm btn-icon btn-square bg-base-100">
                                 <TrashIcon className='h-5 w-5' />
                             </button>
-                            <button className="btn btn-sm btn-icon btn-square bg-base-100">
+                            <Link to={`/class-details/${e.id}`} className="btn btn-sm btn-icon btn-square bg-base-100">
                                 <ArrowRightIcon className='h-5 w-5' />
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}

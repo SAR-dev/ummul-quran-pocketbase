@@ -2,6 +2,8 @@ import { useMemo } from "react"
 import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../helpers/calendar"
 import { CalendarDataType } from "../types/types";
 import classNames from "classnames";
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 const MonthView = ({
     year,
@@ -79,6 +81,21 @@ const MonthView = ({
                     ))}
                 </div>
             ))}
+            {/* <Dialog open={isOpen} onClose={remove} className="relative z-20">
+                <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
+                <div className="fixed inset-0 flex w-screen items-center justify-center">
+                    <DialogPanel className="card p-4 bg-base-100 max-w-md">
+                        {data.status !== NotificationType.LOADING && (
+                            <button className="btn btn-square btn-sm absolute top-0 right-0 m-3" onClick={() => setIsOpen(false)}>
+                                <XMarkIcon className='h-5 w-5' />
+                            </button>
+                        )}
+                        <div className='flex flex-col gap-3 p-5'>
+
+                        </div>
+                    </DialogPanel>
+                </div>
+            </Dialog> */}
         </div>
     )
 }

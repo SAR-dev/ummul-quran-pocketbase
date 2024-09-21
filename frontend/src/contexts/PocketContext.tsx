@@ -29,6 +29,7 @@ interface PocketContextType {
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
     getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
+    getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -127,6 +128,16 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
+    const getClassLogDataById = useCallback(async ({ id }: { id: string }) => {
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getOne<ClassLogsResponse<TexpandStudentWithPackage>>(id, {
+                expand: "student, student.user, student.monthly_package",
+                requestKey: `${id}`
+            });
+        return res
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -138,7 +149,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             token,
             teacher,
             students,
-            getClassLogsData
+            getClassLogsData,
+            getClassLogDataById
         }}>
             {children}
         </PocketContext.Provider>
