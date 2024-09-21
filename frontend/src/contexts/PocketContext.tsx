@@ -10,7 +10,7 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TypedPocketBase } from "../types/pocketbase";
+import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TimezonesResponse, TypedPocketBase } from "../types/pocketbase";
 import { TexpandStudentWithPackage, TexpandUser } from "../types/extend";
 import { dateToUtc } from "../packages/EventCalendar/helpers/calendar";
 
@@ -28,6 +28,7 @@ interface PocketContextType {
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
     students: StudentsResponse<TexpandUser>[];
+    timeZones: TimezonesResponse[];
     getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>
 }
@@ -41,6 +42,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState(pb.authStore.model);
     const [teacher, setTeacher] = useState<TeachersResponse<TexpandUser>>()
     const [students, setStudents] = useState<StudentsResponse<TexpandUser>[]>([])
+    const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
 
     useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
@@ -49,6 +51,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         });
         fetchTeacherData()
         fetchStudentListData()
+        fetchTimezoneListData()
     }, [pb]);
 
     const fetchTeacherData = useCallback(async () => {
@@ -84,6 +87,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
                 expand: "user",
             });
         setStudents(res)
+    }, [pb]);
+
+    const fetchTimezoneListData = useCallback(async () => {
+        const res = await pb
+            .collection(Collections.Timezones)
+            .getFullList<TimezonesResponse>();
+        setTimeZones(res)
     }, [pb]);
 
     const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
@@ -149,6 +159,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             token,
             teacher,
             students,
+            timeZones,
             getClassLogsData,
             getClassLogDataById
         }}>

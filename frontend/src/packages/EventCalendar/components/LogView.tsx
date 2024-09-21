@@ -2,16 +2,15 @@ import { getDateFromString, getTimeIn12HourFormat } from "../helpers/calendar";
 import { CalendarDataType } from "../types/types";
 import { ArrowRightIcon, CheckCircleIcon, ShieldExclamationIcon } from "@heroicons/react/24/solid";
 import { CalendarIcon, TrashIcon, UserIcon } from "@heroicons/react/24/outline";
-import WhatsAppIcon from "../../../assets/whatsapp.png"
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import WhatsAppButton from "../../../components/WhatsAppButton";
 
 const LogView = ({
     data
 }: {
     data: CalendarDataType[]
 }) => {
-    const navigate = useNavigate()
     const groupedData = useMemo(() => {
         return data.reduce((acc, item) => {
             const date = getDateFromString(item.start_at);
@@ -53,10 +52,7 @@ const LogView = ({
                                     </div>
                                 </div>
                                 <div className="w-48 flex-shrink-0">
-                                    <button className='btn btn-icon bg-base-100 btn-sm'>
-                                        <img src={WhatsAppIcon} className='h-6' alt="" />
-                                        {e.student_mobile}
-                                    </button>
+                                    <WhatsAppButton mobile_no={e.student_mobile} />
                                 </div>
                                 <div className="w-32 flex-shrink-0">
                                     <b>{e.class_mins} Mins</b> class

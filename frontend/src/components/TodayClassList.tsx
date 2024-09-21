@@ -7,6 +7,7 @@ import { ArrowRightIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline
 import { getTimeIn12HourFormat } from '../packages/EventCalendar/helpers/calendar';
 import WhatsAppIcon from "../assets/whatsapp.png"
 import { Link } from 'react-router-dom';
+import WhatsAppButton from './WhatsAppButton';
 
 export const TodayClassList = () => {
     const { user, getClassLogsData } = usePocket();
@@ -60,10 +61,7 @@ export const TodayClassList = () => {
                             </div>
                         </div>
                         <div className="w-48 flex-shrink-0">
-                            <button className='btn btn-icon bg-base-100 btn-sm'>
-                                <img src={WhatsAppIcon} className='h-6' alt="" />
-                                {e.expand?.student.mobile_no}
-                            </button>
+                            <WhatsAppButton mobile_no={e.expand?.student.mobile_no} />
                         </div>
                         <div className="w-48 flex-shrink-0">
                             <b>{e.expand?.student.expand.monthly_package.class_mins} Mins</b> class, From <b>{getTimeIn12HourFormat(e.start_at)}</b>

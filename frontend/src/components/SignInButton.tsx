@@ -2,7 +2,7 @@ import { usePocket } from '../contexts/PocketContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
 import DropdownSelect from './DropDownSelect';
-import { getImageUrl } from '../helpers';
+import { getImageUrl } from '../packages/EventCalendar/helpers/base';
 
 const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
     const notification = useNotification()

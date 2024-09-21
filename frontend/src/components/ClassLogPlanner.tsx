@@ -3,7 +3,7 @@ import { usePocket } from '../contexts/PocketContext';
 import { constants } from '../stores/constantStore';
 import "react-multi-date-picker/styles/layouts/mobile.css";
 import { Calendar, DateObject } from "react-multi-date-picker";
-import { getTimeOffset } from '../helpers';
+import { getTimeOffset } from '../packages/EventCalendar/helpers/calendar';
 
 interface ClassLogDataType {
     student: string;

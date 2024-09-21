@@ -1,4 +1,4 @@
-import { MonthlyPackagesResponse, StudentsResponse, UsersResponse } from "./pocketbase"
+import { MonthlyPackagesResponse, StudentsResponse, TimezonesResponse, UsersResponse } from "./pocketbase"
 
 export type TexpandUser = {
   user: UsersResponse

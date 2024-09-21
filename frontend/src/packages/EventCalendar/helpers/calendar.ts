@@ -349,3 +349,22 @@ export const getDateFromString = (dateString: string): string => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${day} ${month}, ${year}`;
 };
+
+export const getTimeOffset = () => {
+    const offset = new Date().getTimezoneOffset(); // Get the offset in minutes
+    const sign = offset <= 0 ? '+' : '-'; // Determine the sign
+    const absOffsetHours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0'); // Absolute hours with leading zero
+    const absOffsetMinutes = String(Math.abs(offset) % 60).padStart(2, '0'); // Absolute minutes with leading zero
+
+    return `${sign}${absOffsetHours}:${absOffsetMinutes}`;
+}
+
+export const formatTimezoneOffset = (offset?: number) => {
+    if(!offset) return;
+    const sign = offset >= 0 ? "+" : "-";
+    const absOffset = Math.abs(offset);
+    const hours = Math.floor(absOffset).toString().padStart(2, "0");
+    const minutes = ((absOffset * 60) % 60).toString().padStart(2, "0");
+    
+    return `${sign}${hours}:${minutes}`;
+}

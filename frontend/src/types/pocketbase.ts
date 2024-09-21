@@ -46,6 +46,7 @@ export type ClassLogsRecord = {
 	cp_teachers_price?: number
 	finish_at?: IsoDateString
 	start_at?: IsoDateString
+	started?: boolean
 	student: RecordIdString
 	topic?: string
 }
@@ -81,6 +82,7 @@ export type TimezonesRecord = {
 
 export type UsersRecord = {
 	avatar?: string
+	location?: string
 	timezone?: RecordIdString
 }
 
