@@ -22,6 +22,7 @@ const oneMinInMs = 60000;
 
 interface PocketContextType {
     pb: TypedPocketBase;
+    refresh: number;
     login: ({ email, password }: { email: string; password: string }) => Promise<void>;
     logout: () => void;
     user?: AuthModel;
@@ -38,6 +39,7 @@ const PocketContext = createContext<PocketContextType | undefined>(undefined);
 
 export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const pb = useMemo(() => new PocketBase(import.meta.env.VITE_API_URL) as TypedPocketBase, []);
+    const [refresh, setRefresh] = useState(1)
 
     const [token, setToken] = useState<string | null>(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
@@ -153,6 +155,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         await pb
             .collection(Collections.ClassLogs)
             .delete(id);
+        setRefresh(refresh + 1)
     }, [pb]);
 
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
@@ -160,6 +163,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     return (
         <PocketContext.Provider value={{
             pb,
+            refresh,
             login,
             logout,
             user,

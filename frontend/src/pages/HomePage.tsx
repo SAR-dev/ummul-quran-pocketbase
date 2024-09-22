@@ -10,7 +10,7 @@ import { CalendarDataType } from "../packages/EventCalendar/types/types";
 import { TodayClassList } from "../components/TodayClassList";
 
 export const HomePage = () => {
-  const { logout, user, teacher, students, getClassLogsData } = usePocket();
+  const { refresh, logout, user, teacher, students, getClassLogsData } = usePocket();
   const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(2024)
   const [month, setMonth] = useState((new Date()).getMonth() + 1)
@@ -25,7 +25,7 @@ export const HomePage = () => {
     const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
 
     getClassLogsData({ start, end }).then(res => setClassLogs(res))
-  }, [user, year, month])
+  }, [user, year, month, refresh])
 
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
     return classLogs

@@ -12,34 +12,24 @@ import { NotificationType } from '../types/notification';
 
 export const TodayClassList = () => {
     const notification = useNotification()
-    const { user, getClassLogsData, deleteClassLogById } = usePocket();
+    const { refresh, user, getClassLogsData, deleteClassLogById } = usePocket();
     const [todayClassLogs, setTodayClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
 
     useEffect(() => {
         if (!user) return;
 
-        getTodayClassLogs()
-    }, [])
-
-    const getTodayClassLogs = () => {
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
 
-        getClassLogsData({
-            start: `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`,
-            end: `${tomorrow.getFullYear()}-${tomorrow.getMonth() + 1}-${tomorrow.getDate()}`
-        })
-            .then(res => {
-                setTodayClassLogs(res)
-            })
-    }
+        const start = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
+        const end = `${tomorrow.getFullYear()}-${tomorrow.getMonth() + 1}-${tomorrow.getDate()}`
+
+        getClassLogsData({ start, end }).then(res => setTodayClassLogs(res))
+    }, [refresh])
 
     const deleteClassLog = (id: string) => {
-        deleteClassLogById({ id }).then(() => {
-            getTodayClassLogs()
-            notification.remove()
-        })
+        deleteClassLogById({ id }).then(() => notification.remove())
     }
 
     const handleDeleteModal = (id: string) => {
