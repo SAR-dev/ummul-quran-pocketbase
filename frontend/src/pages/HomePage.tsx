@@ -4,6 +4,7 @@ import ClassCalendar from "../components/ClassCalendar/ClassCalendar";
 import { TodayClassList } from "../components/TodayClassList";
 import TeacherInfo from "../components/TeacherInfo";
 import StudentList from "../components/StudentList";
+import ClassStats from "../components/ClassStats";
 
 export const HomePage = () => {
   const { user, teacher, students } = usePocket();
@@ -21,10 +22,9 @@ export const HomePage = () => {
           <div className="grid grid-cols-1 gap-10">
             <TeacherInfo />
             <StudentList />
+            <ClassStats />
+            {/* class + earning pending, upcoming, today */}
           </div>
-          {/* teacher details */}
-          {/* student list */}
-          {/* earning list */}
         </div>
       </div>
       <section className="flex flex-col gap-5 p-5">
