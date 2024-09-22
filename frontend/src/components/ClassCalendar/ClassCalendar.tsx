@@ -19,6 +19,7 @@ const ClassCalendar = () => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [date, setDate] = useState(new Date().getDate())
+
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
   const [isOpen, setIsOpen] = useState(false)
   
@@ -106,7 +107,7 @@ const ClassCalendar = () => {
         </div>
       </div>
       {view == CalendarViewTypes.DAY && <DayView year={year} month={month} date={date} data={sortedClassLogs} />}
-      {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} data={sortedClassLogs} />}
+      {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} setDate={setDate} setView={setView} data={sortedClassLogs} />}
       {view == CalendarViewTypes.LOGS && <LogView data={sortedClassLogs} />}
       <div className="flex gap-3 mt-3">
         <button className="btn btn-sm btn-icon btn-outline border-base-300" onClick={() => setIsOpen(true)}>
@@ -122,7 +123,7 @@ const ClassCalendar = () => {
         <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
         <div className="fixed inset-0 flex w-screen items-center justify-center">
           <DialogPanel className="card p-2 bg-base-100">
-            <div className="scrollbar-thin overflow-y-scroll p-3 max-h-[90vh]">
+            <div className="scrollbar-thin overflow-y-auto p-3 max-h-[90vh]">
               <InvoiceGenerator data={sortedClassLogs} />
             </div>
           </DialogPanel>

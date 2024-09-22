@@ -13,11 +13,12 @@ export const HomePage = () => {
           <div className="p-5 md:p-16 w-full grid grid-cols-1 gap-10">
             <TodayClassList />
             <ClassCalendar />
-            {/* <StudentList /> */}
           </div>
         </div>
         <div className="col-span-1 p-5 md:py-16">
-          {/* <ClassHistory /> */}
+          {/* teacher details */}
+          {/* student list */}
+          {/* earning list */}
         </div>
       </div>
       <section className="flex flex-col gap-5 p-5">

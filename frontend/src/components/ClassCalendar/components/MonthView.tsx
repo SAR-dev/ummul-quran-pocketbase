@@ -1,17 +1,21 @@
 import { useMemo } from "react"
 import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../../../helpers/calendar"
-import { CalendarDataType } from "../../../types/calendar";
+import { CalendarDataType, CalendarViewTypes } from "../../../types/calendar";
 import classNames from "classnames";
 
 const MonthView = ({
     year,
     month,
     date,
+    setDate,
+    setView,
     data
 }: {
     year: number,
     month: number,
     date: number,
+    setDate: (props: number) => void,
+    setView: (props: CalendarViewTypes) => void,
     data: CalendarDataType[]
 }) => {
     const weeksByYearAndMonth = useMemo(
@@ -50,6 +54,14 @@ const MonthView = ({
         [weeksByYearAndMonth, data]
     );
 
+    const handleSelectDate = ({weekNo, weekDayIndex}:{weekNo: number, weekDayIndex: number}) => {
+        const found = datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekDayIndex);
+        console.log(found)
+        if(!found || Number(found.date) <= 0) return;
+        setDate(Number(found.date))
+        setView(CalendarViewTypes.DAY)
+    }
+
     return (
         <div className="flex flex-col relative border-y border-base-300 divide-y divide-base-300">
             <div className="w-full grid grid-cols-7 border-l border-base-300 text-sm font-medium sticky top-0">
@@ -62,7 +74,11 @@ const MonthView = ({
             {weeks.map((weekNo) => (
                 <div className="w-full grid grid-cols-7 border-l border-base-300 text-sm font-medium" key={weekNo}>
                     {weekdays.map((weekday, i) => (
-                        <div className={`h-20 relative flex flex-col gap-1 justify-center items-center w-full bg-base-100 border-r border-base-300 hover:bg-warning/50 cursor-pointer ${getDateOfBox(weekNo, weekday.index) == date ? "bg-warning/50" : ""}`} key={i}>
+                        <div 
+                            className={`h-20 relative flex flex-col gap-1 justify-center items-center w-full bg-base-100 border-r border-base-300 hover:bg-warning/50 cursor-pointer ${getDateOfBox(weekNo, weekday.index) == date ? "bg-warning/50" : ""}`} 
+                            onClick={() => handleSelectDate({weekNo, weekDayIndex: weekday.index})}
+                            key={i}
+                        >
                             {datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.date}
                             {datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekday.index)?.date && (
                                 <div className="w-full flex items-center justify-center">
@@ -79,21 +95,6 @@ const MonthView = ({
                     ))}
                 </div>
             ))}
-            {/* <Dialog open={isOpen} onClose={remove} className="relative z-20">
-                <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
-                <div className="fixed inset-0 flex w-screen items-center justify-center">
-                    <DialogPanel className="card p-4 bg-base-100 max-w-md">
-                        {data.status !== NotificationType.LOADING && (
-                            <button className="btn btn-square btn-sm absolute top-0 right-0 m-3" onClick={() => setIsOpen(false)}>
-                                <XMarkIcon className='h-5 w-5' />
-                            </button>
-                        )}
-                        <div className='flex flex-col gap-3 p-5'>
-
-                        </div>
-                    </DialogPanel>
-                </div>
-            </Dialog> */}
         </div>
     )
 }
