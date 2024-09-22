@@ -8,12 +8,15 @@ import { CalculatorIcon, PrinterIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom"
 import { useLocalStorage } from "usehooks-ts"
 import LogView from "./components/LogView"
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react"
+import { MonthlyInvoice } from "./components/MonthlyInvoice"
 
 const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [date, setDate] = useState(new Date().getDate())
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className='card border border-base-300 p-5'>
@@ -81,7 +84,7 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
       {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} data={data} />}
       {view == CalendarViewTypes.LOGS && <LogView data={data} />}
       <div className="flex gap-3 mt-3">
-        <button className="btn btn-sm btn-icon btn-outline border-base-300">
+        <button className="btn btn-sm btn-icon btn-outline border-base-300" onClick={() => setIsOpen(true)}>
           <PrinterIcon className="h-4 w-4" />
           Print Receipt
         </button>
@@ -90,6 +93,14 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
           Class Planner
         </Link>
       </div>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-20">
+        <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
+        <div className="fixed inset-0 flex w-screen items-center justify-center">
+          <DialogPanel className="card p-5 bg-base-100">
+            <MonthlyInvoice data={data} />
+          </DialogPanel>
+        </div>
+      </Dialog>
     </div>
   )
 }

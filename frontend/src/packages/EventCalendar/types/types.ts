@@ -11,6 +11,8 @@ export interface CalendarDataType {
     class_mins: number;
     finish_at?: string;
     completed?: boolean;
+    teachers_price?: number;
+    students_price?: number;
 }
 
 export interface TimeRangeType {

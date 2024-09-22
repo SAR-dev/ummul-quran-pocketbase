@@ -37,7 +37,9 @@ export const HomePage = () => {
         class_mins: log.expand?.student.expand.monthly_package.class_mins ?? 0,
         start_at: log.start_at,
         end_at: log.finish_at,
-        completed: log.completed
+        completed: log.completed,
+        teachers_price: log.cp_teachers_price,
+        students_price: log.cp_students_price
       }));
   }, [classLogs]);
 

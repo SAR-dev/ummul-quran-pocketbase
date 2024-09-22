@@ -2,8 +2,6 @@ import { useMemo } from "react"
 import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../helpers/calendar"
 import { CalendarDataType } from "../types/types";
 import classNames from "classnames";
-import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/solid";
 
 const MonthView = ({
     year,
