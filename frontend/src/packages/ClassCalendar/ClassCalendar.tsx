@@ -1,22 +1,54 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { months, getYearsRange, getDaysOfMonth } from "./helpers/calendar"
 import { CalendarDataType, CalendarViewTypes } from "./types/types"
 import MonthView from "./components/MonthView"
-import WeekView from "./components/WeekView"
 import DayView from "./components/DayView"
 import { CalculatorIcon, PrinterIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom"
 import { useLocalStorage } from "usehooks-ts"
 import LogView from "./components/LogView"
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react"
-import { MonthlyInvoice } from "./components/MonthlyInvoice"
+import { InvoiceGenerator } from "./components/InvoiceGenerator"
+import { TexpandStudentWithPackage } from "../../types/extend"
+import { ClassLogsResponse } from "../../types/pocketbase"
+import { usePocket } from "../../contexts/PocketContext"
 
-const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
+const ClassCalendar = () => {
+  const { refresh, user, getClassLogsData } = usePocket();
+  const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [date, setDate] = useState(new Date().getDate())
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
   const [isOpen, setIsOpen] = useState(false)
+  
+  useEffect(() => {
+    if (!user) return;
+
+    const cd = new Date(year, month - 1, 1);
+    const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+    const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
+    const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
+
+    getClassLogsData({ start, end }).then(res => setClassLogs(res))
+  }, [user, year, month, refresh])
+
+  const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
+    return classLogs
+      .map(log => ({
+        id: log.id,
+        title: log.expand?.student.nickname ?? "",
+        student: log.expand?.student.nickname ?? "",
+        student_mobile: log.expand?.student.mobile_no ?? "",
+        class_mins: log.expand?.student.expand.monthly_package.class_mins ?? 0,
+        start_at: log.start_at,
+        finish_at: log.finish_at,
+        completed: log.completed,
+        teachers_price: log.cp_teachers_price,
+        students_price: log.cp_students_price
+      }));
+  }, [classLogs]);
 
   return (
     <div className='card border border-base-300 p-5'>
@@ -60,12 +92,6 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
             Day
           </button>
           <button
-            className={`btn btn-sm join-item ${view === CalendarViewTypes.WEEK ? "btn-active" : ""}`}
-            onClick={() => setView(CalendarViewTypes.WEEK)}
-          >
-            Week
-          </button>
-          <button
             className={`btn btn-sm join-item ${view === CalendarViewTypes.MONTH ? "btn-active" : ""}`}
             onClick={() => setView(CalendarViewTypes.MONTH)}
           >
@@ -79,14 +105,13 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
           </button>
         </div>
       </div>
-      {view == CalendarViewTypes.DAY && <DayView year={year} month={month} date={date} data={data} />}
-      {view == CalendarViewTypes.WEEK && <WeekView year={year} month={month} date={date} data={data} />}
-      {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} data={data} />}
-      {view == CalendarViewTypes.LOGS && <LogView data={data} />}
+      {view == CalendarViewTypes.DAY && <DayView year={year} month={month} date={date} data={sortedClassLogs} />}
+      {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} data={sortedClassLogs} />}
+      {view == CalendarViewTypes.LOGS && <LogView data={sortedClassLogs} />}
       <div className="flex gap-3 mt-3">
         <button className="btn btn-sm btn-icon btn-outline border-base-300" onClick={() => setIsOpen(true)}>
           <PrinterIcon className="h-4 w-4" />
-          Monthly Invoice
+          Get Invoice
         </button>
         <Link to="/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
           <CalculatorIcon className="h-4 w-4" />
@@ -98,7 +123,7 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
         <div className="fixed inset-0 flex w-screen items-center justify-center">
           <DialogPanel className="card p-2 bg-base-100">
             <div className="scrollbar-thin overflow-y-scroll p-3 max-h-[90vh]">
-              <MonthlyInvoice data={data} />
+              <InvoiceGenerator data={sortedClassLogs} />
             </div>
           </DialogPanel>
         </div>
@@ -107,4 +132,4 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
   )
 }
 
-export default EventCalendar
+export default ClassCalendar

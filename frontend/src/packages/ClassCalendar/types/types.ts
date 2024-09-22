@@ -1,5 +1,5 @@
 export enum CalendarViewTypes {
-    DAY, WEEK, MONTH, LOGS
+    DAY,  MONTH, LOGS
 }
 
 export interface CalendarDataType {

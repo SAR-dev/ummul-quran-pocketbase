@@ -61,7 +61,7 @@ const LogView = ({
                                     <b>{e.class_mins} Mins</b> class
                                 </div>
                                 <div className="w-40 flex-shrink-0">
-                                    <b>{getTimeIn12HourFormat(e.start_at)}</b> - {e.finish_at ? <b>getTimeIn12HourFormat(e.finish_at)</b> : "Not set yet"}
+                                    <b>{getTimeIn12HourFormat(e.start_at)}</b> - {e.finish_at ? <b>{getTimeIn12HourFormat(e.finish_at)}</b> : "Not set yet"}
                                 </div>
                                 <div className='flex gap-2 items-center ml-auto'>
                                     <button className="btn btn-sm btn-icon btn-square bg-base-100">

@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
 import { constants } from '../stores/constantStore';
-import { getTimeOffset } from '../packages/EventCalendar/helpers/calendar';
+import { getTimeOffset } from '../packages/ClassCalendar/helpers/calendar';
 
 interface RoutineDataType {
     student: string;

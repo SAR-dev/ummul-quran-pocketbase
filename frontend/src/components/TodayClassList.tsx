@@ -4,7 +4,7 @@ import { TexpandStudentWithPackage } from '../types/extend'
 import { usePocket } from '../contexts/PocketContext';
 import { CheckCircleIcon, BellAlertIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import { ArrowRightIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
-import { getTimeIn12HourFormat } from '../packages/EventCalendar/helpers/calendar';
+import { getTimeIn12HourFormat } from '../packages/ClassCalendar/helpers/calendar';
 import { Link } from 'react-router-dom';
 import WhatsAppButton from './WhatsAppButton';
 import { useNotification } from '../contexts/NotificationContext';

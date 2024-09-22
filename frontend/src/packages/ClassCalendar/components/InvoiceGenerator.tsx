@@ -3,7 +3,7 @@ import { CalendarDataType } from '../types/types'
 import { useReactToPrint } from "react-to-print";
 import { PrinterIcon } from '@heroicons/react/24/outline';
 
-export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
+export const InvoiceGenerator = ({ data }: { data: CalendarDataType[] }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
