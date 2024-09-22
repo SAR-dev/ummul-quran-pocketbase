@@ -1,6 +1,6 @@
 import { usePocket } from "../contexts/PocketContext";
 import NavLayout from "../layouts/NavLayout";
-import ClassCalendar from "../packages/ClassCalendar/ClassCalendar";
+import ClassCalendar from "../components/ClassCalendar/ClassCalendar";
 import { TodayClassList } from "../components/TodayClassList";
 
 export const HomePage = () => {

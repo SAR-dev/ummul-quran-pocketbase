@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { CalendarDataType } from '../types/types'
+import { CalendarDataType } from '../../../types/calendar'
 import { useReactToPrint } from "react-to-print";
 import { PrinterIcon } from '@heroicons/react/24/outline';
 

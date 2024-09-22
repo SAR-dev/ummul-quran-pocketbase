@@ -12,7 +12,7 @@ import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
 import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TimezonesResponse, TypedPocketBase } from "../types/pocketbase";
 import { TexpandStudentWithPackage, TexpandUser } from "../types/extend";
-import { dateToUtc } from "../packages/ClassCalendar/helpers/calendar";
+import { dateToUtc } from "../helpers/calendar";
 
 interface DecodedToken {
     exp: number;

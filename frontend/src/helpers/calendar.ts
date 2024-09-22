@@ -1,4 +1,4 @@
-import { CalendarDataType, TimeRangeEventsType, TimeRangeType } from "../types/types";
+import { CalendarDataType, TimeRangeEventsType, TimeRangeType } from "../types/calendar";
 
 export const weekdays = [
     {
@@ -192,43 +192,6 @@ export const getWeeksByYearAndMonth = (year: number, month: number) => {
     return weeks;
 };
 
-export const getWeekByYearMonthAndDate = ({
-    year,
-    month,
-    date
-}: {
-    year: number,
-    month: number,
-    date: number
-}) => {
-    // Create a date object for the given date
-    const inputDate = new Date(year, month - 1, date);
-
-    // Find the day of the week for the given date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    const dayOfWeek = inputDate.getDay();
-
-    // Calculate how many days to subtract to get to the Monday of that week
-    const daysToMonday = (dayOfWeek + 6) % 7; // This will give us the offset from Sunday to Monday
-
-    // Create a new date object for the Monday of that week
-    const mondayDate = new Date(inputDate);
-    mondayDate.setDate(inputDate.getDate() - daysToMonday);
-
-    // Generate the week dates starting from Monday
-    const weekDates = [];
-    for (let i = 0; i < 7; i++) {
-        const weekDay = new Date(mondayDate);
-        weekDay.setDate(mondayDate.getDate() + i);
-        weekDates.push({
-            day: weekDay.getDate(),
-            month: weekDay.toLocaleString('default', { month: 'short' }),
-            year: weekDay.getFullYear()
-        });
-    }
-
-    return weekDates;
-}
-
 export const getWeekday = (year: number, month: number, date: number) => {
     // Create a new Date object
     const dateObject = new Date(year, month - 1, date); // month is 0-indexed in JS Date
@@ -296,35 +259,6 @@ export const filterDayViewData = ({
                     month,
                     date
                 }) &&
-                formatTimestampToTime(event.start_at) >= timeRange.start &&
-                formatTimestampToTime(event.start_at) < timeRange.end
-            ),
-        };
-    });
-}
-
-export const filterWeekViewData = ({
-    year,
-    month,
-    date,
-    data
-}: {
-    year: number,
-    month: number,
-    date: number,
-    data: CalendarDataType[]
-}): TimeRangeEventsType[] => {
-    const weekdates = getWeekByYearMonthAndDate({ year, month, date })
-    return timeRanges.map(timeRange => {
-        return {
-            ...timeRange,
-            events: data.filter(event =>
-                weekdates.some(weekDate => isMatchingDate({
-                    dateObject: new Date(event.start_at),
-                    year,
-                    month,
-                    date: weekDate.day
-                })) &&
                 formatTimestampToTime(event.start_at) >= timeRange.start &&
                 formatTimestampToTime(event.start_at) < timeRange.end
             ),

@@ -1,6 +1,6 @@
 import { useMemo } from "react"
-import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../helpers/calendar"
-import { CalendarDataType } from "../types/types";
+import { getWeeksByYearAndMonth, weeks, weekdays, isMatchingDate } from "../../../helpers/calendar"
+import { CalendarDataType } from "../../../types/calendar";
 import classNames from "classnames";
 
 const MonthView = ({

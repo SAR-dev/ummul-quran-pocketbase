@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { months, getWeekday, formatTimestampToTime, filterDayViewData } from "../helpers/calendar"
-import { CalendarDataType, TimeRangeEventsType } from "../types/types"
-import { stringToColor } from "../helpers/color";
+import { months, getWeekday, formatTimestampToTime, filterDayViewData } from "../../../helpers/calendar"
+import { CalendarDataType, TimeRangeEventsType } from "../../../types/calendar"
+import { stringToColor } from "../../../helpers/color";
 import { ClockIcon, UserIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 

@@ -1,8 +1,8 @@
-import { getDateFromString } from "../helpers/calendar";
-import { CalendarDataType } from "../types/types";
+import { getDateFromString } from "../../../helpers/calendar";
+import { CalendarDataType } from "../../../types/calendar";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
-import ClassLogView from "../../../components/ClassLogView";
+import ClassLogView from "../../ClassLogView";
 
 const LogView = ({
     data

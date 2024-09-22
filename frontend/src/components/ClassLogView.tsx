@@ -1,7 +1,7 @@
 import { UserIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { ArrowRightIcon, CheckCircleIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
 import WhatsAppButton from './WhatsAppButton'
-import { getTimeIn12HourFormat } from '../packages/ClassCalendar/helpers/calendar'
+import { getTimeIn12HourFormat } from '../helpers/calendar'
 import { Link } from 'react-router-dom'
 import { usePocket } from '../contexts/PocketContext'
 import { useNotification } from '../contexts/NotificationContext'

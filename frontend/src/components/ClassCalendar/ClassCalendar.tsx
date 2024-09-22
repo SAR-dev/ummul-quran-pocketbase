@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { months, getYearsRange, getDaysOfMonth } from "./helpers/calendar"
-import { CalendarDataType, CalendarViewTypes } from "./types/types"
+import { months, getYearsRange, getDaysOfMonth } from "../../helpers/calendar"
+import { CalendarDataType, CalendarViewTypes } from "../../types/calendar"
 import MonthView from "./components/MonthView"
 import DayView from "./components/DayView"
 import { CalculatorIcon, PrinterIcon } from "@heroicons/react/24/outline";
