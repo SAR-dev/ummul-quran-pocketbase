@@ -36,7 +36,7 @@ interface PocketContextType {
     teacher?: TeachersResponse<TexpandUser>;
     students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
-    getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogsData: ({ start, end, key }: { start: string, end: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
 }
@@ -128,7 +128,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return dateToUtc(date)
     }
 
-    const getClassLogsData = useCallback(async ({ start, end }: { start: string, end: string }) => {
+    const getClassLogsData = useCallback(async ({ start, end, key }: { start: string, end: string, key?: string }) => {
         const userId = user?.id;
         if (!userId) {
             return [];
@@ -142,7 +142,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
                 filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}"`,
                 expand: "student, student.user, student.monthly_package",
-                requestKey: `${userId}${startUTC}${endUTC}`
+                requestKey: `${userId}${startUTC}${endUTC}${key}`
             });
         return res
     }, [pb]);
