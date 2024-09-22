@@ -10,8 +10,14 @@ import {
 import PocketBase, { AuthModel } from "pocketbase";
 import { useInterval } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
-import { ClassLogsResponse, Collections, StudentsResponse, TeachersResponse, TimezonesResponse, TypedPocketBase } from "../types/pocketbase";
-import { TexpandStudentWithPackage, TexpandUser } from "../types/extend";
+import {
+    ClassLogsResponse,
+    Collections,
+    TeachersResponse,
+    TimezonesResponse,
+    TypedPocketBase,
+} from "../types/pocketbase";
+import { TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandUser } from "../types/extend";
 import { dateToUtc } from "../helpers/calendar";
 
 interface DecodedToken {
@@ -28,7 +34,7 @@ interface PocketContextType {
     user?: AuthModel;
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
-    students: StudentsResponse<TexpandUser>[];
+    students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
     getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
@@ -44,7 +50,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
     const [teacher, setTeacher] = useState<TeachersResponse<TexpandUser>>()
-    const [students, setStudents] = useState<StudentsResponse<TexpandUser>[]>([])
+    const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
 
     useEffect(() => {
@@ -85,9 +91,9 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         }
         const res = await pb
             .collection(Collections.Students)
-            .getFullList<StudentsResponse<TexpandUser>>({
+            .getFullList<TexpandStudentListWithPackage>({
                 filter: `teacher.user.id = "${userId}"`,
-                expand: "user",
+                expand: "user, monthly_package",
             });
         setStudents(res)
     }, [pb]);

@@ -2,9 +2,11 @@ import { usePocket } from "../contexts/PocketContext";
 import NavLayout from "../layouts/NavLayout";
 import ClassCalendar from "../components/ClassCalendar/ClassCalendar";
 import { TodayClassList } from "../components/TodayClassList";
+import TeacherInfo from "../components/TeacherInfo";
+import StudentList from "../components/StudentList";
 
 export const HomePage = () => {
-  const { user, teacher, students, } = usePocket();
+  const { user, teacher, students } = usePocket();
 
   return (
     <NavLayout>
@@ -16,6 +18,10 @@ export const HomePage = () => {
           </div>
         </div>
         <div className="col-span-1 p-5 md:py-16">
+          <div className="grid grid-cols-1 gap-10">
+            <TeacherInfo />
+            <StudentList />
+          </div>
           {/* teacher details */}
           {/* student list */}
           {/* earning list */}

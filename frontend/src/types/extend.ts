@@ -16,3 +16,10 @@ export type TexpandStudentWithPackage = {
     };
   };
 };
+
+export type TexpandStudentListWithPackage = StudentsResponse & {
+  expand: {
+    monthly_package: MonthlyPackagesResponse;
+    user: UsersResponse;
+  };
+};
