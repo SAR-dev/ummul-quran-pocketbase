@@ -86,7 +86,7 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
       <div className="flex gap-3 mt-3">
         <button className="btn btn-sm btn-icon btn-outline border-base-300" onClick={() => setIsOpen(true)}>
           <PrinterIcon className="h-4 w-4" />
-          Print Receipt
+          Monthly Invoice
         </button>
         <Link to="/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
           <CalculatorIcon className="h-4 w-4" />
@@ -96,8 +96,10 @@ const EventCalendar = ({ data }: { data: CalendarDataType[] }) => {
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-20">
         <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
         <div className="fixed inset-0 flex w-screen items-center justify-center">
-          <DialogPanel className="card p-5 bg-base-100">
-            <MonthlyInvoice data={data} />
+          <DialogPanel className="card p-2 bg-base-100">
+            <div className="scrollbar-thin overflow-y-scroll p-3 max-h-[90vh]">
+              <MonthlyInvoice data={data} />
+            </div>
           </DialogPanel>
         </div>
       </Dialog>

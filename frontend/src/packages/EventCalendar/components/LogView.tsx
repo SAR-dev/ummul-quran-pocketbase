@@ -21,12 +21,15 @@ const LogView = ({
             return acc;
         }, {} as { [key: string]: CalendarDataType[] });
     }, [data]);
+
+    const sortedKeys = Object.keys(groupedData).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
     return (
         <div className="grid grid-cols-1">
-            {Object.keys(groupedData).map((key, i) => (
+            {sortedKeys.map((key, i) => (
                 <div className="w-full my-5" key={i}>
                     <div className="text-sm flex items-center gap-2 mb-2"><CalendarIcon className="h-5 w-5" /> {key}</div>
-                    <div className="grid grid-cols-gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                         {groupedData[key].map((e, i) => (
                             <div key={i} className='bg-base-200 p-3 card flex-row items-center border border-base-300 text-sm'>
                                 <div className="w-10 flex-shrink-0">

@@ -5,17 +5,23 @@ import { usePocket } from '../contexts/PocketContext';
 import { CheckCircleIcon, BellAlertIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid';
 import { ArrowRightIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
 import { getTimeIn12HourFormat } from '../packages/EventCalendar/helpers/calendar';
-import WhatsAppIcon from "../assets/whatsapp.png"
 import { Link } from 'react-router-dom';
 import WhatsAppButton from './WhatsAppButton';
+import { useNotification } from '../contexts/NotificationContext';
+import { NotificationType } from '../types/notification';
 
 export const TodayClassList = () => {
-    const { user, getClassLogsData } = usePocket();
+    const notification = useNotification()
+    const { user, getClassLogsData, deleteClassLogById } = usePocket();
     const [todayClassLogs, setTodayClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
 
     useEffect(() => {
         if (!user) return;
 
+        getTodayClassLogs()
+    }, [])
+
+    const getTodayClassLogs = () => {
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -27,7 +33,28 @@ export const TodayClassList = () => {
             .then(res => {
                 setTodayClassLogs(res)
             })
-    }, [])
+    }
+
+    const deleteClassLog = (id: string) => {
+        deleteClassLogById({ id }).then(() => {
+            getTodayClassLogs()
+            notification.remove()
+        })
+    }
+
+    const handleDeleteModal = (id: string) => {
+        notification.add({
+            title: "Confirmation Required",
+            message: "Are you sure you want to delete this class log ? If you delete this you can not restore.",
+            status: NotificationType.INFO,
+            body: (
+                <div className='flex gap-3 justify-center w-full'>
+                    <button className="btn btn-error" onClick={() => deleteClassLog(id)}>Yes, I am Sure</button>
+                    <button className="btn btn-success" onClick={() => notification.remove()}>No, I will Keep It</button>
+                </div>
+            )
+        })
+    }
 
     return (
         <div className='card gap-5 border border-base-300 p-5'>
@@ -67,7 +94,7 @@ export const TodayClassList = () => {
                             <b>{e.expand?.student.expand.monthly_package.class_mins} Mins</b> class, From <b>{getTimeIn12HourFormat(e.start_at)}</b>
                         </div>
                         <div className='flex gap-2 items-center ml-auto'>
-                            <button className="btn btn-sm btn-icon btn-square bg-base-100">
+                            <button className="btn btn-sm btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(e.id)}>
                                 <TrashIcon className='h-5 w-5' />
                             </button>
                             <Link to={`/class-details/${e.id}`} className="btn btn-sm btn-icon btn-square bg-base-100">

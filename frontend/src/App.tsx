@@ -6,22 +6,25 @@ import { HomePage } from "./pages/HomePage";
 import { RequireUnAuth } from "./components/RequireUnAuth";
 import { ClassPlanner } from "./pages/ClassPlanner";
 import { ClassDetails } from "./pages/ClassDetails";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 const App = () => {
   return (
     <PocketProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<RequireUnAuth />}>
-            <Route path="/sign-in" element={<SignIn />} />
-          </Route>
-          <Route element={<RequireAuth />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/class-planner" element={<ClassPlanner />} />
-            <Route path="/class-details/:id" element={<ClassDetails />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <NotificationProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<RequireUnAuth />}>
+              <Route path="/sign-in" element={<SignIn />} />
+            </Route>
+            <Route element={<RequireAuth />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/class-planner" element={<ClassPlanner />} />
+              <Route path="/class-details/:id" element={<ClassDetails />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </NotificationProvider>
     </PocketProvider>
   );
 };

@@ -31,6 +31,7 @@ interface PocketContextType {
     timeZones: TimezonesResponse[];
     getClassLogsData: ({ start, end }: { start: string, end: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
+    deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -148,6 +149,12 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
+    const deleteClassLogById = useCallback(async ({ id }: { id: string }) => {
+        await pb
+            .collection(Collections.ClassLogs)
+            .delete(id);
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -162,6 +169,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             timeZones,
             getClassLogsData,
             getClassLogDataById,
+            deleteClassLogById
         }}>
             {children}
         </PocketContext.Provider>

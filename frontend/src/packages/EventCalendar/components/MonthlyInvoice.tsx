@@ -88,25 +88,31 @@ export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
                             <tr className='text-sm font-semibold'>
                                 <th
                                     scope="col"
-                                    className="py-3.5 pr-3 text-left"
+                                    className="py-3 text-left"
                                 >
                                     Students
                                 </th>
                                 <th
                                     scope="col"
-                                    className="px-3 py-3.5 text-right table-cell"
+                                    className="px-3 text-right"
                                 >
                                     Class Mins
                                 </th>
                                 <th
                                     scope="col"
-                                    className="px-3 py-3.5 text-right table-cell"
+                                    className="px-3 text-right"
                                 >
                                     Price
                                 </th>
                                 <th
                                     scope="col"
-                                    className="py-3.5 pl-3 text-right"
+                                    className="px-3 text-right"
+                                >
+                                    Counts
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="py-3 pl-3 text-right"
                                 >
                                     Amount
                                 </th>
@@ -115,19 +121,22 @@ export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
                         <tbody>
                             {Object.values(groupedData).map((group, i) => (
                                 <tr className="border-b border-base-300" key={i}>
-                                    <td className="py-5 pr-3 text-sm">
+                                    <td className="py-2 text-sm">
                                         <div className="font-medium">{group.student}</div>
                                         <div className="mt-1 truncate text-base-content/75">
                                             {group.student_mobile}
                                         </div>
                                     </td>
-                                    <td className="px-3 py-5 text-right text-sm text-base-content/75 table-cell">
+                                    <td className="px-3 text-right text-sm text-base-content/75">
                                         {group.class_mins} Min
                                     </td>
-                                    <td className="px-3 py-5 text-right text-sm text-base-content/75 table-cell">
+                                    <td className="px-3 text-right text-sm text-base-content/75">
                                         {group.teachers_price} TK
                                     </td>
-                                    <td className="py-5 pl-3 text-right text-sm text-base-content/75 pr-0">
+                                    <td className="px-3 text-right text-sm text-base-content/75">
+                                        {group.items.length}
+                                    </td>
+                                    <td className="pl-3 text-right text-sm text-base-content/75">
                                         {group.items.length * group.teachers_price} TK
                                     </td>
                                 </tr>
@@ -137,7 +146,7 @@ export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
                             <tr>
                                 <th
                                     scope="row"
-                                    colSpan={3}
+                                    colSpan={4}
                                     className="pr-3 pt-6 text-right text-sm font-normal text-base-content/75 table-cell"
                                 >
                                     Subtotal
@@ -149,7 +158,7 @@ export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
                             <tr>
                                 <th
                                     scope="row"
-                                    colSpan={3}
+                                    colSpan={4}
                                     className="pr-3 pt-4 text-right text-sm font-normal text-base-content/75 table-cell"
                                 >
                                     Discount
@@ -161,7 +170,7 @@ export const MonthlyInvoice = ({ data }: { data: CalendarDataType[] }) => {
                             <tr>
                                 <th
                                     scope="row"
-                                    colSpan={3}
+                                    colSpan={4}
                                     className="pr-3 pt-4 text-right text-sm font-semibold table-cell"
                                 >
                                     Total
