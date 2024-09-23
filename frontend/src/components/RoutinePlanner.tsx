@@ -24,10 +24,12 @@ interface RoutinePayloadType {
     start_date: string;
     finish_date: string;
     offset_hh_mm: string;
+    new_routine: boolean;
 }
 
 export const RoutinePlanner = () => {
     const { students, token } = usePocket()
+    const [replaceRoutine, setReplaceRoutine] = useState(false)
     const [data, setData] = useState<RoutineDataType>({
         student: "",
         start_date: new Date().toISOString().slice(0, 10),
@@ -44,7 +46,7 @@ export const RoutinePlanner = () => {
     const handleOnSubmit = (evt: FormEvent<HTMLFormElement>) => {
         evt?.preventDefault();
 
-        if(data.student.length == 0){
+        if (data.student.length == 0) {
             alert("Select stuent")
             return;
         }
@@ -82,7 +84,8 @@ export const RoutinePlanner = () => {
             }),
             start_date: data.start_date,
             finish_date: data.finish_date,
-            offset_hh_mm: getTimeOffset()
+            offset_hh_mm: getTimeOffset(),
+            new_routine: replaceRoutine
         }
 
         fetch(`${import.meta.env.VITE_API_URL}/api/class-logs/create-by-routine`, {
@@ -184,6 +187,12 @@ export const RoutinePlanner = () => {
                     min={(new Date()).toISOString().slice(0, 10)}
                     onChange={e => setData({ ...data, finish_date: e.target.value })}
                 />
+                <div className="form-control w-fit">
+                    <label className="label cursor-pointer">
+                        <input type="checkbox" className="checkbox" onChange={e => setReplaceRoutine(e.target.checked)} checked={replaceRoutine} />
+                        <span className="label-text">Replace Routine</span>
+                    </label>
+                </div>
                 <button type="submit" className="btn btn-primary w-32">Submit</button>
             </form>
         </div>

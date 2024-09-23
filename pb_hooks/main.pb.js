@@ -87,6 +87,19 @@ routerAdd("POST", "/api/class-logs/create-by-routine", (c) => {
     const collection = $app.dao().findCollectionByNameOrId("class_logs")
 
     $app.dao().runInTransaction((txDao) => {
+        if(payload.new_routine){
+            const start_at_str = `${start_date.toISOString().slice(0, 10)} 00:00:00.000${payload.offset_hh_mm}`
+            // const finish_at_str = `${finish_date.toISOString().slice(0, 10)} 00:00:00.000${payload.offset_hh_mm}`;
+
+            const records = $app.dao().findRecordsByFilter(
+                "class_logs",                                    
+                // `start_at >= '${start_at_str}' && start_at <= '${finish_at_str}' && completed = false`
+                `start_at >= '${start_at_str}' && completed = false`
+            )
+            for (let record of records){
+                txDao.deleteRecord(record)
+            }
+        }
         let checkData = null;
 
         for (let data of payloads) {
