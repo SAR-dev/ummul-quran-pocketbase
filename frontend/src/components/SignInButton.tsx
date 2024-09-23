@@ -8,6 +8,11 @@ const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
     const notification = useNotification()
     const { logout, teacher } = usePocket()
 
+    const signOut = () => {
+        logout()
+        notification.remove()
+    }
+
     const handleSignOut = () => {
         notification.add({
             title: "Confirmation Required",
@@ -15,15 +20,11 @@ const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
             status: NotificationType.INFO,
             body: (
                 <div className='flex gap-3 justify-center w-full'>
-                    <button className="btn btn-error" onClick={logout}>Yes, I am Sure</button>
+                    <button className="btn btn-error" onClick={signOut}>Yes, I am Sure</button>
                     <button className="btn btn-success" onClick={() => notification.remove()}>No, I will Stay</button>
                 </div>
             )
         })
-    }
-
-    const navigateToProfileUrl = () => {
-
     }
 
     return (
@@ -37,14 +38,14 @@ const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
                         </button>
                     }
                     options={[
-                        { text: teacher.nickname ?? "User Profile", value: teacher.nickname, handleClick: navigateToProfileUrl, icon: <div className='mr-1'>😎</div> },
+                        { text: teacher.nickname ?? "User Profile", value: teacher.nickname, icon: <div className='mr-1'>😎</div> },
                         { text: "Sign Out", value: "sign-out", handleClick: handleSignOut, icon: <div className='mr-1'>👋</div> },
                     ]}
                 />
             )}
             {teacher && asMobile && (
                 <>
-                    <button className="btn btn-icon btn-ghost rounded-none justify-start" onClick={navigateToProfileUrl}>
+                    <button className="btn btn-icon btn-ghost rounded-none justify-start">
                         <img src={getImageUrl({ collectionId: teacher.expand?.user.collectionId, dataId: teacher.expand?.user.id, image: teacher.expand?.user.avatar })} className='h-5 w-5 rounded-full object-cover' />
                         <div>{teacher.nickname}</div>
                     </button>

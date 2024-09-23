@@ -74,12 +74,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .getFirstListItem<TeachersResponse<TexpandUser>>(`user.id = "${userId}"`, {
                 expand: "user",
             });
-
-        // if signed in user is not teacher log user out
-        if (res == null) {
-            logout()
-            return;
-        }
         setTeacher(res)
     }, [pb]);
 

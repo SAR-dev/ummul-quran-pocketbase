@@ -23,3 +23,12 @@ export type TexpandStudentListWithPackage = StudentsResponse & {
     user: UsersResponse;
   };
 };
+
+export interface ErrorResponseType {
+  url: string;
+  status: number;
+  response: {
+    code: number;
+    message: string;
+  };
+}
