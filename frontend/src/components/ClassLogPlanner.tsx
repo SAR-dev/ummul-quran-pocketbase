@@ -4,6 +4,7 @@ import { constants } from '../stores/constantStore';
 import "react-multi-date-picker/styles/layouts/mobile.css";
 import { Calendar, DateObject } from "react-multi-date-picker";
 import { getTimeOffset } from '../helpers/calendar';
+import { PlayIcon, StopIcon } from '@heroicons/react/24/outline';
 
 interface ClassLogDataType {
     student: string;
@@ -68,7 +69,7 @@ export const ClassLogPlanner = () => {
     const handleOnSubmit = (evt: FormEvent<HTMLFormElement>) => {
         evt?.preventDefault();
 
-        if(data.student.length == 0){
+        if (data.student.length == 0) {
             alert("Select stuent")
             return;
         }
@@ -111,8 +112,8 @@ export const ClassLogPlanner = () => {
     };
 
     const handleDelete = (date: DateObject) => {
-        setData({...data, routine: data.routine.filter(e => (new DateObject(e.date).format() != date.format()))})
-      }
+        setData({ ...data, routine: data.routine.filter(e => (new DateObject(e.date).format() != date.format())) })
+    }
 
     const handleStartTimeChange = (date: DateObject, time: string) => {
         if (!constants.REGEX_PATTERN.TIME.test(time)) return;
@@ -165,58 +166,73 @@ export const ClassLogPlanner = () => {
     };
 
     return (
-        <div className="bg-base-200 p-2 rounded">
-            <div className="text-xl mb-3 pb-3 border-b border-base-300">Class Log Planner</div>
-            <form className='flex flex-col gap-3' onSubmit={handleOnSubmit}>
-                <select
-                    className="select select-bordered w-full max-w-xs"
-                    value={data.student}
-                    onChange={e => setData({ ...data, student: e.target.value })}
-                >
-                    <option value="" disabled selected>Select Student</option>
-                    {students.map((student, i) => (
-                        <option value={student.id} key={i}>{student.nickname}</option>
-                    ))}
-                </select>
+        <div>
+            <form className='flex flex-col gap-8' onSubmit={handleOnSubmit}>
                 <div>
-                    <div className="label">
-                        <span className="label-text">Select Dates</span>
-                    </div>
-                    <Calendar
-                        value={data.routine.map(e => new DateObject(e.date))}
-                        onChange={handleClassDates}
-                        multiple
-                        numberOfMonths={3}
-                        minDate={new Date()}
-                        shadow={false}
-                    />
+                    <div className='text-sm mb-2 font-semibold'>Select a student from your student list</div>
+                    <select
+                        className="select select-bordered w-full md:max-w-xs"
+                        value={data.student}
+                        onChange={e => setData({ ...data, student: e.target.value })}
+                    >
+                        <option value="" disabled selected>Select Student</option>
+                        {students.map((student, i) => (
+                            <option value={student.id} key={i}>{student.nickname}</option>
+                        ))}
+                    </select>
                 </div>
+                {data.student.length > 0 && (
+                    <>
+                        <div>
+                            <div className='text-sm mb-2 font-semibold'>Select dates for class</div>
+                            <Calendar
+                                value={data.routine.map(e => new DateObject(e.date))}
+                                onChange={handleClassDates}
+                                multiple
+                                numberOfMonths={1}
+                                minDate={new Date()}
+                                shadow={false}
+                            />
+                        </div>
 
-                <div className="grid grid-cols-1 gap-5">
-                    {sortedRoutine.map((classPlan, i) => (
-                        <div className='flex flex-col gap-3' key={i}>
-                            <div className="flex justify-between w-full items-center">
-                                <div className="font-medium">{(new DateObject(classPlan.date)).format("dddd, DD MMMM YYYY")}</div>
-                                <button className="btn btn-xs" onClick={() => handleDelete(new DateObject(classPlan.date))}>Delete</button>
-                            </div>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-                                <input
-                                    type="time"
-                                    value={classPlan.start_at}
-                                    className='input input-bordered w-full'
-                                    onChange={e => handleStartTimeChange(new DateObject(classPlan.date), e.target.value)}
-                                />
-                                <input
-                                    type="time"
-                                    value={classPlan.finish_at}
-                                    className='input input-bordered w-full'
-                                    onChange={e => handleEndTimeChange(new DateObject(classPlan.date), e.target.value)}
-                                />
+                        <div>
+                            {sortedRoutine.length > 0 && (
+                                <div className='text-sm mb-2 font-semibold'>Pick a time for class</div>
+                            )}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                                {sortedRoutine.map((classPlan, i) => (
+                                    <div className='card p-3 border border-base-300 flex-col gap-3' key={i}>
+                                        <div className="flex justify-between w-full items-center">
+                                            <div className="font-medium text-sm">{(new DateObject(classPlan.date)).format("dddd, DD MMMM YYYY")}</div>
+                                            <button className="btn btn-xs" onClick={() => handleDelete(new DateObject(classPlan.date))}>Delete</button>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-5">
+                                            <label className="input input-sm input-bordered flex items-center gap-2">
+                                                <PlayIcon className='h-4 w-4' />
+                                                <input
+                                                    type="time"
+                                                    value={classPlan.start_at}
+                                                    className='grow'
+                                                    onChange={e => handleStartTimeChange(new DateObject(classPlan.date), e.target.value)}
+                                                />
+                                            </label>
+                                            <label className="input input-sm input-bordered flex items-center gap-2">
+                                                <StopIcon className='h-4 w-4' />
+                                                <input
+                                                    type="time"
+                                                    value={classPlan.finish_at}
+                                                    className='grow'
+                                                    onChange={e => handleEndTimeChange(new DateObject(classPlan.date), e.target.value)}
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
-                </div>
-                <button type="submit" className="btn btn-primary w-32">Submit</button>
+                    </>
+                )}
+                <button type="submit" disabled={data.student.length == 0} className="btn btn-primary w-48">Submit Class Plans</button>
             </form>
         </div>
     )

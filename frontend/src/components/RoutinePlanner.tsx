@@ -2,6 +2,9 @@ import { FormEvent, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
 import { constants } from '../stores/constantStore';
 import { getTimeOffset } from '../helpers/calendar';
+import classNames from 'classnames';
+import { PlayIcon, StopIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/solid';
 
 interface RoutineDataType {
     student: string;
@@ -9,6 +12,7 @@ interface RoutineDataType {
         weekday_index: number;
         start_at: string;
         finish_at: string;
+        activate: boolean
     }[];
     start_date: string;
     finish_date: string;
@@ -38,7 +42,8 @@ export const RoutinePlanner = () => {
             return {
                 weekday_index: i,
                 start_at: "",
-                finish_at: ""
+                finish_at: "",
+                activate: false
             }
         })
     })
@@ -79,7 +84,7 @@ export const RoutinePlanner = () => {
 
         const payload: RoutinePayloadType = {
             student: data.student,
-            routine: data.routine.filter(e => e.start_at.length > 0).map(c => {
+            routine: data.routine.filter(e => e.start_at.length > 0 && e.activate).map(c => {
                 return { ...c, finish_at: c.finish_at.length > 0 ? c.finish_at : null }
             }),
             start_date: data.start_date,
@@ -113,7 +118,8 @@ export const RoutinePlanner = () => {
                 return {
                     weekday_index: e.weekday_index,
                     start_at: start_at,
-                    finish_at: e.finish_at
+                    finish_at: e.finish_at,
+                    activate: e.activate
                 }
             }
             return e;
@@ -128,7 +134,8 @@ export const RoutinePlanner = () => {
                 return {
                     weekday_index: e.weekday_index,
                     start_at: e.start_at,
-                    finish_at: finish_at
+                    finish_at: finish_at,
+                    activate: e.activate
                 }
             }
             return e;
@@ -136,64 +143,135 @@ export const RoutinePlanner = () => {
         setData({ ...data, routine })
     };
 
+    const toogleDayButton = (weekday_index: number) => {
+        const routine = data.routine.map(e => {
+            if (e.weekday_index == weekday_index) {
+                return {
+                    weekday_index: e.weekday_index,
+                    start_at: e.start_at,
+                    finish_at: e.finish_at,
+                    activate: !e.activate
+                }
+            }
+            return e;
+        })
+        setData({ ...data, routine })
+    };
+
+
     return (
-        <div className="bg-base-200 p-2 rounded">
-            <div className="text-xl mb-3 pb-3 border-b border-base-300">Routine Planner</div>
-            <form className='flex flex-col gap-3' onSubmit={handleOnSubmit}>
-                <select
-                    className="select select-bordered w-full max-w-xs"
-                    value={data.student}
-                    onChange={e => setData({ ...data, student: e.target.value })}
-                >
-                    <option value="" disabled selected>Select Student</option>
-                    {students.map((student, i) => (
-                        <option value={student.id} key={i}>{student.nickname}</option>
-                    ))}
-                </select>
-                {data.routine.map((routine, i) => (
-                    <div className="flex gap-5 p-3 rounded bg-base-100 items-center" key={i}>
-                        <div className="w-20 flex-shrink-0">{constants.DAY_NAMES[i]}</div>
-                        <input
-                            type="time"
-                            value={routine.start_at}
-                            className='input input-bordered w-48'
-                            onChange={e => handleStartTimeChange({
-                                start_at: e.target.value,
-                                weekday_index: routine.weekday_index
-                            })}
-                        />
-                        <input
-                            type="time"
-                            value={routine.finish_at}
-                            className='input input-bordered w-48'
-                            onChange={e => handleEndTimeChange({
-                                finish_at: e.target.value,
-                                weekday_index: routine.weekday_index
-                            })}
-                        />
-                    </div>
-                ))}
-                <input
-                    type="date"
-                    className='input input-bordered w-48'
-                    value={data.start_date}
-                    min={(new Date()).toISOString().slice(0, 10)}
-                    onChange={e => setData({ ...data, start_date: e.target.value })}
-                />
-                <input
-                    type="date"
-                    className='input input-bordered w-48'
-                    value={data.finish_date}
-                    min={(new Date()).toISOString().slice(0, 10)}
-                    onChange={e => setData({ ...data, finish_date: e.target.value })}
-                />
-                <div className="form-control w-fit">
-                    <label className="label cursor-pointer">
-                        <input type="checkbox" className="checkbox" onChange={e => setReplaceRoutine(e.target.checked)} checked={replaceRoutine} />
-                        <span className="label-text">Replace Routine</span>
-                    </label>
+        <div>
+            <form className='flex flex-col gap-8' onSubmit={handleOnSubmit}>
+                <div>
+                    <div className='text-sm mb-2 font-semibold'>Select a student from your student list</div>
+                    <select
+                        className="select select-bordered w-full md:max-w-xs"
+                        value={data.student}
+                        onChange={e => setData({ ...data, student: e.target.value })}
+                    >
+                        <option value="" disabled selected>Select Student</option>
+                        {students.map((student, i) => (
+                            <option value={student.id} key={i}>{student.nickname}</option>
+                        ))}
+                    </select>
                 </div>
-                <button type="submit" className="btn btn-primary w-32">Submit</button>
+                {data.student.length > 0 && (<>
+                    <div>
+                        <div className='text-sm mb-2 font-semibold'>Pick a date and time for class</div>
+                        <div className="grid grid-cols-1 md:grid-cols-7 gap-5">
+                            {data.routine.map((routine, i) => (
+                                <div className='card flex-col gap-3 p-2 border border-base-300' key={i}>
+                                    <button
+                                        type='button'
+                                        className={classNames({
+                                            'btn w-full h-32 uppercase': true,
+                                            'btn-info': routine.activate
+                                        })}
+                                        onClick={() => toogleDayButton(routine.weekday_index)}
+                                    >
+                                        {constants.DAY_NAMES[i]}
+                                    </button>
+                                    <label className="input input-sm input-bordered flex items-center gap-2">
+                                        <PlayIcon className='h-4 w-4' />
+                                        <input
+                                            disabled={!routine.activate}
+                                            type="time"
+                                            value={routine.start_at}
+                                            className='grow'
+                                            onChange={e => handleStartTimeChange({
+                                                start_at: e.target.value,
+                                                weekday_index: routine.weekday_index
+                                            })}
+                                        />
+                                    </label>
+                                    <label className="input input-sm input-bordered flex items-center gap-2">
+                                        <StopIcon className='h-4 w-4' />
+                                        <input
+                                            disabled={!routine.activate}
+                                            type="time"
+                                            value={routine.finish_at}
+                                            className='grow'
+                                            onChange={e => handleEndTimeChange({
+                                                finish_at: e.target.value,
+                                                weekday_index: routine.weekday_index
+                                            })}
+                                        />
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className='text-sm mb-2 font-semibold'>Select date range for this routine</div>
+                        <div className="flex flex-col md:flex-row gap-5">
+                            <label className="input input-bordered flex items-center gap-2">
+                                <PlayIcon className='h-5 w-5' />
+                                <input
+                                    type="date"
+                                    className='grow'
+                                    value={data.start_date}
+                                    min={(new Date()).toISOString().slice(0, 10)}
+                                    onChange={e => setData({ ...data, start_date: e.target.value })}
+                                />
+                            </label>
+                            <div className='hidden md:flex items-center'>
+                                <ArrowRightIcon className='h-5 w-5' />
+                            </div>
+                            <label className="input input-bordered flex items-center gap-2">
+                                <StopIcon className='h-5 w-5' />
+                                <input
+                                    type="date"
+                                    className='grow'
+                                    value={data.finish_date}
+                                    min={(new Date()).toISOString().slice(0, 10)}
+                                    onChange={e => setData({ ...data, finish_date: e.target.value })}
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className='text-sm mb-2 font-semibold'>Do you want to replace the routine if exists ? Otherwise it will add a routine to existing one.</div>
+                        <div className="flex gap-5">
+                            <div className="form-control">
+                                <label className="label cursor-pointer">
+                                    <span className="label-text mr-2">Yes</span>
+                                    <input type="radio" className="radio checked:bg-info" checked={replaceRoutine} onChange={e => setReplaceRoutine(e.target.checked)} />
+                                </label>
+                            </div>
+
+                            <div className="form-control">
+                                <label className="label cursor-pointer">
+                                    <span className="label-text mr-2">No</span>
+                                    <input type="radio" className="radio checked:bg-info" checked={!replaceRoutine} onChange={e => setReplaceRoutine(!e.target.checked)} />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </>)}
+
+                <button type="submit" disabled={data.student.length == 0} className="btn btn-primary w-48">Submit Routine</button>
             </form>
         </div>
     )
