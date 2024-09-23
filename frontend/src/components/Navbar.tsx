@@ -9,7 +9,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="border-b border-base-300 w-full flex justify-between items-center px-5 py-4">
+            <nav className="border-b border-base-300 w-full flex justify-between items-center px-5 py-4 bg-base-100">
                 <Link className="flex gap-3 items-center" to="/">
                     <img className="h-6" src="https://i.ibb.co/qjD26QZ/quran.png" alt="" />
                     <div className="font-bold text-xl hidden md:block">Ummul Quran</div>

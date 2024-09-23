@@ -23,8 +23,6 @@ const DayView = ({
         [year, month, date, data]
     );
 
-    console.log(timeRangeEvents)
-
     return (
         <div className="flex flex-col divide-y divide-base-300 border border-base-300 relative max-h-[25rem] overflow-y-scroll scrollbar-thin bg-base-200 border border-base-300">
             <div className="w-full flex border-x border-base-300 text-sm font-medium sticky top-0 bg-base-100">

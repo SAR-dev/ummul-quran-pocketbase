@@ -5,6 +5,9 @@ import "react-multi-date-picker/styles/layouts/mobile.css";
 import { Calendar, DateObject } from "react-multi-date-picker";
 import { getTimeOffset } from '../helpers/calendar';
 import { PlayIcon, StopIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../contexts/NotificationContext';
+import { NotificationType } from '../types/notification';
 
 interface ClassLogDataType {
     student: string;
@@ -26,6 +29,8 @@ interface ClassLogPayloadType {
 }
 
 export const ClassLogPlanner = () => {
+    const navigate = useNavigate()
+    const notification = useNotification()
     const { students, token } = usePocket()
     const [data, setData] = useState<ClassLogDataType>({
         student: "",
@@ -107,8 +112,21 @@ export const ClassLogPlanner = () => {
                 }
                 return response.json();
             })
-            .then(data => console.log('Success:', data))
-            .catch(error => console.error('Error:', error));
+            .then(() => {
+                notification.add({
+                    title: "Class Created",
+                    message: "The requested classes has been created. Please check the routine",
+                    status: NotificationType.SUCCESS,
+                })
+                navigate("/")
+            })
+            .catch(() => {
+                notification.add({
+                    title: "Error Occured",
+                    message: "There was an error performing the request. Please try again later..",
+                    status: NotificationType.ERROR,
+                })
+            });
     };
 
     const handleDelete = (date: DateObject) => {

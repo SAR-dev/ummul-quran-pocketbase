@@ -56,7 +56,6 @@ const MonthView = ({
 
     const handleSelectDate = ({weekNo, weekDayIndex}:{weekNo: number, weekDayIndex: number}) => {
         const found = datesWithClassCount.find(e => e.weekNo == weekNo && e.weekdayIndex == weekDayIndex);
-        console.log(found)
         if(!found || Number(found.date) <= 0) return;
         setDate(Number(found.date))
         setView(CalendarViewTypes.DAY)

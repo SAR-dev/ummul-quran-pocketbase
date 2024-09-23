@@ -5,6 +5,9 @@ import { getTimeOffset } from '../helpers/calendar';
 import classNames from 'classnames';
 import { PlayIcon, StopIcon } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
+import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../contexts/NotificationContext';
+import { NotificationType } from '../types/notification';
 
 interface RoutineDataType {
     student: string;
@@ -32,6 +35,8 @@ interface RoutinePayloadType {
 }
 
 export const RoutinePlanner = () => {
+    const navigate = useNavigate()
+    const notification = useNotification()
     const { students, token } = usePocket()
     const [replaceRoutine, setReplaceRoutine] = useState(false)
     const [data, setData] = useState<RoutineDataType>({
@@ -107,8 +112,21 @@ export const RoutinePlanner = () => {
                 }
                 return response.json();
             })
-            .then(data => console.log('Success:', data))
-            .catch(error => console.error('Error:', error));
+            .then(() => {
+                notification.add({
+                    title: "Class Created",
+                    message: "The requested classes has been created. Please check the routine",
+                    status: NotificationType.SUCCESS,
+                })
+                navigate("/")
+            })
+            .catch(() => {
+                notification.add({
+                    title: "Error Occured",
+                    message: "There was an error performing the request. Please try again later..",
+                    status: NotificationType.ERROR,
+                })
+            });
     };
 
     const handleStartTimeChange = ({ start_at, weekday_index }: { start_at: string, weekday_index: number }) => {

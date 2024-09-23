@@ -52,7 +52,7 @@ const ClassCalendar = () => {
   }, [classLogs]);
 
   return (
-    <div className='card border border-base-300 p-5'>
+    <div className='card border-2 border-base-300 bg-base-100 p-5'>
       <div className="w-full flex justify-between items-center mb-3">
         <div className="flex gap-3">
           {view != CalendarViewTypes.LOGS && (
@@ -62,7 +62,7 @@ const ClassCalendar = () => {
               onChange={e => setDate(parseInt(e.target.value))}
             >
               {getDaysOfMonth(year, month).map(e => (
-                <option value={e}>{e}</option>
+                <option value={e} key={e}>{e}</option>
               ))}
             </select>
           )}
@@ -72,7 +72,7 @@ const ClassCalendar = () => {
             onChange={e => setMonth(parseInt(e.target.value))}
           >
             {months.map(e => (
-              <option value={e.index}>{e.longName}</option>
+              <option value={e.index} key={e.index}>{e.longName}</option>
             ))}
           </select>
           <select

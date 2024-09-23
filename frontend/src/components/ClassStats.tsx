@@ -26,7 +26,7 @@ const ClassStats = () => {
     }, [user, year, month, refresh])
 
     return (
-        <div className='card border border-base-300'>
+        <div className='card border-2 border-base-300 bg-base-100'>
             <div className="text-center w-full font-semibold py-3 border-b border-base-300">
                 Class Stats
             </div>
@@ -45,13 +45,13 @@ const ClassStats = () => {
                 </select>
             </div>
             <div className="grid grid-cols-2">
-                <div className='py-3 border-b pl-5 font-semibold'>Completed Class</div>
+                <div className='py-3 border-b border-base-300 pl-5 font-semibold'>Completed Class</div>
                 <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => e.completed).length}</div>
-                <div className='py-3 border-b pl-5 font-semibold'>Pending Class</div>
+                <div className='py-3 border-b border-base-300 pl-5 font-semibold'>Pending Class</div>
                 <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => !e.completed).length}</div>
-                <div className='py-3 border-b pl-5 font-semibold'>Completed Earnings</div>
+                <div className='py-3 border-b border-base-300 pl-5 font-semibold'>Completed Earnings</div>
                 <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => e.completed).map(c => c.cp_teachers_price).reduce((acc, curr) => acc + curr, 0)}</div>
-                <div className='py-3 border-b pl-5 font-semibold'>Pending Earnings</div>
+                <div className='py-3 border-b border-base-300 pl-5 font-semibold'>Pending Earnings</div>
                 <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => !e.completed).map(c => c.expand?.student.expand.monthly_package.teachers_price ?? 0).reduce((acc, curr) => acc + curr, 0)}</div>
                 
             </div>

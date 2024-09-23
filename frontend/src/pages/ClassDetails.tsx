@@ -84,7 +84,7 @@ export const ClassDetails = () => {
         <NavLayout>
             <div className="p-5 md:p-16 w-full">
                 {classLog && (
-                    <div className="card flex-col border border-base-300 px-5 py-10 w-96 shadow bg-base-200 flex-shrink-0 mx-auto">
+                    <div className="card flex-col border border-base-300 px-5 py-10 w-96 shadow flex-shrink-0 mx-auto bg-base-100">
                         <div className="w-full flex justify-center">
                             <img className='h-28 w-28 object-cover rounded-full ring-2 ring-base-300 ring-offset-8' src={getImageUrl({ collectionId: classLog.expand?.student.expand.user.collectionId, dataId: classLog.expand?.student.expand.user.id, image: classLog.expand?.student.expand.user.avatar })} alt="" />
                         </div>

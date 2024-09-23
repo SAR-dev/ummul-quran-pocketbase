@@ -266,7 +266,7 @@ export const filterDayViewData = ({
     });
 }
 
-export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.000Z`
+export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}.000Z`
 
 export const getTimeIn12HourFormat = (val: string) => {
     const date = new Date(val);

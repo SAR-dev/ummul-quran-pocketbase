@@ -23,10 +23,10 @@ export const TodayClassList = () => {
     }, [refresh])
 
     return (
-        <div className='card gap-5 border border-base-300 p-5'>
+        <div className='card gap-5 border-2 border-base-300 bg-base-100 p-5'>
             <div className='flex items-center gap-3'>
                 <BellAlertIcon className='h-5 w-5 text-primary' />
-                <div>You have <b>{todayClassLogs.length.toString().padStart(2, '0')}</b> classes today</div>
+                <div>You have <b>{todayClassLogs.length > 0 ? todayClassLogs.length.toString().padStart(2, '0') : "No"}</b> classes today</div>
             </div>
             <div className="grid grid-cols-1 gap-3">
                 {todayClassLogs.map((e, i) => (

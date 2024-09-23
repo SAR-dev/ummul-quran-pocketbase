@@ -5,7 +5,7 @@ import WhatsAppButton from './WhatsAppButton';
 const StudentList = () => {
     const { students } = usePocket();
     return (
-        <div className='card border border-base-300'>
+        <div className='card border-2 border-base-300 bg-base-100'>
             <div className="tw-full font-semibold py-3 px-5 border-b border-base-300">
                 Student List
             </div>
