@@ -52,7 +52,7 @@ const ClassStats = () => {
                 <div className='py-3 border-b pl-5 font-semibold'>Completed Earnings</div>
                 <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => e.completed).map(c => c.cp_teachers_price).reduce((acc, curr) => acc + curr, 0)}</div>
                 <div className='py-3 border-b pl-5 font-semibold'>Pending Earnings</div>
-                <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => !e.completed).map(c => c.cp_teachers_price).reduce((acc, curr) => acc + curr, 0)}</div>
+                <div className='py-3 border-b border-base-300 pl-5 border-l'>{classLogs.filter(e => !e.completed).map(c => c.expand?.student.expand.monthly_package.teachers_price ?? 0).reduce((acc, curr) => acc + curr, 0)}</div>
                 
             </div>
         </div>
