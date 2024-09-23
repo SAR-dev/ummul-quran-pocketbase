@@ -13,12 +13,12 @@ export const HomePage = () => {
           <div className="w-full grid grid-cols-1 gap-10">
             <TodayClassList />
             <ClassCalendar />
+            <StudentList />
           </div>
         </div>
         <div className="col-span-2">
           <div className="grid grid-cols-1 gap-10">
             <TeacherInfo />
-            <StudentList />
             <ClassStats />
           </div>
         </div>
