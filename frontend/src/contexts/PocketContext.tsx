@@ -13,6 +13,7 @@ import { jwtDecode } from "jwt-decode";
 import {
     ClassLogsResponse,
     Collections,
+    StudentsResponse,
     TeachersResponse,
     TimezonesResponse,
     TypedPocketBase,
@@ -34,6 +35,7 @@ interface PocketContextType {
     user?: AuthModel;
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
+    student?: StudentsResponse<TexpandUser>;
     students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
     getClassLogsData: ({ start, end, key }: { start: string, end: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
@@ -50,6 +52,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
     const [teacher, setTeacher] = useState<TeachersResponse<TexpandUser>>()
+    const [student, setStudent] = useState<StudentsResponse<TexpandUser>>()
     const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
 
@@ -59,6 +62,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             setUser(model);
         });
         fetchTeacherData()
+        fetchStudentData()
         fetchStudentListData()
         fetchTimezoneListData()
     }, [pb]);
@@ -75,6 +79,20 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
                 expand: "user",
             });
         setTeacher(res)
+    }, [pb]);
+
+    const fetchStudentData = useCallback(async () => {
+        const userId = user?.id;
+        if (!userId) {
+            setStudent(undefined);
+            return;
+        }
+        const res = await pb
+            .collection(Collections.Students)
+            .getFirstListItem<StudentsResponse<TexpandUser>>(`user.id = "${userId}"`, {
+                expand: "user",
+            });
+        setStudent(res)
     }, [pb]);
 
     const fetchStudentListData = useCallback(async () => {
@@ -169,6 +187,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             user,
             token,
             teacher,
+            student,
             students,
             timeZones,
             getClassLogsData,

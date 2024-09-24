@@ -1,12 +1,15 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { PocketProvider } from "./contexts/PocketContext";
-import { RequireAuth } from "./components/RequireAuth";
+import { RequireTeacherAuth } from "./components/RequireTeacherAuth";
 import { SignIn } from "./pages/SignIn";
-import { HomePage } from "./pages/HomePage";
 import { RequireUnAuth } from "./components/RequireUnAuth";
 import { ClassPlanner } from "./pages/ClassPlanner";
 import { ClassDetails } from "./pages/ClassDetails";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import TeacherSelf from "./pages/TeacherSelf";
+import StudentSelf from "./pages/StudentSelf";
+import { RequireStudentAuth } from "./components/RequireStudentAuth";
+import HomePage from "./pages/HomePage";
 
 const App = () => {
   return (
@@ -14,13 +17,17 @@ const App = () => {
       <NotificationProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route element={<RequireUnAuth />}>
               <Route path="/sign-in" element={<SignIn />} />
             </Route>
-            <Route element={<RequireAuth />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/class-planner" element={<ClassPlanner />} />
-              <Route path="/class-details/:id" element={<ClassDetails />} />
+            <Route element={<RequireTeacherAuth />}>
+              <Route path="/teacher" element={<TeacherSelf />} />
+              <Route path="/teacher/class-planner" element={<ClassPlanner />} />
+              <Route path="/teacher/class-details/:id" element={<ClassDetails />} />
+            </Route>
+            <Route element={<RequireStudentAuth />}>
+              <Route path="/student" element={<StudentSelf />} />
             </Route>
           </Routes>
         </BrowserRouter>

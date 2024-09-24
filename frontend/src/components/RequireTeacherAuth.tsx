@@ -1,13 +1,13 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { usePocket } from "../contexts/PocketContext";
 
-export const RequireAuth = () => {
-  const { user } = usePocket();
+export const RequireTeacherAuth = () => {
+  const { user, teacher } = usePocket();
   const location = useLocation();
 
-  if (!user) {
+  if (!user || !teacher) {
     return (
-      <Navigate to={{ pathname: "/sign-in" }} state={{ location }} replace />
+      <Navigate to={{ pathname: "/" }} state={{ location }} replace />
     );
   }
 

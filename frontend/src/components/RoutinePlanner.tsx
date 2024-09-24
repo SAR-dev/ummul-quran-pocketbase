@@ -120,7 +120,7 @@ export const RoutinePlanner = () => {
                     message: "The requested classes has been created. Please check the routine",
                     status: NotificationType.SUCCESS,
                 })
-                navigate("/")
+                navigate("/teacher")
             })
             .catch(() => {
                 notification.add({
