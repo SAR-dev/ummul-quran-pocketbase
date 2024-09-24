@@ -16,7 +16,7 @@ export const HomePage = () => {
             <StudentList />
           </div>
         </div>
-        <div className="col-span-2">
+        <div className="col-span-1 md:col-span-2">
           <div className="grid grid-cols-1 gap-10">
             <TeacherInfo />
             <ClassStats />

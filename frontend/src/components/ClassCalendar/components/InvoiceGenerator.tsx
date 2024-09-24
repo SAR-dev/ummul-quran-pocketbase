@@ -3,7 +3,7 @@ import { CalendarDataType } from '../../../types/calendar'
 import { useReactToPrint } from "react-to-print";
 import { PrinterIcon } from '@heroicons/react/24/outline';
 
-export const InvoiceGenerator = ({ data }: { data: CalendarDataType[] }) => {
+export const InvoiceGenerator = ({ data, closeInvoiceFn }: { data: CalendarDataType[], closeInvoiceFn: () => void }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
@@ -187,7 +187,10 @@ export const InvoiceGenerator = ({ data }: { data: CalendarDataType[] }) => {
                     The actual invoice may vary depending on admin decisions. It is just a calculation based on the data provided by database.
                 </div>
             </div>
-            <div className="flex w-full justify-end px-5">
+            <div className="flex gap-3 w-full justify-end px-5">
+            <button className="btn btn-sm btn-icon" onClick={closeInvoiceFn}>
+                    Close
+                </button>
                 <button className="btn btn-sm btn-icon" onClick={handlePrint}>
                     <PrinterIcon className='h-4 w-4' />
                     Print Invoice

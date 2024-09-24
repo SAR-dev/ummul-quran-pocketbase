@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { usePocket } from '../contexts/PocketContext';
 import { ClassLogsResponse } from '../types/pocketbase';
 import { TexpandStudentWithPackage } from '../types/extend';
-import { months } from '../helpers/calendar';
+import { getYearsRange, months } from '../helpers/calendar';
 
 const currentYear = new Date().getFullYear();
 
@@ -39,7 +39,7 @@ const ClassStats = () => {
                 </select>
                 <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered select-sm w-full">
                     <option disabled selected>Select Year</option>
-                    {[currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map((e, i) => (
+                    {getYearsRange().map((e, i) => (
                         <option value={e} key={i}>{e}</option>
                     ))}
                 </select>

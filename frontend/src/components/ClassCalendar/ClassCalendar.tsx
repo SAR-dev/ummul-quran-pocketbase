@@ -35,6 +35,8 @@ const ClassCalendar = () => {
     getClassLogsData({ start, end }).then(res => setClassLogs(res))
   }, [user, year, month, refresh])
 
+  const closeInvoiceFn = () => setIsOpen(false)
+
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
     return classLogs
       .map(log => ({
@@ -77,11 +79,11 @@ const ClassCalendar = () => {
           </select>
           <select
             value={year}
-            className="select select-sm select-bordered w-28"
+            className="select select-sm select-bordered w-20 md:w-28"
             onChange={e => setYear(parseInt(e.target.value))}
           >
             {getYearsRange().map(e => (
-              <option value={e}>{e}</option>
+              <option value={e} key={e}>{e}</option>
             ))}
           </select>
         </div>
@@ -93,7 +95,7 @@ const ClassCalendar = () => {
             Day
           </button>
           <button
-            className={`btn btn-sm join-item ${view === CalendarViewTypes.MONTH ? "btn-active" : ""}`}
+            className={`hidden md:btn md:btn-sm join-item ${view === CalendarViewTypes.MONTH ? "btn-active" : ""}`}
             onClick={() => setView(CalendarViewTypes.MONTH)}
           >
             Month
@@ -124,7 +126,7 @@ const ClassCalendar = () => {
         <div className="fixed inset-0 flex w-screen items-center justify-center">
           <DialogPanel className="card p-2 bg-base-100">
             <div className="scrollbar-thin overflow-y-auto p-3 max-h-[90vh]">
-              <InvoiceGenerator data={sortedClassLogs} />
+              <InvoiceGenerator data={sortedClassLogs} closeInvoiceFn={closeInvoiceFn} />
             </div>
           </DialogPanel>
         </div>
