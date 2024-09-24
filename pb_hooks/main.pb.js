@@ -275,16 +275,58 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     return c.json(200, { "message": "Class log finished" })
 })
 
-routerAdd("POST", "/api/class-logs/finish", (c) => {
+routerAdd("POST", "/api/generate-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
     // check if the year and month is in past
 
-    // delete incomplete classes of the year and month
+    const year = Number(payload.year)
+    const month = Number(payload.month)
 
-    // insert into student invoices
+    if(!year || !month || year > new Date().getFullYear() || month >= new Date().getMonth() + 1){
+        throw ForbiddenError()
+    }
+    
+    $app.dao().runInTransaction((txDao) => {
+        // delete incomplete classes of the year and month
+        const start = `${new Date(year, month-1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${new Date(year, month, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const records = $app.dao().findRecordsByFilter(
+            "class_logs",                                    
+            `start_at >= '${start}' && start_at < '${end}' && completed = false`
+        )
+        // for (let record of records){
+        //     txDao.deleteRecord(record)
+        // }
 
-    // insert into teacher invoices
+        // insert into student invoices
 
+        const student_collection = $app.dao().findCollectionByNameOrId("student_invoices")
+        const students = $app.dao().findRecordsByFilter("students", `id != '0'`)
+        for (let student of students) {
+            const record = new Record(student_collection)
+
+            record.set("student", student.get("id"))
+            record.set("year", year)
+            record.set("month", month)
+
+            txDao.saveRecord(record)
+        }
+        
+        // insert into teacher invoices
+
+        const teacher_collection = $app.dao().findCollectionByNameOrId("teacher_invoices")
+        const teachers = $app.dao().findRecordsByFilter("teachers", `id != '0'`)
+        for (let teacher of teachers) {
+            const record = new Record(teacher_collection)
+
+            record.set("teacher", teacher.get("id"))
+            record.set("year", year)
+            record.set("month", month)
+
+            txDao.saveRecord(record)
+        }
+    })
+    
     return c.json(200, { "message": "Invoices Issued" })
 })
