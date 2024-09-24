@@ -4,8 +4,6 @@ import { ClassLogsResponse } from '../types/pocketbase';
 import { TexpandStudentWithPackage } from '../types/extend';
 import { getYearsRange, months } from '../helpers/calendar';
 
-const currentYear = new Date().getFullYear();
-
 const ClassStats = () => {
     const { refresh, user, getClassLogsData } = usePocket();
     const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])

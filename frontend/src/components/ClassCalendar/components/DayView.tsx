@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { months, getWeekday, formatTimestampToTime, filterDayViewData } from "../../../helpers/calendar"
 import { CalendarDataType, TimeRangeEventsType } from "../../../types/calendar"
 import { stringToColor } from "../../../helpers/color";
-import { ClockIcon, UserIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, ShieldExclamationIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
 
