@@ -32,6 +32,7 @@ export const ClassLogPlanner = () => {
     const navigate = useNavigate()
     const notification = useNotification()
     const { students, token } = usePocket()
+    const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<ClassLogDataType>({
         student: "",
         routine: []
@@ -98,6 +99,7 @@ export const ClassLogPlanner = () => {
             offset_hh_mm: getTimeOffset()
         }
 
+        setIsLoading(true)
         fetch(`${import.meta.env.VITE_API_URL}/api/class-logs/create-by-dates`, {
             method: 'POST',
             headers: {
@@ -126,7 +128,8 @@ export const ClassLogPlanner = () => {
                     message: "There was an error performing the request. Please try again later..",
                     status: NotificationType.ERROR,
                 })
-            });
+            })
+            .finally(() => setIsLoading(false));
     };
 
     const handleDelete = (date: DateObject) => {
@@ -250,7 +253,14 @@ export const ClassLogPlanner = () => {
                         </div>
                     </>
                 )}
-                <button type="submit" disabled={data.student.length == 0} className="btn btn-primary w-48">Submit Class Plans</button>
+                <button 
+                    type="submit" 
+                    disabled={data.student.length == 0 || isLoading} 
+                    className="btn btn-info btn-icon w-48"
+                >
+                    {isLoading && <div className="loading w-5 h-5" />}
+                    Submit Class Plans
+                </button>
             </form>
         </div>
     )

@@ -28,20 +28,22 @@ export const TodayClassList = () => {
                 <BellAlertIcon className='h-5 w-5 text-primary' />
                 <div>You have <b>{todayClassLogs.length > 0 ? todayClassLogs.length.toString().padStart(2, '0') : "No"}</b> classes today</div>
             </div>
-            <div className="grid grid-cols-1 gap-3">
-                {todayClassLogs.map((e, i) => (
-                    <ClassLogView
-                        id={e.id}
-                        completed={e.completed}
-                        start_at={e.start_at}
-                        finish_at={e.finish_at}
-                        student={e.expand?.student.nickname ?? ""}
-                        student_mobile={e.expand?.student.mobile_no ?? ""}
-                        class_mins={e.expand?.student.expand.monthly_package.class_mins ?? 0}
-                        key={i}
-                    />
-                ))}
-            </div>
+            {todayClassLogs.length > 0 && (
+                <div className="grid grid-cols-1 gap-3">
+                    {todayClassLogs.map((e, i) => (
+                        <ClassLogView
+                            id={e.id}
+                            completed={e.completed}
+                            start_at={e.start_at}
+                            finish_at={e.finish_at}
+                            student={e.expand?.student.nickname ?? ""}
+                            student_mobile={e.expand?.student.mobile_no ?? ""}
+                            class_mins={e.expand?.student.expand.monthly_package.class_mins ?? 0}
+                            key={i}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

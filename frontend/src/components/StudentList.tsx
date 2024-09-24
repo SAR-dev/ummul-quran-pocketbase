@@ -6,8 +6,9 @@ const StudentList = () => {
     const { students } = usePocket();
     return (
         <div className='card border-2 border-base-300 bg-base-100'>
-            <div className="tw-full font-semibold py-3 px-5 border-b border-base-300">
-                Student List
+            <div className="w-full flex justify-between items-center py-3 px-5 border-b border-base-300">
+                <div className='font-semibold'>Student List</div>
+                <div className='text-sm'>{students.length} Students</div>
             </div>
             <div className="flex flex-col divide-y divide-base-300">
                 {students.map((e, i) => (
@@ -21,6 +22,7 @@ const StudentList = () => {
                         </div>
                         <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.name}</div>
                         <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.class_mins} Mins</div>
+                        <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
                         <div className="ml-auto">
                             <WhatsAppButton mobile_no={e.mobile_no} />
                         </div>

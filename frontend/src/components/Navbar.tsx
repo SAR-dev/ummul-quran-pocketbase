@@ -11,8 +11,7 @@ const Navbar = () => {
         <>
             <nav className="border-b border-base-300 w-full flex justify-between items-center px-5 py-4 bg-base-100">
                 <Link className="flex gap-3 items-center" to="/">
-                    <img className="h-6" src="https://i.ibb.co/qjD26QZ/quran.png" alt="" />
-                    <div className="font-bold text-xl hidden md:block">Ummul Quran</div>
+                    <img className="h-6" src="https://merakiui.com/images/logo.svg" alt="" />
                 </Link>
 
                 <div className="gap-3 hidden md:flex">
@@ -30,7 +29,7 @@ const Navbar = () => {
             </nav>
             {showMenu && (
                 <div className="flex flex-col divide-y divide-base-300 border-b border-base-300 md:hidden shadow">
-                    <Link to="/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start">
+                    <Link to="/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
                         <PlusIcon className='h-5 w-5' />
                         Class Planner
                     </Link>

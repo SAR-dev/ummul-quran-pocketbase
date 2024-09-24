@@ -42,21 +42,21 @@ export const InvoiceGenerator = ({ data }: { data: CalendarDataType[] }) => {
 
     return (
         <div>
-            <div className="bg-base-100 p-5" ref={contentRef}>
+            <div className="bg-base-100 p-5 w-full max-w-[50rem]" ref={contentRef}>
                 <div className="grid grid-cols-2 items-center">
                     <div>
                         {/*  Company logo  */}
                         <img
-                            src="https://img.freepik.com/premium-vector/mosque-quran-logo-design-spiritual-reverent-vector-graphics_579306-25250.jpg"
+                            src="https://merakiui.com/images/logo.svg"
                             height={100}
                             width={100}
                         />
                     </div>
                     <div className="text-right">
-                        <p>Tailwind Inc.</p>
+                        <p>Ummul Quran Inc.</p>
                         <p className="text-base-content/75 text-sm">sales@ummul.com</p>
-                        <p className="text-base-content/75 text-sm mt-1">+880-1761-1129</p>
-                        <p className="text-base-content/75 text-sm mt-1">Dhaka, Bangladesh2</p>
+                        <p className="text-base-content/75 text-sm mt-1">+88017611129</p>
+                        <p className="text-base-content/75 text-sm mt-1">Dhaka, Bangladesh</p>
                     </div>
                 </div>
                 <div className="w-full flex mt-5">
@@ -184,8 +184,7 @@ export const InvoiceGenerator = ({ data }: { data: CalendarDataType[] }) => {
                 </div>
                 {/*  Footer  */}
                 <div className="border-t-2 border-base-300 pt-4 text-xs text-base-content/75 text-center mt-16">
-                    Please pay the invoice before the due date. You can pay the invoice by
-                    logging in to your account from our client portal.
+                    The actual invoice may vary depending on admin decisions. It is just a calculation based on the data provided by database.
                 </div>
             </div>
             <div className="flex w-full justify-end px-5">

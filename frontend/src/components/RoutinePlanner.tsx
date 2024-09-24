@@ -38,6 +38,7 @@ export const RoutinePlanner = () => {
     const navigate = useNavigate()
     const notification = useNotification()
     const { students, token } = usePocket()
+    const [isLoading, setIsLoading] = useState(false)
     const [replaceRoutine, setReplaceRoutine] = useState(false)
     const [data, setData] = useState<RoutineDataType>({
         student: "",
@@ -98,6 +99,7 @@ export const RoutinePlanner = () => {
             new_routine: replaceRoutine
         }
 
+        setIsLoading(true)
         fetch(`${import.meta.env.VITE_API_URL}/api/class-logs/create-by-routine`, {
             method: 'POST',
             headers: {
@@ -126,7 +128,8 @@ export const RoutinePlanner = () => {
                     message: "There was an error performing the request. Please try again later..",
                     status: NotificationType.ERROR,
                 })
-            });
+            })
+            .finally(() => setIsLoading(false));
     };
 
     const handleStartTimeChange = ({ start_at, weekday_index }: { start_at: string, weekday_index: number }) => {
@@ -289,7 +292,14 @@ export const RoutinePlanner = () => {
                     </div>
                 </>)}
 
-                <button type="submit" disabled={data.student.length == 0} className="btn btn-primary w-48">Submit Routine</button>
+                <button 
+                    type="submit" 
+                    disabled={data.student.length == 0 || isLoading} 
+                    className="btn btn-icon btn-info w-48"
+                >
+                    {isLoading && <div className="loading w-5 h-5" />}
+                    Submit Routine
+                </button>
             </form>
         </div>
     )

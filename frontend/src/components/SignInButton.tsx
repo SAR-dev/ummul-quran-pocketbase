@@ -3,6 +3,7 @@ import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
 import DropdownSelect from './DropDownSelect';
 import { getImageUrl } from '../helpers/base';
+import { PowerIcon } from '@heroicons/react/24/solid';
 
 const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
     const notification = useNotification()
@@ -39,18 +40,18 @@ const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
                     }
                     options={[
                         { text: teacher.nickname ?? "User Profile", value: teacher.nickname, icon: <div className='mr-1'>😎</div> },
-                        { text: "Sign Out", value: "sign-out", handleClick: handleSignOut, icon: <div className='mr-1'>👋</div> },
+                        { text: "Sign Out", value: "sign-out", handleClick: handleSignOut, icon: <PowerIcon className='h-5 w-5' /> },
                     ]}
                 />
             )}
             {teacher && asMobile && (
                 <>
-                    <button className="btn btn-icon btn-ghost rounded-none justify-start">
+                    <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
                         <img src={getImageUrl({ collectionId: teacher.expand?.user.collectionId, dataId: teacher.expand?.user.id, image: teacher.expand?.user.avatar })} className='h-5 w-5 rounded-full object-cover' />
                         <div>{teacher.nickname}</div>
                     </button>
-                    <button className="btn btn-icon btn-ghost rounded-none justify-start" onClick={handleSignOut}>
-                        <div>👋</div>
+                    <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation" onClick={handleSignOut}>
+                        <PowerIcon className='h-5 w-5' />
                         Sign Out
                     </button>
                 </>
