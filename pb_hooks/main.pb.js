@@ -295,9 +295,9 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
             "class_logs",                                    
             `start_at >= '${start}' && start_at < '${end}' && completed = false`
         )
-        // for (let record of records){
-        //     txDao.deleteRecord(record)
-        // }
+        for (let record of records){
+            txDao.deleteRecord(record)
+        }
 
         // insert into student invoices
 
@@ -327,6 +327,46 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
             txDao.saveRecord(record)
         }
     })
-    
+
     return c.json(200, { "message": "Invoices Issued" })
 })
+
+routerAdd("GET", "/api/get-student-invoices", (c) => {
+    const userId = c.get("authRecord").get("id");
+
+    const invoices = $app.dao().findRecordsByFilter(
+        "student_invoices",                                    
+        `student.user.id = '${userId}'`
+    )
+
+    const res = []
+
+    for (let invoice of invoices) {
+        const start = `${new Date(invoice.get("year"), invoice.get("month")-1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const records = $app.dao().findRecordsByFilter(
+            "class_logs",                                    
+            `start_at >= '${start}' && start_at < '${end}' && completed = false`
+        )
+        $app.dao().expandRecords(records, ["student", "student.monthly_package"], null)
+        const totalSum = records.reduce((sum, record) => {
+            const price = record.publicExport().expand.student.publicExport().monthly_package_price > 0
+                ? record.publicExport().expand.student.publicExport().monthly_package_price
+                : record.publicExport().expand.student.publicExport().expand.monthly_package.publicExport().students_price;
+        
+            return sum + price;
+        }, 0);
+        
+        res.push({
+            "id": invoice.get("id"),
+            "year": invoice.get("year"),
+            "month": invoice.get("month"),
+            "paid": invoice.get("paid"),
+            "total_classes": records.length,
+            "total_price": totalSum
+        })     
+    }
+
+    return c.json(200, res)
+})
+

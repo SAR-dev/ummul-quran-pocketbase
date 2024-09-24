@@ -32,3 +32,12 @@ export interface ErrorResponseType {
     message: string;
   };
 }
+
+export interface InvoiceResponseType {
+  id: string
+  year: number
+  month: number
+  total_classes: number
+  total_price: number
+  paid: boolean
+}
