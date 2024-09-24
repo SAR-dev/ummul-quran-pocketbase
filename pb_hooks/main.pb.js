@@ -87,16 +87,16 @@ routerAdd("POST", "/api/class-logs/create-by-routine", (c) => {
     const collection = $app.dao().findCollectionByNameOrId("class_logs")
 
     $app.dao().runInTransaction((txDao) => {
-        if(payload.new_routine){
+        if (payload.new_routine) {
             const start_at_str = `${start_date.toISOString().slice(0, 10)} 00:00:00.000${payload.offset_hh_mm}`
             // const finish_at_str = `${finish_date.toISOString().slice(0, 10)} 00:00:00.000${payload.offset_hh_mm}`;
 
             const records = $app.dao().findRecordsByFilter(
-                "class_logs",                                    
+                "class_logs",
                 // `start_at >= '${start_at_str}' && start_at <= '${finish_at_str}' && completed = false`
                 `start_at >= '${start_at_str}' && completed = false`
             )
-            for (let record of records){
+            for (let record of records) {
                 txDao.deleteRecord(record)
             }
         }
@@ -250,7 +250,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
 
     const student = $app.dao().findRecordById("students", record.get("student"))
     const monthly_package = $app.dao().findRecordById("monthly_packages", student.get("monthly_package"))
-    
+
     $app.dao().runInTransaction((txDao) => {
         record.set("cp_teacher", student.get("teacher"))
         record.set("cp_class_mins", monthly_package.get("class_mins"))
@@ -283,19 +283,19 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     const year = Number(payload.year)
     const month = Number(payload.month)
 
-    if(!year || !month || year > new Date().getFullYear() || month >= new Date().getMonth() + 1){
+    if (!year || !month || year > new Date().getFullYear() || month >= new Date().getMonth() + 1) {
         throw ForbiddenError()
     }
-    
+
     $app.dao().runInTransaction((txDao) => {
         // delete incomplete classes of the year and month
-        const start = `${new Date(year, month-1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const start = `${new Date(year, month - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const end = `${new Date(year, month, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
-            "class_logs",                                    
+            "class_logs",
             `start_at >= '${start}' && start_at < '${end}' && completed = false`
         )
-        for (let record of records){
+        for (let record of records) {
             txDao.deleteRecord(record)
         }
 
@@ -312,7 +312,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
 
             txDao.saveRecord(record)
         }
-        
+
         // insert into teacher invoices
 
         const teacher_collection = $app.dao().findCollectionByNameOrId("teacher_invoices")
@@ -335,28 +335,24 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
     const userId = c.get("authRecord").get("id");
 
     const invoices = $app.dao().findRecordsByFilter(
-        "student_invoices",                                    
+        "student_invoices",
         `student.user.id = '${userId}'`
     )
 
     const res = []
 
     for (let invoice of invoices) {
-        const start = `${new Date(invoice.get("year"), invoice.get("month")-1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
-            "class_logs",                                    
-            `start_at >= '${start}' && start_at < '${end}' && completed = false`
+            "class_logs",
+            `start_at >= '${start}' && start_at < '${end}' && completed = true`
         )
-        $app.dao().expandRecords(records, ["student", "student.monthly_package"], null)
+        $app.dao().expandRecords(records, ["student"], null)
         const totalSum = records.reduce((sum, record) => {
-            const price = record.publicExport().expand.student.publicExport().monthly_package_price > 0
-                ? record.publicExport().expand.student.publicExport().monthly_package_price
-                : record.publicExport().expand.student.publicExport().expand.monthly_package.publicExport().students_price;
-        
-            return sum + price;
+            return sum + record.publicExport().cp_students_price;
         }, 0);
-        
+
         res.push({
             "id": invoice.get("id"),
             "year": invoice.get("year"),
@@ -364,9 +360,62 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
             "paid": invoice.get("paid"),
             "total_classes": records.length,
             "total_price": totalSum
-        })     
+        })
     }
 
     return c.json(200, res)
 })
 
+routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
+    const userId = c.get("authRecord").get("id");
+
+    const invoice = $app.dao().findFirstRecordByFilter(
+        "student_invoices",
+        `student.user.id = '${userId}' && id = '${c.pathParam("id")}'`
+    )
+    
+    const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const records = $app.dao().findRecordsByFilter(
+        "class_logs",
+        `start_at >= '${start}' && start_at < '${end}' && completed = true`
+    )
+    $app.dao().expandRecords(records, ["student"], null)
+
+    const logs = []
+    records.forEach(record => logs.push({
+        class_mins: record.publicExport().cp_class_mins,
+        students_price: record.publicExport().cp_students_price,
+    }))
+
+    // Map to store unique combinations of class_mins and students_price
+    const uniqueLogsMap = new Map();
+
+    logs.forEach(log => {
+        const key = `${log.class_mins}-${log.students_price}`;
+        if (uniqueLogsMap.has(key)) {
+            uniqueLogsMap.set(key, uniqueLogsMap.get(key) + 1);
+        } else {
+            uniqueLogsMap.set(key, 1);
+        }
+    });
+
+    // Convert the map into an array of unique combinations and their counts
+    const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
+        const [class_mins, students_price] = key.split('-');
+        return { class_mins: Number(class_mins), students_price: Number(students_price), no_of_classes: count };
+    });
+
+    const totalSum = records.reduce((sum, record) => {
+        return sum + record.publicExport().cp_students_price;
+    }, 0);
+
+    return c.json(200, {
+        "id": invoice.get("id"),
+        "year": invoice.get("year"),
+        "month": invoice.get("month"),
+        "paid": invoice.get("paid"),
+        "class_logs": uniqueLogsArray,
+        "total_price": totalSum
+    })
+})
