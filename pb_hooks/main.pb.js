@@ -275,5 +275,16 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     return c.json(200, { "message": "Class log finished" })
 })
 
+routerAdd("POST", "/api/class-logs/finish", (c) => {
+    const payload = $apis.requestInfo(c).data
 
+    // check if the year and month is in past
 
+    // delete incomplete classes of the year and month
+
+    // insert into student invoices
+
+    // insert into teacher invoices
+
+    return c.json(200, { "message": "Invoices Issued" })
+})
