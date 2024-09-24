@@ -8,7 +8,9 @@ import type { RecordService } from 'pocketbase'
 export enum Collections {
 	ClassLogs = "class_logs",
 	MonthlyPackages = "monthly_packages",
+	StudentInvoices = "student_invoices",
 	Students = "students",
+	TeacherInvoices = "teacher_invoices",
 	Teachers = "teachers",
 	Timezones = "timezones",
 	Users = "users",
@@ -59,6 +61,13 @@ export type MonthlyPackagesRecord = {
 	teachers_price: number
 }
 
+export type StudentInvoicesRecord = {
+	month: number
+	paid?: boolean
+	student: RecordIdString
+	year: number
+}
+
 export type StudentsRecord = {
 	class_link?: string
 	mobile_no?: string
@@ -67,6 +76,13 @@ export type StudentsRecord = {
 	nickname: string
 	teacher: RecordIdString
 	user: RecordIdString
+}
+
+export type TeacherInvoicesRecord = {
+	month: number
+	paid?: boolean
+	teacher: RecordIdString
+	year: number
 }
 
 export type TeachersRecord = {
@@ -89,7 +105,9 @@ export type UsersRecord = {
 // Response types include system fields and match responses from the PocketBase API
 export type ClassLogsResponse<Texpand = unknown> = Required<ClassLogsRecord> & BaseSystemFields<Texpand>
 export type MonthlyPackagesResponse<Texpand = unknown> = Required<MonthlyPackagesRecord> & BaseSystemFields<Texpand>
+export type StudentInvoicesResponse<Texpand = unknown> = Required<StudentInvoicesRecord> & BaseSystemFields<Texpand>
 export type StudentsResponse<Texpand = unknown> = Required<StudentsRecord> & BaseSystemFields<Texpand>
+export type TeacherInvoicesResponse<Texpand = unknown> = Required<TeacherInvoicesRecord> & BaseSystemFields<Texpand>
 export type TeachersResponse<Texpand = unknown> = Required<TeachersRecord> & BaseSystemFields<Texpand>
 export type TimezonesResponse<Texpand = unknown> = Required<TimezonesRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -99,7 +117,9 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 export type CollectionRecords = {
 	class_logs: ClassLogsRecord
 	monthly_packages: MonthlyPackagesRecord
+	student_invoices: StudentInvoicesRecord
 	students: StudentsRecord
+	teacher_invoices: TeacherInvoicesRecord
 	teachers: TeachersRecord
 	timezones: TimezonesRecord
 	users: UsersRecord
@@ -108,7 +128,9 @@ export type CollectionRecords = {
 export type CollectionResponses = {
 	class_logs: ClassLogsResponse
 	monthly_packages: MonthlyPackagesResponse
+	student_invoices: StudentInvoicesResponse
 	students: StudentsResponse
+	teacher_invoices: TeacherInvoicesResponse
 	teachers: TeachersResponse
 	timezones: TimezonesResponse
 	users: UsersResponse
@@ -120,7 +142,9 @@ export type CollectionResponses = {
 export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'class_logs'): RecordService<ClassLogsResponse>
 	collection(idOrName: 'monthly_packages'): RecordService<MonthlyPackagesResponse>
+	collection(idOrName: 'student_invoices'): RecordService<StudentInvoicesResponse>
 	collection(idOrName: 'students'): RecordService<StudentsResponse>
+	collection(idOrName: 'teacher_invoices'): RecordService<TeacherInvoicesResponse>
 	collection(idOrName: 'teachers'): RecordService<TeachersResponse>
 	collection(idOrName: 'timezones'): RecordService<TimezonesResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>

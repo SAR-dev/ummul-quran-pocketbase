@@ -13,6 +13,7 @@ import { jwtDecode } from "jwt-decode";
 import {
     ClassLogsResponse,
     Collections,
+    StudentInvoicesResponse,
     StudentsResponse,
     TeachersResponse,
     TimezonesResponse,
@@ -41,6 +42,7 @@ interface PocketContextType {
     getClassLogsData: ({ start, end, key }: { start: string, end: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
+    getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -176,6 +178,20 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setRefresh(refresh + 1)
     }, [pb]);
 
+    const getStudentInvoiceData = useCallback(async () => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.StudentInvoices)
+            .getFullList<StudentInvoicesResponse>({
+                filter: `student.user.id = "${userId}"`
+            });
+        return res
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -192,7 +208,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             timeZones,
             getClassLogsData,
             getClassLogDataById,
-            deleteClassLogById
+            deleteClassLogById,
+            getStudentInvoiceData
         }}>
             {children}
         </PocketContext.Provider>

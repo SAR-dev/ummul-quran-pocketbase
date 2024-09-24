@@ -27,7 +27,10 @@ const ThemeSwitcher = ({ asMobile }: { asMobile?: boolean }) => {
         )
     } else {
         return (
-            <button className="btn btn-ghost justify-start btn-icon rounded-none hover:no-animation" onClick={() => setTheme(theme == ThemeName.Dark ? ThemeName.Light : ThemeName.Dark)}>
+            <button 
+                className="btn btn-ghost justify-start btn-icon rounded-none hover:no-animation" 
+                onClick={() => setTheme(theme == ThemeName.Dark ? ThemeName.Light : ThemeName.Dark)}
+            >
                 {theme == ThemeName.Dark && <MoonIcon className='h-5 w-5' />}
                 {theme == ThemeName.Light && <SunIcon className='h-5 w-5' />}
                 {theme == ThemeName.Dark && "Light"}
