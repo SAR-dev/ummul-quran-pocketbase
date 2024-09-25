@@ -46,7 +46,9 @@ interface PocketContextType {
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
     getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
     getStudentInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    updateStudentInvoiceData: ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => Promise<void>;
     getTeacherInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
+    updateTeacherInvoiceData: ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => Promise<void>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -222,6 +224,19 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
+    const updateStudentInvoiceData = useCallback(async ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => {
+        if (!isAdmin) return;
+
+        await pb
+            .collection(Collections.StudentInvoices)
+            .update(id, {
+                paid, 
+                paid_amount, 
+                note
+            });
+        setRefresh(refresh + 1)
+    }, [pb]);
+
     const getTeacherInvoiceListData = useCallback(async ({ year, month }: { year: number, month: number }) => {
         if (!isAdmin) {
             return [];
@@ -234,6 +249,19 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
                 filter: `year = "${year}" && month = "${month}"`
             });
         return res
+    }, [pb]);
+
+    const updateTeacherInvoiceData = useCallback(async ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => {
+        if (!isAdmin) return;
+
+        await pb
+            .collection(Collections.TeacherInvoices)
+            .update(id, {
+                paid, 
+                paid_amount, 
+                note
+            });
+        setRefresh(refresh + 1)
     }, [pb]);
 
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
@@ -256,7 +284,9 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             deleteClassLogById,
             getStudentInvoiceData,
             getStudentInvoiceListData,
-            getTeacherInvoiceListData
+            updateStudentInvoiceData,
+            getTeacherInvoiceListData,
+            updateTeacherInvoiceData
         }}>
             {children}
         </PocketContext.Provider>

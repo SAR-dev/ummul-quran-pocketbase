@@ -7,7 +7,7 @@ import { NotificationType } from "../types/notification";
 export const SignIn = () => {
   const { login } = usePocket();
   const notification = useNotification()
-  const [isLoading, setsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [asAdmin, setAsAdmin] = useState(false)
   const [data, setData] = useState({
     email: "",
@@ -16,10 +16,10 @@ export const SignIn = () => {
 
   const handleOnSubmit = async () => {
     const { email, password } = data
-    setsLoading(true)
+    setIsLoading(true)
     try {
       await login({ email, password, asAdmin });
-      setsLoading(false)
+      setIsLoading(false)
       window.location.reload();
     } catch (err) {
       const error = err as ErrorResponseType;
@@ -28,7 +28,7 @@ export const SignIn = () => {
         message: error.response.message ?? "An error occured. Please try again later!",
         status: NotificationType.ERROR,
       })
-      setsLoading(false)
+      setIsLoading(false)
     }
   };
 

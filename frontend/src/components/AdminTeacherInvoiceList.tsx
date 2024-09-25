@@ -2,20 +2,44 @@ import { useEffect, useState } from 'react';
 import { TeacherInvoicesResponse } from '../types/pocketbase';
 import { getYearsRange, months } from '../helpers/calendar'
 import { usePocket } from '../contexts/PocketContext'
-import { TexpandTeacher } from '../types/extend';
+import { ErrorResponseType, TexpandTeacher } from '../types/extend';
+import { useNotification } from '../contexts/NotificationContext';
+import { NotificationType } from '../types/notification';
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 
 const AdminTeacherInvoiceList = () => {
-    const { user, getTeacherInvoiceListData } = usePocket()
+    const { user, refresh, getTeacherInvoiceListData, updateTeacherInvoiceData } = usePocket()
+    const notification = useNotification()
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [invoices, setInvoices] = useState<TeacherInvoicesResponse<TexpandTeacher>[]>([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [updateInvoice, setUpdateInvoice] = useState<TeacherInvoicesResponse<TexpandTeacher> | undefined>(undefined)
 
     useEffect(() => {
         if (!user) return;
 
         getTeacherInvoiceListData({ year, month }).then(res => setInvoices(res))
-    }, [year, month, user])
+    }, [year, month, user, refresh])
 
+    const handleUpdate = async () => {
+        if (!updateInvoice) return;
+        const { id, paid, paid_amount, note } = updateInvoice
+        setIsLoading(true)
+        try {
+            await updateTeacherInvoiceData({ id, paid, paid_amount, note });
+            setIsLoading(false)
+            setUpdateInvoice(undefined)
+        } catch (err) {
+            const error = err as ErrorResponseType;
+            notification.add({
+                title: "Error Occured",
+                message: error.response.message ?? "An error occured. Please try again later!",
+                status: NotificationType.ERROR,
+            })
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className='w-auto'>
@@ -42,7 +66,7 @@ const AdminTeacherInvoiceList = () => {
                     <div className='font-semibold py-3 px-5'>Note</div>
                 </div>
                 {invoices.map((invoice, i) => (
-                    <div className="grid grid-cols-5" key={i}>
+                    <div className="grid grid-cols-5 cursor-pointer hover:bg-base-300" onClick={() => setUpdateInvoice({ ...invoice })} key={i}>
                         <div className='font-semibold py-3 px-5'>{invoice.expand?.teacher.nickname}</div>
                         <div className='py-3 px-5'>
                             {invoice.paid ? (
@@ -57,6 +81,72 @@ const AdminTeacherInvoiceList = () => {
                     </div>
                 ))}
             </div>
+            {!!updateInvoice && (
+                <Dialog open={true} onClose={() => { }} className="relative z-20">
+                    <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
+                    <div className="fixed inset-0 flex w-screen items-center justify-center">
+                        <DialogPanel className="card p-4 bg-base-100 min-w-96 max-w-md">
+                            <div className='p-5'>
+                                <div className='flex justify-between font-semibold'>
+                                    <div>{updateInvoice.expand?.teacher.nickname}</div>
+                                    <div>{months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</div>
+                                </div>
+                                <div className="card my-5 flex-col border border-base-300 divide-y divide-base-300">
+                                    <div className="grid grid-cols-2 divide-x divide-base-300">
+                                        <div className='py-3 px-5'>Due Amount</div>
+                                        <div className="py-3 px-5">
+                                            {updateInvoice.due_amount} TK
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 divide-x divide-base-300">
+                                        <div className='py-3 px-5'>Payment Status</div>
+                                        <div className="py-3 px-5">
+                                            <label className="swap">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={updateInvoice.paid}
+                                                    onChange={e => setUpdateInvoice({ ...updateInvoice, paid: e.target.checked })}
+                                                />
+                                                <div className="swap-on text-success">PAID</div>
+                                                <div className="swap-off text-error">UNPAID</div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 divide-x divide-base-300">
+                                        <div className='py-3 px-5'>Paid Amount</div>
+                                        <div className="py-1 px-5 flex items-center">
+                                            <label className="input input-sm input-bordered flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="grow w-16"
+                                                    value={updateInvoice.paid_amount}
+                                                    onChange={e => setUpdateInvoice({ ...updateInvoice, paid_amount: Number(e.target.value) })}
+                                                />
+                                                TK
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className='p-3'>
+                                        <textarea
+                                            className="textarea textarea-bordered w-full textarea-sm resize-none"
+                                            rows={2}
+                                            value={updateInvoice.note}
+                                            onChange={e => setUpdateInvoice({ ...updateInvoice, note: e.target.value })}
+                                            placeholder="Note" />
+                                    </div>
+                                </div>
+                                <div className="flex justify-between">
+                                    <button className="btn btn-sm" disabled={isLoading} onClick={() => setUpdateInvoice(undefined)}>Go Back</button>
+                                    <button className="btn btn-sm btn-info btn-icon" onClick={handleUpdate} disabled={isLoading}>
+                                        {isLoading && <div className="loading w-4 h-4" />}
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </Dialog>
+            )}
         </div>
     )
 }
