@@ -59,6 +59,11 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [teacher, setTeacher] = useLocalStorage<TeachersResponse<TexpandUser> | undefined>('teacher', undefined)
 
     useEffect(() => {
+        if (!pb.authStore.isValid) logout()
+    }, [])
+    
+
+    useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
             setToken(newToken);
             setUser(model);
@@ -129,17 +134,12 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     }, [pb]);
 
     const refreshSession = useCallback(async () => {
-        if (!pb.authStore.isValid) {
-            logout()
-            return
-        };
+        if (!pb.authStore.isValid) return;
         const decoded = jwtDecode<DecodedToken>(token!);
         const tokenExpiration = decoded.exp ?? 0;
         const expirationWithBuffer = (tokenExpiration + 5 * oneMinInMs) / 1000;
         if (Date.now() / 1000 < expirationWithBuffer) {
             await pb.collection(Collections.Users).authRefresh();
-        } else {
-            logout()
         }
     }, [pb, token]);
 
