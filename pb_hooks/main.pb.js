@@ -376,6 +376,37 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
     return c.json(200, res)
 })
 
+routerAdd("GET", "/api/get-teacher-invoices", (c) => {
+    const userId = c.get("authRecord").get("id");
+
+    const invoices = $app.dao().findRecordsByFilter(
+        "teacher_invoices",
+        `teacher.user.id = '${userId}'`
+    )
+
+    const res = []
+
+    for (let invoice of invoices) {
+        const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const records = $app.dao().findRecordsByFilter(
+            "class_logs",
+            `start_at >= '${start}' && start_at < '${end}' && completed = true`
+        )
+
+        res.push({
+            "id": invoice.get("id"),
+            "year": invoice.get("year"),
+            "month": invoice.get("month"),
+            "paid": invoice.get("paid"),
+            "total_classes": records.length,
+            "due_amount": invoice.get("due_amount")
+        })
+    }
+
+    return c.json(200, res)
+})
+
 routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     const userId = c.get("authRecord").get("id");
 
@@ -401,8 +432,7 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     const logs = []
     records.forEach(record => logs.push({
         class_mins: record.publicExport().cp_class_mins,
-        students_price: record.publicExport().cp_students_price,
-        teacher_nickname: record.publicExport()
+        students_price: record.publicExport().cp_students_price
     }))
 
     // Map to store unique combinations of class_mins and students_price
@@ -421,6 +451,62 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
         const [class_mins, students_price] = key.split('-');
         return { class_mins: Number(class_mins), students_price: Number(students_price), total_classes: count };
+    });
+
+    return c.json(200, {
+        "id": invoice.get("id"),
+        "year": invoice.get("year"),
+        "month": invoice.get("month"),
+        "paid": invoice.get("paid"),
+        "class_logs": uniqueLogsArray,
+        "due_amount": invoice.get("due_amount")
+    })
+})
+
+routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
+    const userId = c.get("authRecord").get("id");
+
+    // filter by matching teacher and id
+
+    const invoice = $app.dao().findFirstRecordByFilter(
+        "teacher_invoices",
+        `teacher.user.id = '${userId}' && id = '${c.pathParam("id")}'`
+    )
+
+    if (invoice == null) {
+        throw new ForbiddenError()
+    }
+    
+    const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const records = $app.dao().findRecordsByFilter(
+        "class_logs",
+        `start_at >= '${start}' && start_at < '${end}' && completed = true`
+    )
+    $app.dao().expandRecords(records, ["student"], null)
+
+    const logs = []
+    records.forEach(record => logs.push({
+        class_mins: record.publicExport().cp_class_mins,
+        teachers_price: record.publicExport().cp_teachers_price
+    }))
+
+    // Map to store unique combinations of class_mins and students_price
+    const uniqueLogsMap = new Map();
+
+    logs.forEach(log => {
+        const key = `${log.class_mins}-${log.teachers_price}`;
+        if (uniqueLogsMap.has(key)) {
+            uniqueLogsMap.set(key, uniqueLogsMap.get(key) + 1);
+        } else {
+            uniqueLogsMap.set(key, 1);
+        }
+    });
+
+    // Convert the map into an array of unique combinations and their counts
+    const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
+        const [class_mins, teachers_price] = key.split('-');
+        return { class_mins: Number(class_mins), teachers_price: Number(teachers_price), total_classes: count };
     });
 
     return c.json(200, {

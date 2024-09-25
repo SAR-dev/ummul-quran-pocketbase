@@ -42,7 +42,7 @@ export interface InvoiceListResponseType {
   paid: boolean
 }
 
-export interface InvoiceResponseType {
+export interface StudentInvoiceResponseType {
   id: string
   year: number
   month: number
@@ -52,5 +52,18 @@ export interface InvoiceResponseType {
     class_mins: number
     total_classes: number
     students_price: number
+  }[]
+}
+
+export interface TeacherInvoiceResponseType {
+  id: string
+  year: number
+  month: number
+  due_amount: number
+  paid: boolean
+  class_logs: {
+    class_mins: number
+    total_classes: number
+    teachers_price: number
   }[]
 }

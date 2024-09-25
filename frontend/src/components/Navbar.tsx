@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
-import { Bars3Icon, PlusIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, PlusIcon, WalletIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react'
 import ThemeSwitcher from './ThemeSwitcher';
 import SignInButton from './SignInButton';
+import { usePocket } from '../contexts/PocketContext';
 
 const Navbar = () => {
+    const { teacher } = usePocket()
     const [showMenu, setShowMenu] = useState(false)
 
     return (
@@ -15,9 +17,16 @@ const Navbar = () => {
                 </Link>
 
                 <div className="gap-3 hidden md:flex">
-                    <Link to="/teacher/class-planner" className="btn btn-ghost">
-                        Class Planner
-                    </Link>
+                    {teacher && (
+                        <Link to="/teacher/class-planner" className="btn btn-ghost">
+                            Class Planner
+                        </Link>
+                    )}
+                    {teacher && (
+                        <Link to="/teacher/invoices" className="btn btn-ghost">
+                            Invoices
+                        </Link>
+                    )}
                     <ThemeSwitcher />
                     <SignInButton />
                 </div>
@@ -29,10 +38,18 @@ const Navbar = () => {
             </nav>
             {showMenu && (
                 <div className="flex flex-col divide-y divide-base-300 border-b border-base-300 md:hidden shadow">
-                    <Link to="/teacher/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
-                        <PlusIcon className='h-5 w-5' />
-                        Class Planner
-                    </Link>
+                    {teacher && (
+                        <Link to="/teacher/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                            <PlusIcon className='h-5 w-5' />
+                            Class Planner
+                        </Link>
+                    )}
+                    {teacher && (
+                        <Link to="/teacher/invoices" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                            <WalletIcon className='h-5 w-5' />
+                            Invoices
+                        </Link>
+                    )}
                     <ThemeSwitcher asMobile={true} />
                     <SignInButton asMobile={true} />
                 </div>

@@ -11,6 +11,8 @@ import StudentSelf from "./pages/StudentSelf";
 import { RequireStudentAuth } from "./components/RequireStudentAuth";
 import HomePage from "./pages/HomePage";
 import StudentInvoice from "./pages/StudentInvoice";
+import TeacherSelfInvoices from "./pages/TeacherSelfInvoices";
+import TeacherInvoice from "./pages/TeacherInvoice";
 
 const App = () => {
   return (
@@ -26,10 +28,12 @@ const App = () => {
               <Route path="/teacher" element={<TeacherSelf />} />
               <Route path="/teacher/class-planner" element={<ClassPlanner />} />
               <Route path="/teacher/class-details/:id" element={<ClassDetails />} />
+              <Route path="/teacher/invoices" element={<TeacherSelfInvoices />} />
+              <Route path="/teacher/invoices/:id" element={<TeacherInvoice />} />
             </Route>
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
-              <Route path="/student/invoice/:id" element={<StudentInvoice />} />
+              <Route path="/student/invoices/:id" element={<StudentInvoice />} />
             </Route>
           </Routes>
         </BrowserRouter>

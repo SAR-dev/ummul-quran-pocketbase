@@ -6,7 +6,7 @@ import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
 import { Link } from 'react-router-dom'
 
-const StudentInvoiceList = () => {
+const TeacherInvoiceList = () => {
     const { token } = usePocket()
     const notification = useNotification()
     const [invoices, setInvoices] = useState<InvoiceListResponseType[]>([])
@@ -16,7 +16,7 @@ const StudentInvoiceList = () => {
     }, [token])
 
     const fetchStudentInvoices = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/get-student-invoices`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/get-teacher-invoices`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ const StudentInvoiceList = () => {
                             )}
                         </div>
                         <div className='py-3 px-5 flex justify-end'>
-                            <Link to={`/student/invoices/${invoice.id}`} className="btn btn-info btn-sm">View Receipt</Link>
+                            <Link to={`/teacher/invoices/${invoice.id}`} className="btn btn-info btn-sm">View Receipt</Link>
                         </div>
                     </div>
                 ))}
@@ -70,4 +70,4 @@ const StudentInvoiceList = () => {
     )
 }
 
-export default StudentInvoiceList
+export default TeacherInvoiceList

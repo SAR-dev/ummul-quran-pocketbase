@@ -2,18 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import { usePocket } from '../contexts/PocketContext'
 import NavLayout from '../layouts/NavLayout'
 import { months } from '../helpers/calendar'
-import { StudentInvoiceResponseType } from '../types/extend';
+import { TeacherInvoiceResponseType } from '../types/extend';
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
 import { useParams } from 'react-router-dom'
 import { useReactToPrint } from 'react-to-print';
 import { PrinterIcon } from '@heroicons/react/24/solid';
 
-const StudentInvoice = () => {
+const TeacherInvoice = () => {
     const { id = "" } = useParams();
-    const { token, student } = usePocket()
+    const { token, teacher } = usePocket()
     const notification = useNotification()
-    const [invoice, setInvoice] = useState<StudentInvoiceResponseType>()
+    const [invoice, setInvoice] = useState<TeacherInvoiceResponseType>()
     const contentRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
@@ -22,11 +22,11 @@ const StudentInvoice = () => {
 
     useEffect(() => {
         if (id.length == 0) return;
-        fetchStudentInvoiceById()
+        fetchTeacherInvoiceById()
     }, [token, id])
 
-    const fetchStudentInvoiceById = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/get-student-invoices/${id}`, {
+    const fetchTeacherInvoiceById = () => {
+        fetch(`${import.meta.env.VITE_API_URL}/api/get-teacher-invoices/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ const StudentInvoice = () => {
 
     return (
         <NavLayout>
-            {student && invoice && (
+            {teacher && invoice && (
                 <div className='max-w-[40rem] mx-auto mt-5'>
                     <div className="flex justify-center mb-5">
                         <button className="btn btn-info btn-sm btn-icon" onClick={handlePrint}>
@@ -71,11 +71,11 @@ const StudentInvoice = () => {
                             </div>
                             <div className="flex flex-col text-sm">
                                 <div className="font-semibold">Invoice Type</div>
-                                <div>Student</div>
+                                <div>Teacher</div>
                             </div>
                             <div className="flex flex-col text-sm">
                                 <div className="font-semibold">Billed To</div>
-                                <div>{student.nickname}</div>
+                                <div>{teacher.nickname}</div>
                             </div>
                             <div className="flex flex-col text-sm">
                                 <div className="font-semibold">Month</div>
@@ -125,13 +125,13 @@ const StudentInvoice = () => {
                                                 {group.class_mins} Min
                                             </td>
                                             <td className="px-3 text-right text-sm text-base-content/75">
-                                                {group.students_price} TK
+                                                {group.teachers_price} TK
                                             </td>
                                             <td className="px-3 text-right text-sm text-base-content/75">
                                                 {group.total_classes}
                                             </td>
                                             <td className="pl-3 text-right text-sm text-base-content/75">
-                                                {group.students_price * group.total_classes} TK
+                                                {group.teachers_price * group.total_classes} TK
                                             </td>
                                         </tr>
                                     ))}
@@ -177,7 +177,7 @@ const StudentInvoice = () => {
                             </table>
                         </div>
                         <div className="border-t border-base-300 pt-4 text-xs text-base-content/75 text-center mt-10 uppercase">
-                            INVOICE NO: STUDENT-{invoice.id}
+                            INVOICE NO: TEACHER-{invoice.id}
                         </div>
                     </div>
                 </div>
@@ -186,4 +186,4 @@ const StudentInvoice = () => {
     )
 }
 
-export default StudentInvoice
+export default TeacherInvoice
