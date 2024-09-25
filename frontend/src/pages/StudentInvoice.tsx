@@ -61,32 +61,25 @@ const StudentInvoice = () => {
                         </button>
                     </div>
                     <div className="bg-base-100 p-5 w-full" ref={contentRef}>
-                        <div className="grid grid-cols-2 items-center">
-                            <div>
-                                {/*  Company logo  */}
+                        <div className="w-full flex gap-10">
+                            <div className='flex-1'>
                                 <img
                                     src="https://merakiui.com/images/logo.svg"
-                                    height={100}
-                                    width={100}
+                                    height={50}
+                                    width={50}
                                 />
                             </div>
-                            <div className="text-right">
-                                <p>Ummul Quran Inc.</p>
-                                <p className="text-base-content/75 text-sm">sales@ummul.com</p>
-                                <p className="text-base-content/75 text-sm mt-1">88017611129</p>
-                                <p className="text-base-content/75 text-sm mt-1">Dhaka, Bangladesh</p>
+                            <div className="flex flex-col text-sm">
+                                <div className="font-semibold">Invoice Type</div>
+                                <div>Student</div>
                             </div>
-                        </div>
-                        <div className="w-full flex gap-10 mt-5">
                             <div className="flex flex-col text-sm">
                                 <div className="font-semibold">Billed To</div>
-                                <div>
-                                    {student.nickname} <span className="uppercase text-xs">({student.expand?.user.username})</span>
-                                </div>
+                                <div>{student.nickname}</div>
                             </div>
                             <div className="flex flex-col text-sm">
                                 <div className="font-semibold">Month</div>
-                                <div>{months.find(e => e.index == invoice.month)?.longName} {invoice.year}</div>
+                                <div>{months.find(e => e.index == invoice.month)?.shortName} {invoice.year}</div>
                             </div>
                         </div>
                         <div className="mt-8 flow-root">
@@ -183,9 +176,8 @@ const StudentInvoice = () => {
                                 </tfoot>
                             </table>
                         </div>
-                        {/*  Footer  */}
-                        <div className="border-t-2 border-base-300 pt-4 text-xs text-base-content/75 text-center mt-16">
-                            Please contact the admin if you face any problem with this bill of payment
+                        <div className="border-t border-base-300 pt-4 text-xs text-base-content/75 text-center mt-10 uppercase">
+                            INVOICE NO: STUDENT-{invoice.id}
                         </div>
                     </div>
                 </div>
