@@ -278,7 +278,9 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
 routerAdd("POST", "/api/generate-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
-    // TODO: allow admin only
+    // allow admin only
+    const admin = !!c.get("admin")
+    if(!admin) throw ForbiddenError()
 
     // check if the year and month is in past
 

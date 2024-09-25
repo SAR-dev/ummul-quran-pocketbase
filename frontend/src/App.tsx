@@ -13,6 +13,8 @@ import HomePage from "./pages/HomePage";
 import StudentInvoice from "./pages/StudentInvoice";
 import TeacherSelfInvoices from "./pages/TeacherSelfInvoices";
 import TeacherInvoice from "./pages/TeacherInvoice";
+import { RequireAdminAuth } from "./components/RequireAdminAuth";
+import AdminSelf from "./pages/AdminSelf";
 
 const App = () => {
   return (
@@ -34,6 +36,9 @@ const App = () => {
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
               <Route path="/student/invoices/:id" element={<StudentInvoice />} />
+            </Route>
+            <Route element={<RequireAdminAuth />}>
+              <Route path="/admin" element={<AdminSelf />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -3,10 +3,10 @@ import { usePocket } from "../contexts/PocketContext";
 import NavLayout from "../layouts/NavLayout";
 
 const HomePage = () => {
-    const { user, student, teacher } = usePocket();
+    const { user, student, teacher, isAdmin } = usePocket();
     const location = useLocation();
 
-    if (user && (!teacher && !student)) {
+    if (user && (!teacher && !student && !isAdmin)) {
         return (
             <NavLayout>
                 <div className="absolute top-0 left-0 h-screen w-full flex justify-center items-center">
@@ -14,6 +14,10 @@ const HomePage = () => {
                 </div>
             </NavLayout>
         )
+    } else if (isAdmin) {
+        return (
+            <Navigate to={{ pathname: "/admin" }} state={{ location }} replace />
+        );
     } else if (teacher) {
         return (
             <Navigate to={{ pathname: "/teacher" }} state={{ location }} replace />

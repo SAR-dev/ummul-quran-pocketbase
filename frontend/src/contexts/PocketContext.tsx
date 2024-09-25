@@ -7,7 +7,7 @@ import {
     useMemo,
     ReactNode,
 } from "react";
-import PocketBase, { AuthModel } from "pocketbase";
+import PocketBase, { AuthModel, getTokenPayload } from "pocketbase";
 import { useInterval, useLocalStorage } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -30,6 +30,7 @@ const oneMinInMs = 60000;
 
 interface PocketContextType {
     pb: TypedPocketBase;
+    isAdmin: boolean;
     refresh: number;
     login: ({ email, password }: { email: string; password: string }) => Promise<void>;
     logout: () => void;
@@ -53,6 +54,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
     const [token, setToken] = useState<string | null>(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
+    const [isAdmin, setIsAdmin] = useState(getTokenPayload(pb.authStore.token).type == "admin")
     const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
     const [student, setStudent] = useLocalStorage<StudentsResponse<TexpandUser> | undefined>('student', undefined)
@@ -65,6 +67,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
+            setIsAdmin(getTokenPayload(newToken).type == "admin")
             setToken(newToken);
             setUser(model);
         });
@@ -203,6 +206,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     return (
         <PocketContext.Provider value={{
             pb,
+            isAdmin,
             refresh,
             login,
             logout,
