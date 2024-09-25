@@ -42,7 +42,7 @@ const DayView = ({
                         {timeRangeEvent.events.map((e, i) => (
                             <div 
                                 className="w-fit flex gap-2 items-center text-sm py-1 px-3 rounded cursor-pointer hover:translate-x-1 duration-100" 
-                                onClick={() => navigate(`/class-details/${e.id}`)} 
+                                onClick={() => navigate(`/teacher/class-details/${e.id}`)} 
                                 style={{ backgroundColor: `${stringToColor(e.title, .3)}` }} 
                                 key={i}
                             >

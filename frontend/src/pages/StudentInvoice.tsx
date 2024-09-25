@@ -153,7 +153,7 @@ const StudentInvoice = () => {
                                             Subtotal
                                         </th>
                                         <td className="pl-3 pt-6 text-right text-sm text-base-content/75">
-                                            {invoice.total_price} TK
+                                            {invoice.due_amount} TK
                                         </td>
                                     </tr>
                                     <tr>
@@ -177,7 +177,7 @@ const StudentInvoice = () => {
                                             Total
                                         </th>
                                         <td className="pl-3 pt-4 text-right text-sm font-semibold">
-                                            {invoice.total_price} TK
+                                            {invoice.due_amount} TK
                                         </td>
                                     </tr>
                                 </tfoot>

@@ -52,7 +52,7 @@ const StudentInvoiceList = () => {
                             {months.find(e => e.index == invoice.month)?.shortName} {invoice.year}
                         </div>
                         <div className='py-3 px-5'>{invoice.total_classes} Classes</div>
-                        <div className='py-3 px-5'>{invoice.total_price} TK</div>
+                        <div className='py-3 px-5'>{invoice.due_amount} TK</div>
                         <div className='py-3 px-5'>
                             {invoice.paid ? (
                                 <div className='uppercase w-20 btn btn-success btn-sm no-animation'>Paid</div>

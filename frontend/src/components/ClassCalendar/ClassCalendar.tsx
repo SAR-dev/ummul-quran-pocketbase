@@ -107,7 +107,7 @@ const ClassCalendar = () => {
       {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} setDate={setDate} setView={setView} data={sortedClassLogs} />}
       {view == CalendarViewTypes.LOGS && <LogView data={sortedClassLogs} />}
       <div className="flex gap-3 mt-3">
-        <Link to="/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
+        <Link to="/teacher/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
           <CalculatorIcon className="h-4 w-4" />
           Class Planner
         </Link>

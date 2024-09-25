@@ -278,7 +278,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
 routerAdd("POST", "/api/generate-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
-    // allow admin only
+    // TODO: allow admin only
 
     // check if the year and month is in past
 
@@ -331,7 +331,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
         for (let teacher of teachers) {
             const record = new Record(teacher_collection)
 
-            const due_amount = classLogs.filter(e => e.publicExport().cp_teacher == teacher.get("id")).reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
+            const due_amount = classLogs.filter(e => e.publicExport().cp_teacher == teacher.get("id")).reduce((sum, record) => sum + record.publicExport().cp_teachers_price, 0);
 
             record.set("teacher", teacher.get("id"))
             record.set("year", year)
@@ -362,8 +362,6 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
             "class_logs",
             `start_at >= '${start}' && start_at < '${end}' && completed = true`
         )
-        $app.dao().expandRecords(records, ["student"], null)
-        const totalSum = records.reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
 
         res.push({
             "id": invoice.get("id"),
@@ -371,7 +369,7 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
             "month": invoice.get("month"),
             "paid": invoice.get("paid"),
             "total_classes": records.length,
-            "total_price": totalSum
+            "due_amount": invoice.get("due_amount")
         })
     }
 
@@ -425,16 +423,12 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
         return { class_mins: Number(class_mins), students_price: Number(students_price), total_classes: count };
     });
 
-    const totalSum = records.reduce((sum, record) => {
-        return sum + record.publicExport().cp_students_price;
-    }, 0);
-
     return c.json(200, {
         "id": invoice.get("id"),
         "year": invoice.get("year"),
         "month": invoice.get("month"),
         "paid": invoice.get("paid"),
         "class_logs": uniqueLogsArray,
-        "total_price": totalSum
+        "due_amount": invoice.get("due_amount")
     })
 })

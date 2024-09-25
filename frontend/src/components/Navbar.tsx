@@ -15,7 +15,7 @@ const Navbar = () => {
                 </Link>
 
                 <div className="gap-3 hidden md:flex">
-                    <Link to="/class-planner" className="btn btn-ghost">
+                    <Link to="/teacher/class-planner" className="btn btn-ghost">
                         Class Planner
                     </Link>
                     <ThemeSwitcher />
@@ -29,7 +29,7 @@ const Navbar = () => {
             </nav>
             {showMenu && (
                 <div className="flex flex-col divide-y divide-base-300 border-b border-base-300 md:hidden shadow">
-                    <Link to="/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                    <Link to="/teacher/class-planner" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
                         <PlusIcon className='h-5 w-5' />
                         Class Planner
                     </Link>

@@ -76,7 +76,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                         <button className="btn btn-xs btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>
                             <TrashIcon className='h-4 w-4' />
                         </button>
-                        <Link to={`/class-details/${props.id}`} className="btn btn-xs btn-icon btn-square bg-base-100">
+                        <Link to={`/teacher/class-details/${props.id}`} className="btn btn-xs btn-icon btn-square bg-base-100">
                             <ArrowRightIcon className='h-4 w-4' />
                         </Link>
                     </div>
@@ -118,7 +118,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                     <button className="btn btn-sm btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>
                         <TrashIcon className='h-5 w-5' />
                     </button>
-                    <Link to={`/class-details/${props.id}`} className="btn btn-sm btn-icon btn-square bg-base-100">
+                    <Link to={`/teacher/class-details/${props.id}`} className="btn btn-sm btn-icon btn-square bg-base-100">
                         <ArrowRightIcon className='h-5 w-5' />
                     </Link>
                 </div>

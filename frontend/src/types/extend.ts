@@ -38,7 +38,7 @@ export interface InvoiceListResponseType {
   year: number
   month: number
   total_classes: number
-  total_price: number
+  due_amount: number
   paid: boolean
 }
 
@@ -46,7 +46,7 @@ export interface InvoiceResponseType {
   id: string
   year: number
   month: number
-  total_price: number
+  due_amount: number
   paid: boolean
   class_logs: {
     class_mins: number

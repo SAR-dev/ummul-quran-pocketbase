@@ -10,6 +10,7 @@ enum ClassPlannerType {
 
 export const ClassPlanner = () => {
     const [plannerType, setPlannerType] = useState<ClassPlannerType>(ClassPlannerType.CLASS_LOG)
+    
     return (
         <NavLayout>
             <section className="p-5 md:p-16">

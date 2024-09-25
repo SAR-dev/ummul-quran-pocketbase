@@ -62,8 +62,10 @@ export type MonthlyPackagesRecord = {
 }
 
 export type StudentInvoicesRecord = {
+	due_amount?: number
 	month: number
 	paid?: boolean
+	paid_amount?: number
 	student: RecordIdString
 	year: number
 }
@@ -79,8 +81,10 @@ export type StudentsRecord = {
 }
 
 export type TeacherInvoicesRecord = {
+	due_amount?: number
 	month: number
 	paid?: boolean
+	paid_amount?: number
 	teacher: RecordIdString
 	year: number
 }
