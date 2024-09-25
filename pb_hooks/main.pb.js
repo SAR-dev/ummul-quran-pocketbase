@@ -278,6 +278,8 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
 routerAdd("POST", "/api/generate-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
+    // allow admin only
+
     // check if the year and month is in past
 
     const year = Number(payload.year)
@@ -289,6 +291,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
 
     $app.dao().runInTransaction((txDao) => {
         // delete incomplete classes of the year and month
+
         const start = `${new Date(year, month - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const end = `${new Date(year, month, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
@@ -369,10 +372,16 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
 routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     const userId = c.get("authRecord").get("id");
 
+    // filter by matching student and id
+
     const invoice = $app.dao().findFirstRecordByFilter(
         "student_invoices",
         `student.user.id = '${userId}' && id = '${c.pathParam("id")}'`
     )
+
+    if (invoice == null) {
+        throw new ForbiddenError()
+    }
     
     const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
     const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
@@ -386,6 +395,7 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     records.forEach(record => logs.push({
         class_mins: record.publicExport().cp_class_mins,
         students_price: record.publicExport().cp_students_price,
+        teacher_nickname: record.publicExport()
     }))
 
     // Map to store unique combinations of class_mins and students_price
@@ -403,7 +413,7 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     // Convert the map into an array of unique combinations and their counts
     const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
         const [class_mins, students_price] = key.split('-');
-        return { class_mins: Number(class_mins), students_price: Number(students_price), no_of_classes: count };
+        return { class_mins: Number(class_mins), students_price: Number(students_price), total_classes: count };
     });
 
     const totalSum = records.reduce((sum, record) => {

@@ -10,6 +10,7 @@ import TeacherSelf from "./pages/TeacherSelf";
 import StudentSelf from "./pages/StudentSelf";
 import { RequireStudentAuth } from "./components/RequireStudentAuth";
 import HomePage from "./pages/HomePage";
+import StudentInvoice from "./pages/StudentInvoice";
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
             </Route>
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
+              <Route path="/student/invoice/:id" element={<StudentInvoice />} />
             </Route>
           </Routes>
         </BrowserRouter>
