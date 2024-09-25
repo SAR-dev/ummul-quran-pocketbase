@@ -3,12 +3,10 @@ import { months, getYearsRange, getDaysOfMonth } from "../../helpers/calendar"
 import { CalendarDataType, CalendarViewTypes } from "../../types/calendar"
 import MonthView from "./components/MonthView"
 import DayView from "./components/DayView"
-import { CalculatorIcon, PrinterIcon } from "@heroicons/react/24/outline";
+import { CalculatorIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom"
 import { useLocalStorage } from "usehooks-ts"
 import LogView from "./components/LogView"
-import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react"
-import { InvoiceGenerator } from "./components/InvoiceGenerator"
 import { TexpandStudentWithPackage } from "../../types/extend"
 import { ClassLogsResponse } from "../../types/pocketbase"
 import { usePocket } from "../../contexts/PocketContext"
@@ -21,7 +19,6 @@ const ClassCalendar = () => {
   const [date, setDate] = useState(new Date().getDate())
 
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
-  const [isOpen, setIsOpen] = useState(false)
   
   useEffect(() => {
     if (!user) return;
@@ -34,8 +31,6 @@ const ClassCalendar = () => {
 
     getClassLogsData({ start, end }).then(res => setClassLogs(res))
   }, [user, year, month, refresh])
-
-  const closeInvoiceFn = () => setIsOpen(false)
 
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
     return classLogs
@@ -112,25 +107,11 @@ const ClassCalendar = () => {
       {view == CalendarViewTypes.MONTH && <MonthView year={year} month={month} date={date} setDate={setDate} setView={setView} data={sortedClassLogs} />}
       {view == CalendarViewTypes.LOGS && <LogView data={sortedClassLogs} />}
       <div className="flex gap-3 mt-3">
-        <button className="btn btn-sm btn-icon btn-outline border-base-300" onClick={() => setIsOpen(true)}>
-          <PrinterIcon className="h-4 w-4" />
-          Get Invoice
-        </button>
         <Link to="/class-planner" className="btn btn-sm btn-icon btn-outline border-base-300">
           <CalculatorIcon className="h-4 w-4" />
           Class Planner
         </Link>
       </div>
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-20">
-        <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
-        <div className="fixed inset-0 flex w-screen items-center justify-center">
-          <DialogPanel className="card p-2 bg-base-100">
-            <div className="scrollbar-thin overflow-y-auto p-3 max-h-[90vh]">
-              <InvoiceGenerator data={sortedClassLogs} closeInvoiceFn={closeInvoiceFn} />
-            </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
     </div>
   )
 }

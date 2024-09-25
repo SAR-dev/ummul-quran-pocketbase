@@ -8,7 +8,7 @@ import {
     ReactNode,
 } from "react";
 import PocketBase, { AuthModel } from "pocketbase";
-import { useInterval } from "usehooks-ts";
+import { useInterval, useLocalStorage } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
 import {
     ClassLogsResponse,
@@ -53,10 +53,10 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
     const [token, setToken] = useState<string | null>(pb.authStore.token);
     const [user, setUser] = useState(pb.authStore.model);
-    const [teacher, setTeacher] = useState<TeachersResponse<TexpandUser>>()
-    const [student, setStudent] = useState<StudentsResponse<TexpandUser>>()
     const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
+    const [student, setStudent] = useLocalStorage<StudentsResponse<TexpandUser> | undefined>('student', undefined)
+    const [teacher, setTeacher] = useLocalStorage<TeachersResponse<TexpandUser> | undefined>('teacher', undefined)
 
     useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
@@ -124,6 +124,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     }, [pb]);
 
     const logout = useCallback(() => {
+        localStorage.clear()
         pb.authStore.clear();
     }, [pb]);
 

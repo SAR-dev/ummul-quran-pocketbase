@@ -302,6 +302,11 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
             txDao.deleteRecord(record)
         }
 
+        const classLogs = $app.dao().findRecordsByFilter(
+            "class_logs",
+            `start_at >= '${start}' && start_at < '${end}' && completed = true`
+        )
+
         // insert into student invoices
 
         const student_collection = $app.dao().findCollectionByNameOrId("student_invoices")
@@ -309,9 +314,12 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
         for (let student of students) {
             const record = new Record(student_collection)
 
+            const due_amount = classLogs.filter(e => e.publicExport().student == student.get("id")).reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
+            
             record.set("student", student.get("id"))
             record.set("year", year)
             record.set("month", month)
+            record.set("due_amount", due_amount)
 
             txDao.saveRecord(record)
         }
@@ -323,9 +331,12 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
         for (let teacher of teachers) {
             const record = new Record(teacher_collection)
 
+            const due_amount = classLogs.filter(e => e.publicExport().cp_teacher == teacher.get("id")).reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
+
             record.set("teacher", teacher.get("id"))
             record.set("year", year)
             record.set("month", month)
+            record.set("due_amount", due_amount)
 
             txDao.saveRecord(record)
         }
@@ -352,9 +363,7 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
             `start_at >= '${start}' && start_at < '${end}' && completed = true`
         )
         $app.dao().expandRecords(records, ["student"], null)
-        const totalSum = records.reduce((sum, record) => {
-            return sum + record.publicExport().cp_students_price;
-        }, 0);
+        const totalSum = records.reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
 
         res.push({
             "id": invoice.get("id"),
