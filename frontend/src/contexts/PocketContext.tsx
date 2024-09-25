@@ -15,11 +15,12 @@ import {
     Collections,
     StudentInvoicesResponse,
     StudentsResponse,
+    TeacherInvoicesResponse,
     TeachersResponse,
     TimezonesResponse,
     TypedPocketBase,
 } from "../types/pocketbase";
-import { TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandUser } from "../types/extend";
+import { TexpandStudent, TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandTeacher, TexpandUser } from "../types/extend";
 import { dateToUtc } from "../helpers/calendar";
 
 interface DecodedToken {
@@ -32,7 +33,7 @@ interface PocketContextType {
     pb: TypedPocketBase;
     isAdmin: boolean;
     refresh: number;
-    login: ({ email, password }: { email: string; password: string }) => Promise<void>;
+    login: ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => Promise<void>;
     logout: () => void;
     user?: AuthModel;
     token: string | null;
@@ -44,6 +45,8 @@ interface PocketContextType {
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
     getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
+    getStudentInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    getTeacherInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -63,7 +66,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (!pb.authStore.isValid) logout()
     }, [])
-    
+
 
     useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
@@ -127,8 +130,12 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setTimeZones(res)
     }, [pb]);
 
-    const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
-        await pb.collection(Collections.Users).authWithPassword(email, password);
+    const login = useCallback(async ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => {
+        if (asAdmin) {
+            await pb.admins.authWithPassword(email, password);
+        } else {
+            await pb.collection(Collections.Users).authWithPassword(email, password);
+        }
     }, [pb]);
 
     const logout = useCallback(() => {
@@ -201,6 +208,34 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
+    const getStudentInvoiceListData = useCallback(async ({ year, month }: { year: number, month: number }) => {
+        if (!isAdmin) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.StudentInvoices)
+            .getFullList<StudentInvoicesResponse<TexpandStudent>>({
+                expand: "student",
+                filter: `year = "${year}" && month = "${month}"`
+            });
+        return res
+    }, [pb]);
+
+    const getTeacherInvoiceListData = useCallback(async ({ year, month }: { year: number, month: number }) => {
+        if (!isAdmin) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.TeacherInvoices)
+            .getFullList<TeacherInvoicesResponse<TexpandTeacher>>({
+                expand: "teacher",
+                filter: `year = "${year}" && month = "${month}"`
+            });
+        return res
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -219,7 +254,9 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             getClassLogsData,
             getClassLogDataById,
             deleteClassLogById,
-            getStudentInvoiceData
+            getStudentInvoiceData,
+            getStudentInvoiceListData,
+            getTeacherInvoiceListData
         }}>
             {children}
         </PocketContext.Provider>

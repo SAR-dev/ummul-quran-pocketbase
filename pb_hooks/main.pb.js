@@ -279,6 +279,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
     // allow admin only
+
     const admin = !!c.get("admin")
     if(!admin) throw ForbiddenError()
 
@@ -288,8 +289,23 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     const month = Number(payload.month)
 
     if (!year || !month || year > new Date().getFullYear() || month >= new Date().getMonth() + 1) {
-        throw ForbiddenError()
+        throw new ApiError(500, "You need to select a past date.", {});
     }
+
+    // check if already generated
+
+    const student_invoices = $app.dao().findRecordsByFilter(
+        "student_invoices",
+        `year = '${year}' && month = '${month}'`
+    )
+    if(student_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
+
+    const teacher_invoices = $app.dao().findRecordsByFilter(
+        "teacher_invoices",
+        `year = '${year}' && month = '${month}'`
+    )
+    if(teacher_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
+
 
     $app.dao().runInTransaction((txDao) => {
         // delete incomplete classes of the year and month

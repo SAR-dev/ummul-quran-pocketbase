@@ -8,6 +8,7 @@ export const SignIn = () => {
   const { login } = usePocket();
   const notification = useNotification()
   const [isLoading, setsLoading] = useState(false)
+  const [asAdmin, setAsAdmin] = useState(false)
   const [data, setData] = useState({
     email: "",
     password: ""
@@ -17,7 +18,7 @@ export const SignIn = () => {
     const { email, password } = data
     setsLoading(true)
     try {
-      await login({ email, password });
+      await login({ email, password, asAdmin });
       setsLoading(false)
       window.location.reload();
     } catch (err) {
@@ -66,6 +67,15 @@ export const SignIn = () => {
               onChange={e => setData({ ...data, password: e.target.value })}
             />
           </div>
+          <div className="flex items-center gap-2 text-sm mt-2">
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-success"
+              checked={asAdmin}
+              onChange={e => setAsAdmin(e.target.checked)}
+            />
+            <div>Admin</div>
+          </div>
           <div className="mt-6">
             <button className="w-full btn btn-icon btn-neutral" disabled={isLoading} onClick={handleOnSubmit}>
               {isLoading && <div className="loading w-5 h-5" />}
@@ -75,9 +85,7 @@ export const SignIn = () => {
         </form>
         <div className="flex items-center justify-between mt-4">
           <span className="w-1/5 border-b lg:w-1/5 border-base-content/50" />
-          <div
-            className="text-xs text-center text-base-content/50 uppercase"
-          >
+          <div className="text-xs text-center text-base-content/50 uppercase">
             or login with Social Media
           </div>
           <span className="w-1/5 border-b lg:w-1/5 border-base-content/50" />

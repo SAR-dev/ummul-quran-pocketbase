@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
     const notification = useNotification()
     const navigate = useNavigate()
-    const { logout, teacher, student } = usePocket()
+    const { logout, teacher, student, isAdmin } = usePocket()
 
     const signOut = () => {
         logout()
@@ -77,6 +77,31 @@ const SignInButton = ({ asMobile }: { asMobile?: boolean }) => {
                     <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
                         <img src={getImageUrl({ collectionId: student.expand?.user.collectionId, dataId: student.expand?.user.id, image: student.expand?.user.avatar })} className='h-5 w-5 rounded-full object-cover' />
                         <div>{student.nickname}</div>
+                    </button>
+                    <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation" onClick={handleSignOut}>
+                        <PowerIcon className='h-5 w-5' />
+                        Sign Out
+                    </button>
+                </>
+            )}
+            {isAdmin && !asMobile && (
+                <DropdownSelect
+                    button={
+                        <button className="btn btn-ghost border-base-300">
+                            <img src="https://img.icons8.com/parakeet/96/administrator-male.png" className='h-5 w-5 rounded-full object-cover' />
+                            <div>Admin</div>
+                        </button>
+                    }
+                    options={[
+                        { text: "Sign Out", value: "sign-out", handleClick: handleSignOut, icon: <PowerIcon className='h-5 w-5' /> },
+                    ]}
+                />
+            )}
+            {isAdmin && asMobile && (
+                <>
+                    <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                        <img src="https://img.icons8.com/parakeet/96/administrator-male.png" className='h-5 w-5 rounded-full object-cover' />
+                        <div>Admin</div>
                     </button>
                     <button className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation" onClick={handleSignOut}>
                         <PowerIcon className='h-5 w-5' />

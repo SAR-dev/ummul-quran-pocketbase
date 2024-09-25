@@ -1,4 +1,4 @@
-import { MonthlyPackagesResponse, StudentsResponse, UsersResponse } from "./pocketbase";
+import { MonthlyPackagesResponse, StudentsResponse, TeachersResponse, UsersResponse } from "./pocketbase";
 
 export type TexpandUser = {
   user: UsersResponse
@@ -6,6 +6,10 @@ export type TexpandUser = {
 
 export type TexpandStudent = {
   student: StudentsResponse
+}
+
+export type TexpandTeacher = {
+  teacher: TeachersResponse
 }
 
 export type TexpandStudentWithPackage = {
@@ -31,6 +35,10 @@ export interface ErrorResponseType {
     code: number;
     message: string;
   };
+}
+
+export interface ErrorMessageType {
+  message: string;
 }
 
 export interface InvoiceListResponseType {
