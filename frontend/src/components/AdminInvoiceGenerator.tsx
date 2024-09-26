@@ -51,20 +51,21 @@ const AdminInvoiceGenerator = () => {
 
     return (
         <div className='w-auto'>
-            <div className="flex gap-5 items-center">
-                <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="select select-bordered w-32">
+            <div className="font-semibold mb-5">Select date and click button to generate invoices</div>
+            <div className="grid sm:grid-cols-3 gap-5 w-full sm:w-[30rem]">
+                <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="select select-bordered">
                     <option disabled selected>Select Month</option>
                     {months.map((e, i) => (
                         <option value={e.index} key={i}>{e.longName}</option>
                     ))}
                 </select>
-                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered w-32">
+                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered">
                     <option disabled selected>Select Year</option>
                     {getYearsRange().map((e, i) => (
                         <option value={e} key={i}>{e}</option>
                     ))}
                 </select>
-                <button className="btn btn-info btn-icon w-48" disabled={isLoading} onClick={handleSubmit}>
+                <button className="btn btn-info btn-icon" disabled={isLoading} onClick={handleSubmit}>
                     {isLoading && <div className="loading w-5 h-5" />}
                     Generate Invoices
                 </button>

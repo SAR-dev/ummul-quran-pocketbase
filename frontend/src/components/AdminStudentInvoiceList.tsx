@@ -51,44 +51,44 @@ const AdminStudentInvoiceList = () => {
     return (
         <div className='w-auto'>
             <div className="flex gap-5 items-center">
-                <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="select select-bordered w-32">
+                <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="select select-bordered">
                     <option disabled selected>Select Month</option>
                     {months.map((e, i) => (
                         <option value={e.index} key={i}>{e.longName}</option>
                     ))}
                 </select>
-                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered w-32">
+                <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered">
                     <option disabled selected>Select Year</option>
                     {getYearsRange().map((e, i) => (
                         <option value={e} key={i}>{e}</option>
                     ))}
                 </select>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "PAID" | "UNPAID")} className="select select-bordered w-32">
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "PAID" | "UNPAID")} className="select select-bordered">
                     <option value="PAID">Paid</option>
                     <option value="UNPAID">Unpaid</option>
                 </select>
             </div>
             <div className="card flex-col divide-y divide-base-300 w-full border border-base-300 mt-5">
-                <div className="grid grid-cols-5">
-                    <div className='font-semibold py-3 px-5'>Student</div>
-                    <div className='font-semibold py-3 px-5'>Status</div>
-                    <div className='font-semibold py-3 px-5'>Due AMount</div>
-                    <div className='font-semibold py-3 px-5'>Paid AMount</div>
-                    <div className='font-semibold py-3 px-5'>Note</div>
+                <div className="grid grid-cols-4 sm:grid-cols-5">
+                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Student</div>
+                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Status</div>
+                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Due <span className='hidden sm:block'>Amount</span></div>
+                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Paid <span className='hidden sm:block'>Amount</span></div>
+                    <div className='font-semibold p-3 sm:py-3 sm:px-5 hidden sm:block'>Note</div>
                 </div>
                 {sortedInvoices.map((invoice, i) => (
-                    <div className="grid grid-cols-5 cursor-pointer hover:bg-base-300" onClick={() => setUpdateInvoice({ ...invoice })} key={i}>
-                        <div className='font-semibold py-3 px-5'>{invoice.expand?.student.nickname}</div>
-                        <div className='py-3 px-5'>
+                    <div className="grid grid-cols-4 sm:grid-cols-5 cursor-pointer hover:bg-base-300" onClick={() => setUpdateInvoice({ ...invoice })} key={i}>
+                        <div className='font-semibold p-3 sm:py-3 sm:px-5'>{invoice.expand?.student.nickname}</div>
+                        <div className='p-3 sm:py-3 sm:px-5'>
                             {invoice.paid ? (
                                 <span className='text-success'>PAID</span>
                             ) : (
                                 <span className='text-error'>UNPAID</span>
                             )}
                         </div>
-                        <div className='py-3 px-5'>{invoice.due_amount} TK</div>
-                        <div className='py-3 px-5'>{invoice.paid_amount} TK</div>
-                        <div className='py-3 px-5'>{invoice.note}</div>
+                        <div className='p-3 sm:py-3 sm:px-5'>{invoice.due_amount} TK</div>
+                        <div className='p-3 sm:py-3 sm:px-5'>{invoice.paid_amount} TK</div>
+                        <div className='p-3 sm:py-3 sm:px-5 hidden sm:block'>{invoice.note}</div>
                     </div>
                 ))}
             </div>
@@ -112,7 +112,7 @@ const AdminStudentInvoiceList = () => {
                                     <div className="grid grid-cols-2 divide-x divide-base-300">
                                         <div className='py-3 px-5'>Payment Status</div>
                                         <div className="py-3 px-5">
-                                            <label className="swap">
+                                            <label className="swap bg-base-300 w-full h-full rounded-lg text-center">
                                                 <input
                                                     type="checkbox"
                                                     checked={updateInvoice.paid}
