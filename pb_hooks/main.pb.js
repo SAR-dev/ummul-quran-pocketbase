@@ -310,8 +310,11 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     $app.dao().runInTransaction((txDao) => {
         // delete incomplete classes of the year and month
 
-        const start = `${new Date(year, month - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${new Date(year, month, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const cd = new Date(year, month - 1, 1);
+        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
             `start_at >= '${start}' && start_at < '${end}' && completed = false`
@@ -374,8 +377,13 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
     const res = []
 
     for (let invoice of invoices) {
-        const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const year = invoice.get("year")
+        const month = invoice.get("month")
+        const cd = new Date(year, month - 1, 1);
+        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
             `start_at >= '${start}' && start_at < '${end}' && completed = true`
@@ -405,8 +413,13 @@ routerAdd("GET", "/api/get-teacher-invoices", (c) => {
     const res = []
 
     for (let invoice of invoices) {
-        const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+        const year = invoice.get("year")
+        const month = invoice.get("month")
+        const cd = new Date(year, month - 1, 1);
+        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
+        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
             `start_at >= '${start}' && start_at < '${end}' && completed = true`
@@ -439,8 +452,13 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
         throw new ForbiddenError()
     }
     
-    const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
-    const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const year = invoice.get("year")
+    const month = invoice.get("month")
+    const cd = new Date(year, month - 1, 1);
+    const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+    const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
+    const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
         `start_at >= '${start}' && start_at < '${end}' && completed = true`
@@ -495,8 +513,13 @@ routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
         throw new ForbiddenError()
     }
     
-    const start = `${new Date(invoice.get("year"), invoice.get("month") - 1, 1).toISOString().slice(0, 10)} 00:00:00.000Z`
-    const end = `${new Date(invoice.get("year"), invoice.get("month"), 1).toISOString().slice(0, 10)} 00:00:00.000Z`
+    const year = invoice.get("year")
+    const month = invoice.get("month")
+    const cd = new Date(year, month - 1, 1);
+    const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+
+    const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
+    const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
         `start_at >= '${start}' && start_at < '${end}' && completed = true`

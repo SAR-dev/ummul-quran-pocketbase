@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TeacherInvoicesResponse } from '../types/pocketbase';
 import { getYearsRange, months } from '../helpers/calendar'
 import { usePocket } from '../contexts/PocketContext'
@@ -13,14 +13,21 @@ const AdminTeacherInvoiceList = () => {
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [invoices, setInvoices] = useState<TeacherInvoicesResponse<TexpandTeacher>[]>([])
+    const [sortBy, setSortBy] = useState<"PAID" | "UNPAID">("UNPAID")
     const [isLoading, setIsLoading] = useState(false)
     const [updateInvoice, setUpdateInvoice] = useState<TeacherInvoicesResponse<TexpandTeacher> | undefined>(undefined)
 
     useEffect(() => {
         if (!user) return;
 
-        getTeacherInvoiceListData({ year, month }).then(res => setInvoices(res))
+        getTeacherInvoiceListData({ year, month })
+            .then(res => setInvoices(res))
     }, [year, month, user, refresh])
+
+    const sortedInvoices = useMemo(
+        () => invoices.sort((a, b) => sortBy == "PAID" ? (Number(b.paid) - Number(a.paid)) : Number(a.paid) - Number(b.paid)),
+        [invoices, sortBy]
+    );
 
     const handleUpdate = async () => {
         if (!updateInvoice) return;
@@ -56,6 +63,10 @@ const AdminTeacherInvoiceList = () => {
                         <option value={e} key={i}>{e}</option>
                     ))}
                 </select>
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "PAID" | "UNPAID")} className="select select-bordered w-32">
+                    <option value="PAID">Paid</option>
+                    <option value="UNPAID">Unpaid</option>
+                </select>
             </div>
             <div className="card flex-col divide-y divide-base-300 w-full border border-base-300 mt-5">
                 <div className="grid grid-cols-5">
@@ -65,7 +76,7 @@ const AdminTeacherInvoiceList = () => {
                     <div className='font-semibold py-3 px-5'>Paid AMount</div>
                     <div className='font-semibold py-3 px-5'>Note</div>
                 </div>
-                {invoices.map((invoice, i) => (
+                {sortedInvoices.map((invoice, i) => (
                     <div className="grid grid-cols-5 cursor-pointer hover:bg-base-300" onClick={() => setUpdateInvoice({ ...invoice })} key={i}>
                         <div className='font-semibold py-3 px-5'>{invoice.expand?.teacher.nickname}</div>
                         <div className='py-3 px-5'>
