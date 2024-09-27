@@ -6,7 +6,7 @@ import { ErrorResponseType, TexpandStudent } from '../types/extend';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
-import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon, PencilIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames';
 import { ServerIcon } from '@heroicons/react/24/outline';
 
@@ -154,12 +154,12 @@ const AdminStudentInvoiceList = () => {
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>Status</div>
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Due <span className='hidden sm:block'>Amount</span></div>
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Paid <span className='hidden sm:block'>Amount</span></div>
-                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 hidden sm:flex'>
                         <button className="btn btn-sm btn-outline border-base-300" onClick={() => setShowMsgUpdateModal(true)}>Template</button>
                     </div>
                 </div>
                 {sortedInvoices.map((invoice, i) => (
-                    <div className="flex" key={i}>
+                    <div className="flex flex-wrap" key={i}>
                         <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>{invoice.expand?.student.nickname}</div>
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>
                             {invoice.paid ? (
@@ -170,7 +170,7 @@ const AdminStudentInvoiceList = () => {
                         </div>
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.due_amount} TK</div>
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.paid_amount} TK</div>
-                        <div className='flex-1 p-3 sm:py-3 sm:px-5'>
+                        <div className='w-full sm:flex-1 p-3 pt-0 sm:py-3 sm:px-5'>
                             <button className="btn btn-sm btn-outline border-base-300 btn-square mr-2" onClick={() => setUpdateInvoice({ ...invoice })}>
                                 <PencilIcon className='h-4 w-4' />
                             </button>
@@ -183,10 +183,13 @@ const AdminStudentInvoiceList = () => {
                 <Dialog open={true} onClose={() => { }} className="relative z-20">
                     <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
                     <div className="fixed inset-0 flex w-screen items-center justify-center">
-                        <DialogPanel className="card p-4 bg-base-100 min-w-96 max-w-md">
+                        <DialogPanel className="card p-4 bg-base-100 w-full max-w-md">
                             <div className='p-5'>
-                                <div className='flex'>
+                                <div className='flex justify-between items-center'>
                                     <div>Invoice of <b>{updateInvoice.expand?.student.nickname}</b> for <b>{months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</b></div>
+                                    <button className="btn btn-sm btn-square" onClick={() => setUpdateInvoice(undefined)}>
+                                        <XMarkIcon className='h-4 w-4' />
+                                    </button>
                                 </div>
                                 <div className="card my-5 flex-col border border-base-300 divide-y divide-base-300">
                                     <div className="grid grid-cols-2 divide-x divide-base-300">
@@ -198,7 +201,7 @@ const AdminStudentInvoiceList = () => {
                                     <div className="grid grid-cols-2 divide-x divide-base-300">
                                         <div className='py-3 px-5'>Payment Status</div>
                                         <div className="py-3 px-5">
-                                            <label className="swap bg-base-300 w-full h-full rounded-lg text-center">
+                                            <label className="swap bg-base-300 w-20 h-full rounded-lg text-center">
                                                 <input
                                                     type="checkbox"
                                                     checked={updateInvoice.paid}
@@ -232,9 +235,8 @@ const AdminStudentInvoiceList = () => {
                                             placeholder="Note" />
                                     </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <button className="btn btn-sm" disabled={isLoading} onClick={() => setUpdateInvoice(undefined)}>Go Back</button>
-                                    <button className="btn btn-sm btn-info btn-icon" onClick={handleUpdate} disabled={isLoading}>
+                                <div className="flex">
+                                    <button className="btn border-base-300 btn-icon w-full" onClick={handleUpdate} disabled={isLoading}>
                                         {isLoading && <div className="loading w-4 h-4" />}
                                         {!isLoading && <ServerIcon className="w-4 h-4" />}
                                         Save
@@ -255,8 +257,8 @@ const AdminStudentInvoiceList = () => {
                                 <div className="text-xs">ⓘ Autosave Enabled</div>
                             </div>
                             <textarea
-                                className="textarea textarea-bordered w-full textarea-xs sm:textarea-sm resize-none scrollbar-thin"
-                                rows={10}
+                                className="textarea textarea-bordered bg-base-200 w-full textarea-xs sm:textarea-sm resize-none scrollbar-thin"
+                                rows={8}
                                 value={message}
                                 onChange={e => setMessage(e.target.value)}
                             />

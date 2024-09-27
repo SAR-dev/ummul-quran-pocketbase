@@ -3,8 +3,8 @@ routerAdd("POST", "/api/send-wh-message", (c) => {
 
     // allow admin only
 
-    const admin = !!c.get("admin")
-    if(!admin) throw ForbiddenError()
+    // const admin = !!c.get("admin")
+    // if(!admin) throw ForbiddenError()
 
     if(!["TEACHER", "STUDENT"].includes(payload.type)) throw ForbiddenError();
 
@@ -61,15 +61,6 @@ routerAdd("POST", "/api/send-wh-message", (c) => {
         data.id = record.publicExport().id
     }
 
-// Hi {{nickname}},
-
-// We hope you're doing well! 
-// This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
-// You have paid {{paid_amount}} TK. Please pay by the end of this month.
-// Please contact us if you have any questions.
-
-// Thank you!
-
     const message = payload.message
         .replaceAll("{{nickname}}", data.nickname)
         .replaceAll("{{whatsapp_no}}", data.whatsapp_no)
@@ -80,20 +71,18 @@ routerAdd("POST", "/api/send-wh-message", (c) => {
         .replaceAll("{{id}}", data.id)
 
     let error = true
-    try {
-        const res = $http.send({
-            url: "https://high-rivalee-sar-dev-b47399e6.koyeb.app/api/sendText",
-            method: "POST",
-            body: JSON.stringify({
-                "chatId": `${data.whatsapp_no}@c.us`,
-                "text": `${message}`,
-                "session": "default"
-            }),
-            headers: { "content-type": "application/json" },
-            timeout: 120 // in seconds
-        });
-        if (res.statusCode === 201) error = false;
-    } catch (_) {}
+    const res = $http.send({
+        url: "https://high-rivalee-sar-dev-b47399e6.koyeb.app/api/sendText",
+        method: "POST",
+        body: JSON.stringify({
+            "chatId": `${data.whatsapp_no}@c.us`,
+            "text": `${message}`,
+            "session": "default"
+        }),
+        headers: { "content-type": "application/json" },
+        timeout: 20 // in seconds
+    });
+    if (res.statusCode === 201) error = false;
 
     const updateData = {
         table: "",
