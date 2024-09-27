@@ -8,6 +8,7 @@ import { NotificationType } from '../types/notification';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon, PencilIcon } from '@heroicons/react/24/solid';
 import classNames from 'classnames';
+import { ServerIcon } from '@heroicons/react/24/outline';
 
 const WhatsAppInvoiceButton = ({ id, message, status }: { id: string, message: string, status?: string }) => {
     const { token } = usePocket()
@@ -51,24 +52,26 @@ const WhatsAppInvoiceButton = ({ id, message, status }: { id: string, message: s
     return (
         <button
             className={classNames({
-                "btn btn-sm btn-icon w-40 flex-shrink-0": true,
-                "btn-info": messageStatus && messageStatus?.length > 0,
-                "btn-neutral": messageStatus?.length == 0
+                "btn btn-sm btn-icon btn-outline border-base-300 w-40 flex-shrink-0": true,
+                "text-success": messageStatus == SUCCESS,
+                "text-error": messageStatus == ERROR
             })}
-            onClick={handleSubmit} 
+            onClick={handleSubmit}
             disabled={isLoading}
         >
             {isLoading && <div className="loading w-4 h-4" />}
             {!isLoading && messageStatus?.length == 0 && <PaperAirplaneIcon className="w-4 h-4" />}
             {!isLoading && messageStatus == SUCCESS && <CheckCircleIcon className="w-4 h-4" />}
             {!isLoading && messageStatus == ERROR && <ExclamationCircleIcon className="w-4 h-4" />}
-            {messageStatus?.length == 0 ? "Send Message" : "Resend Message"}
+            {messageStatus?.length == 0 && "Send Message"}
+            {messageStatus == SUCCESS && "Resend Message"}
+            {messageStatus == ERROR && "Retry Message"}
         </button>
     )
 }
 
 const defaultMessage =
-`Hi {{nickname}},
+    `Hi {{nickname}},
 
 We hope you're doing well! 
 This is a reminder that your payment for {{month}}, {{year}} is {{due_amount}} TK. 
@@ -79,7 +82,7 @@ You can get the invoice at: ${window.location.origin}/teacher/invoices/{{id}}
 
 Thank you!`
 
-const msgFields = [ "{{nickname}}", "{{whatsapp_no}}", "{{year}}", "{{month}}", "{{due_amount}}", "{{paid_amount}}", "{{id}}"]
+const msgFields = ["{{nickname}}", "{{whatsapp_no}}", "{{year}}", "{{month}}", "{{due_amount}}", "{{paid_amount}}", "{{id}}"]
 
 const AdminTeacherInvoiceList = () => {
     const { user, refresh, getTeacherInvoiceListData, updateTeacherInvoiceData } = usePocket()
@@ -152,7 +155,7 @@ const AdminTeacherInvoiceList = () => {
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Due <span className='hidden sm:block'>Amount</span></div>
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Paid <span className='hidden sm:block'>Amount</span></div>
                     <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>
-                        <button className="btn-neutral btn btn-sm" onClick={() => setShowMsgUpdateModal(true)}>Template</button>
+                        <button className="btn btn-sm btn-outline border-base-300" onClick={() => setShowMsgUpdateModal(true)}>Template</button>
                     </div>
                 </div>
                 {sortedInvoices.map((invoice, i) => (
@@ -168,7 +171,7 @@ const AdminTeacherInvoiceList = () => {
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.due_amount} TK</div>
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.paid_amount} TK</div>
                         <div className='flex-1 p-3 sm:py-3 sm:px-5'>
-                            <button className="btn btn-sm btn-accent btn-square mr-2" onClick={() => setUpdateInvoice({ ...invoice })}>
+                            <button className="btn btn-sm btn-outline border-base-300 btn-square mr-2" onClick={() => setUpdateInvoice({ ...invoice })}>
                                 <PencilIcon className='h-4 w-4' />
                             </button>
                             <WhatsAppInvoiceButton id={invoice.id} message={message} status={invoice.status} />
@@ -182,9 +185,8 @@ const AdminTeacherInvoiceList = () => {
                     <div className="fixed inset-0 flex w-screen items-center justify-center">
                         <DialogPanel className="card p-4 bg-base-100 min-w-96 max-w-md">
                             <div className='p-5'>
-                                <div className='flex justify-between font-semibold'>
-                                    <div>{updateInvoice.expand?.teacher.nickname}</div>
-                                    <div>{months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</div>
+                                <div className='flex'>
+                                    <div>Invoice of <b>{updateInvoice.expand?.teacher.nickname}</b> for {months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</div>
                                 </div>
                                 <div className="card my-5 flex-col border border-base-300 divide-y divide-base-300">
                                     <div className="grid grid-cols-2 divide-x divide-base-300">
@@ -234,7 +236,8 @@ const AdminTeacherInvoiceList = () => {
                                     <button className="btn btn-sm" disabled={isLoading} onClick={() => setUpdateInvoice(undefined)}>Go Back</button>
                                     <button className="btn btn-sm btn-info btn-icon" onClick={handleUpdate} disabled={isLoading}>
                                         {isLoading && <div className="loading w-4 h-4" />}
-                                        Update
+                                        {!isLoading && <ServerIcon className="w-4 h-4" />}
+                                        Save
                                     </button>
                                 </div>
                             </div>
@@ -247,8 +250,12 @@ const AdminTeacherInvoiceList = () => {
                 <div className="fixed inset-0 flex w-screen items-center justify-center">
                     <DialogPanel className="card p-4 bg-base-100 w-full min-w-96 max-w-[40rem]">
                         <div className='p-5'>
+                            <div className='flex justify-between items-center mb-5'>
+                                <div className="font-semibold">Update Message Template</div>
+                                <div className="text-xs">ⓘ Autosave Enabled</div>
+                            </div>
                             <textarea
-                                className="textarea textarea-bordered w-full textarea-sm resize-none scrollbar-thin"
+                                className="textarea textarea-bordered w-full textarea-xs sm:textarea-sm resize-none scrollbar-thin"
                                 rows={10}
                                 value={message}
                                 onChange={e => setMessage(e.target.value)}
