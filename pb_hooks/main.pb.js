@@ -1,8 +1,118 @@
-routerAdd("GET", "/api/hello/:name", (c) => {
-    let name = c.pathParam("name")
+routerAdd("POST", "/api/send-wh-message", (c) => {
+    const payload = $apis.requestInfo(c).data
 
-    return c.json(200, { "message": "Hello " + name })
-})
+    // allow admin only
+
+    const admin = !!c.get("admin")
+    if(!admin) throw ForbiddenError()
+
+    if(!["TEACHER", "STUDENT"].includes(payload.type)) throw ForbiddenError();
+
+    const data = {
+        id: "",
+        nickname: "",
+        whatsapp_no: "",
+        year: "",
+        month: "",
+        due_amount: "",
+        paid_amount: ""
+    }
+
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    if (payload.type == "TEACHER") {
+        const record = $app.dao().findFirstRecordByFilter(
+            "teacher_invoices",
+            `id = '${payload.id}'`
+        )
+        $app.dao().expandRecord(record, ["teacher"], null)
+        
+        if (record == null) {
+            throw new ForbiddenError()
+        }
+        
+        data.nickname = record.publicExport().expand.teacher.publicExport().nickname
+        data.whatsapp_no = record.publicExport().expand.teacher.publicExport().mobile_no.replace(/\D/g, '')
+        data.year = record.publicExport().year
+        data.month = months[record.publicExport().month - 1]
+        data.due_amount = record.publicExport().due_amount
+        data.id = record.publicExport().id
+    }
+
+    if (payload.type == "STUDENT") {
+        const record = $app.dao().findFirstRecordByFilter(
+            "student_invoices",
+            `id = '${payload.id}'`
+        )
+        $app.dao().expandRecord(record, ["student"], null)
+
+        if (record == null) {
+            throw new ForbiddenError()
+        }
+
+        data.nickname = record.publicExport().expand.student.publicExport().nickname
+        data.whatsapp_no = record.publicExport().expand.student.publicExport().mobile_no.replace(/\D/g, '')
+        data.year = record.publicExport().year
+        data.month = months[record.publicExport().month - 1]
+        data.due_amount = record.publicExport().due_amount
+        data.id = record.publicExport().id
+    }
+
+// Hi {{nickname}},
+
+// We hope you're doing well! 
+// This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
+// You have paid {{paid_amount}} TK. Please pay by the end of this month.
+// Please contact us if you have any questions.
+
+// Thank you!
+
+    const message = payload.message
+        .replaceAll("{{nickname}}", data.nickname)
+        .replaceAll("{{whatsapp_no}}", data.whatsapp_no)
+        .replaceAll("{{year}}", data.year)
+        .replaceAll("{{month}}", data.month)
+        .replaceAll("{{due_amount}}", data.due_amount)
+        .replaceAll("{{paid_amount}}", data.paid_amount)
+        .replaceAll("{{id}}", data.id)
+
+    let error = true
+    try {
+        const res = $http.send({
+            url: "https://high-rivalee-sar-dev-b47399e6.koyeb.app/api/sendText",
+            method: "POST",
+            body: JSON.stringify({
+                "chatId": `${data.whatsapp_no}@c.us`,
+                "text": `${message}`,
+                "session": "default"
+            }),
+            headers: { "content-type": "application/json" },
+            timeout: 120 // in seconds
+        });
+        if (res.statusCode === 201) error = false;
+    } catch (_) {}
+
+    const updateData = {
+        table: "",
+        id: "",
+        status: ""
+    }
+    updateData.id = data.id
+    if(payload.type == "TEACHER") updateData.table = "teacher_invoices";
+    if(payload.type == "STUDENT") updateData.table = "student_invoices";
+    if(error) updateData.status = "ERROR"
+    if(!error) updateData.status = "SUCCESS"
+
+    const record = $app.dao().findRecordById(updateData.table, updateData.id)
+    record.set("status", updateData.status)
+    $app.dao().saveRecord(record)
+
+    c.json(200, { "message": "Request processed!" });
+});
+
 
 routerAdd("POST", "/api/class-logs/create-by-routine", (c) => {
     const payload = $apis.requestInfo(c).data
@@ -281,7 +391,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     // allow admin only
 
     const admin = !!c.get("admin")
-    if(!admin) throw ForbiddenError()
+    if (!admin) throw ForbiddenError()
 
     // check if the year and month is in past
 
@@ -298,13 +408,13 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
         "student_invoices",
         `year = '${year}' && month = '${month}'`
     )
-    if(student_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
+    if (student_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
 
     const teacher_invoices = $app.dao().findRecordsByFilter(
         "teacher_invoices",
         `year = '${year}' && month = '${month}'`
     )
-    if(teacher_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
+    if (teacher_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
 
 
     $app.dao().runInTransaction((txDao) => {
@@ -336,7 +446,7 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
             const record = new Record(student_collection)
 
             const due_amount = classLogs.filter(e => e.publicExport().student == student.get("id")).reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
-            
+
             record.set("student", student.get("id"))
             record.set("year", year)
             record.set("month", month)
@@ -451,7 +561,7 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     if (invoice == null) {
         throw new ForbiddenError()
     }
-    
+
     const year = invoice.get("year")
     const month = invoice.get("month")
     const cd = new Date(year, month - 1, 1);
@@ -512,7 +622,7 @@ routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
     if (invoice == null) {
         throw new ForbiddenError()
     }
-    
+
     const year = invoice.get("year")
     const month = invoice.get("month")
     const cd = new Date(year, month - 1, 1);

@@ -61,12 +61,17 @@ export type MonthlyPackagesRecord = {
 	teachers_price: number
 }
 
+export enum StudentInvoicesStatusOptions {
+	"SUCCESS" = "SUCCESS",
+	"ERROR" = "ERROR",
+}
 export type StudentInvoicesRecord = {
 	due_amount?: number
 	month: number
 	note?: string
 	paid?: boolean
 	paid_amount?: number
+	status?: StudentInvoicesStatusOptions
 	student: RecordIdString
 	year: number
 }
@@ -81,12 +86,17 @@ export type StudentsRecord = {
 	user: RecordIdString
 }
 
+export enum TeacherInvoicesStatusOptions {
+	"SUCCESS" = "SUCCESS",
+	"ERROR" = "ERROR",
+}
 export type TeacherInvoicesRecord = {
 	due_amount?: number
 	month: number
 	note?: string
 	paid?: boolean
 	paid_amount?: number
+	status?: TeacherInvoicesStatusOptions
 	teacher: RecordIdString
 	year: number
 }

@@ -6,6 +6,80 @@ import { ErrorResponseType, TexpandStudent } from '../types/extend';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
+import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import classNames from 'classnames';
+
+const WhatsAppInvoiceButton = ({ id, message, status }: { id: string, message: string, status?: string }) => {
+    const { token } = usePocket()
+    const [messageStatus, setMessageStatus] = useState(status)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const SUCCESS = "SUCCESS"
+    const ERROR = "ERROR"
+
+    const handleSubmit = () => {
+        const payload = {
+            type: "STUDENT",
+            id,
+            message
+        }
+
+        setIsLoading(true)
+        fetch(`${import.meta.env.VITE_API_URL}/api/send-wh-message`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ?? ""
+            },
+            body: JSON.stringify(payload),
+        })
+            .then(async response => {
+                if (!response.ok) {
+                    setMessageStatus(ERROR)
+                }
+                setMessageStatus(SUCCESS)
+            })
+            .then(() => {
+                setMessageStatus(SUCCESS)
+            })
+            .catch(() => {
+                setMessageStatus(ERROR)
+            })
+            .finally(() => setIsLoading(false));
+    }
+
+    return (
+        <button
+            className={classNames({
+                "btn btn-sm btn-icon w-40 flex-shrink-0": true,
+                "btn-info": messageStatus && messageStatus?.length > 0,
+                "btn-neutral": messageStatus?.length == 0
+            })}
+            onClick={handleSubmit}
+            disabled={isLoading}
+        >
+            {isLoading && <div className="loading w-4 h-4" />}
+            {!isLoading && messageStatus?.length == 0 && <PaperAirplaneIcon className="w-4 h-4" />}
+            {!isLoading && messageStatus == SUCCESS && <CheckCircleIcon className="w-4 h-4" />}
+            {!isLoading && messageStatus == ERROR && <ExclamationCircleIcon className="w-4 h-4" />}
+            {messageStatus?.length == 0 ? "Send Message" : "Resend Message"}
+        </button>
+    )
+}
+
+const defaultMessage =
+    `Hi {{nickname}},
+
+We hope you're doing well! 
+This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
+You have paid {{paid_amount}} TK. Please pay by the end of this month.
+Please contact us if you have any questions.
+
+You can get the invoice at: ${window.location.origin}/teacher/invoices/{{id}}
+
+Thank you!`
+
+const msgFields = ["{{nickname}}", "{{whatsapp_no}}", "{{year}}", "{{month}}", "{{due_amount}}", "{{paid_amount}}", "{{id}}"]
 
 const AdminStudentInvoiceList = () => {
     const { user, refresh, getStudentInvoiceListData, updateStudentInvoiceData } = usePocket()
@@ -16,6 +90,9 @@ const AdminStudentInvoiceList = () => {
     const [sortBy, setSortBy] = useState<"PAID" | "UNPAID">("UNPAID")
     const [isLoading, setIsLoading] = useState(false)
     const [updateInvoice, setUpdateInvoice] = useState<StudentInvoicesResponse<TexpandStudent> | undefined>(undefined)
+
+    const [message, setMessage] = useState(defaultMessage)
+    const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
 
     useEffect(() => {
         if (!user) return;
@@ -69,26 +146,30 @@ const AdminStudentInvoiceList = () => {
                 </select>
             </div>
             <div className="card flex-col divide-y divide-base-300 w-full border border-base-300 mt-5">
-                <div className="grid grid-cols-4 sm:grid-cols-5">
-                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Student</div>
-                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Status</div>
-                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Due <span className='hidden sm:block'>Amount</span></div>
-                    <div className='font-semibold p-3 sm:py-3 sm:px-5'>Paid <span className='hidden sm:block'>Amount</span></div>
-                    <div className='font-semibold p-3 sm:py-3 sm:px-5 hidden sm:block'>Note</div>
+                <div className="flex">
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>Student</div>
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>Status</div>
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Due <span className='hidden sm:block'>Amount</span></div>
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5 inline-flex gap-1'>Paid <span className='hidden sm:block'>Amount</span></div>
+                    <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>
+                        <button className="btn-neutral btn btn-sm" onClick={() => setShowMsgUpdateModal(true)}>Template</button>
+                    </div>
                 </div>
                 {sortedInvoices.map((invoice, i) => (
-                    <div className="grid grid-cols-4 sm:grid-cols-5 cursor-pointer hover:bg-base-300" onClick={() => setUpdateInvoice({ ...invoice })} key={i}>
-                        <div className='font-semibold p-3 sm:py-3 sm:px-5'>{invoice.expand?.student.nickname}</div>
-                        <div className='p-3 sm:py-3 sm:px-5'>
+                    <div className="flex" key={i}>
+                        <div className='flex-1 font-semibold p-3 sm:py-3 sm:px-5'>{invoice.expand?.student.nickname}</div>
+                        <div className='flex-1 p-3 sm:py-3 sm:px-5'>
                             {invoice.paid ? (
                                 <span className='text-success'>PAID</span>
                             ) : (
                                 <span className='text-error'>UNPAID</span>
                             )}
                         </div>
-                        <div className='p-3 sm:py-3 sm:px-5'>{invoice.due_amount} TK</div>
-                        <div className='p-3 sm:py-3 sm:px-5'>{invoice.paid_amount} TK</div>
-                        <div className='p-3 sm:py-3 sm:px-5 hidden sm:block'>{invoice.note}</div>
+                        <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.due_amount} TK</div>
+                        <div className='flex-1 p-3 sm:py-3 sm:px-5'>{invoice.paid_amount} TK</div>
+                        <div className='flex-1 p-3 sm:py-3 sm:px-5'>
+                            <WhatsAppInvoiceButton id={invoice.id} message={message} status={invoice.status} />
+                        </div>
                     </div>
                 ))}
             </div>
@@ -158,6 +239,22 @@ const AdminStudentInvoiceList = () => {
                     </div>
                 </Dialog>
             )}
+            <Dialog open={showMsgUpdateModal} onClose={() => setShowMsgUpdateModal(false)} className="relative z-20">
+                <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
+                <div className="fixed inset-0 flex w-screen items-center justify-center">
+                    <DialogPanel className="card p-4 bg-base-100 w-full min-w-96 max-w-[40rem]">
+                        <div className='p-5'>
+                            <textarea
+                                className="textarea textarea-bordered w-full textarea-sm resize-none scrollbar-thin"
+                                rows={10}
+                                value={message}
+                                onChange={e => setMessage(e.target.value)}
+                            />
+                            <div className="mt-3 text-xs">Available variables: {msgFields.join(", ")}</div>
+                        </div>
+                    </DialogPanel>
+                </div>
+            </Dialog>
         </div>
     )
 }
