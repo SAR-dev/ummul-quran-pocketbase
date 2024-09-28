@@ -3,8 +3,8 @@ routerAdd("POST", "/api/send-wh-message", (c) => {
 
     // allow admin only
 
-    // const admin = !!c.get("admin")
-    // if(!admin) throw ForbiddenError()
+    const admin = !!c.get("admin")
+    if(!admin) throw ForbiddenError()
 
     if(!["TEACHER", "STUDENT"].includes(payload.type)) throw ForbiddenError();
 
@@ -336,6 +336,9 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     const id = payload.id
     if (!id) throw ForbiddenError();
 
+    const feedback = payload.feedback
+    if (!feedback || feedback.length < 10) throw ForbiddenError();
+
     // helpers
 
     function getCurrentTime() {
@@ -351,6 +354,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     const monthly_package = $app.dao().findRecordById("monthly_packages", student.get("monthly_package"))
 
     $app.dao().runInTransaction((txDao) => {
+        record.set("feedback", feedback)
         record.set("cp_teacher", student.get("teacher"))
         record.set("cp_class_mins", monthly_package.get("class_mins"))
         record.set("cp_teachers_price", monthly_package.get("teachers_price"))

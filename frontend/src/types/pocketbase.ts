@@ -46,6 +46,7 @@ export type ClassLogsRecord = {
 	cp_students_price?: number
 	cp_teacher?: RecordIdString
 	cp_teachers_price?: number
+	feedback?: string
 	finish_at?: IsoDateString
 	start_at?: IsoDateString
 	started?: boolean

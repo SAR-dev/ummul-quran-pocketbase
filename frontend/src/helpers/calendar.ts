@@ -101,7 +101,7 @@ export const months = [
     }
 ];
 
-export const weeks = [1, 2, 3, 4, 5]
+export const weeks = [1, 2, 3, 4, 5, 6]
 
 export const timeRanges: TimeRangeType[] = [
     { start: "00:00", end: "01:00" },

@@ -15,7 +15,7 @@ type ThemeStore = {
 export const useThemeStore = create<ThemeStore>()(
     persist(
         (set) => ({
-            theme: ThemeName.Light,
+            theme: ThemeName.Dark,
             setTheme: (value: ThemeName) => {
                 set(() => ({ theme: value }))
                 document.querySelector('html')?.setAttribute('data-theme', value)

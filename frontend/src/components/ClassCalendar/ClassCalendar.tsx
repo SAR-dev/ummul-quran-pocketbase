@@ -5,13 +5,14 @@ import MonthView from "./components/MonthView"
 import DayView from "./components/DayView"
 import { CalculatorIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom"
-import { useLocalStorage } from "usehooks-ts"
+import { useLocalStorage, useWindowSize } from "usehooks-ts"
 import LogView from "./components/LogView"
 import { TexpandStudentWithPackage } from "../../types/extend"
 import { ClassLogsResponse } from "../../types/pocketbase"
 import { usePocket } from "../../contexts/PocketContext"
 
 const ClassCalendar = () => {
+  const { width = 0 } = useWindowSize()
   const { refresh, user, getClassLogsData } = usePocket();
   const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(new Date().getFullYear())
@@ -48,14 +49,21 @@ const ClassCalendar = () => {
       }));
   }, [classLogs]);
 
+  useEffect(() => {
+    if(width < 600 && view == CalendarViewTypes.MONTH){
+      setView(CalendarViewTypes.LOGS)
+    }
+  }, [width])
+  
+
   return (
     <div className='card border-2 border-base-300 bg-base-100 p-5'>
-      <div className="w-full flex justify-between items-center mb-3">
+      <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-3">
         <div className="flex gap-3">
           {view != CalendarViewTypes.LOGS && (
             <select
               value={date}
-              className="select select-sm select-bordered w-20"
+              className="select select-sm select-bordered flex-1 md:w-20"
               onChange={e => setDate(parseInt(e.target.value))}
             >
               {getDaysOfMonth(year, month).map(e => (
@@ -65,7 +73,7 @@ const ClassCalendar = () => {
           )}
           <select
             value={month}
-            className="select select-sm select-bordered w-32"
+            className="select select-sm select-bordered flex-1 md:w-32"
             onChange={e => setMonth(parseInt(e.target.value))}
           >
             {months.map(e => (
@@ -74,7 +82,7 @@ const ClassCalendar = () => {
           </select>
           <select
             value={year}
-            className="select select-sm select-bordered w-20 md:w-28"
+            className="select select-sm select-bordered flex-1 md:w-28"
             onChange={e => setYear(parseInt(e.target.value))}
           >
             {getYearsRange().map(e => (
@@ -84,7 +92,7 @@ const ClassCalendar = () => {
         </div>
         <div className="join join-horizontal">
           <button
-            className={`btn btn-sm join-item ${view === CalendarViewTypes.DAY ? "btn-active" : ""}`}
+            className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.DAY ? "btn-active" : ""}`}
             onClick={() => setView(CalendarViewTypes.DAY)}
           >
             Day
@@ -96,7 +104,7 @@ const ClassCalendar = () => {
             Month
           </button>
           <button
-            className={`btn btn-sm join-item ${view === CalendarViewTypes.LOGS ? "btn-active" : ""}`}
+            className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.LOGS ? "btn-active" : ""}`}
             onClick={() => setView(CalendarViewTypes.LOGS)}
           >
             Logs

@@ -10,6 +10,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 
 export const ClassDetails = () => {
     const { id = "" } = useParams();
@@ -19,6 +20,9 @@ export const ClassDetails = () => {
     const { getClassLogDataById, token, timeZones } = usePocket()
 
     const [classLog, setClassLog] = useState<ClassLogsResponse<TexpandStudentWithPackage>>()
+
+    const [feedback, setFeedback] = useState("")
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false)
 
     useEffect(() => {
         if (id.length == 0) return;
@@ -66,7 +70,7 @@ export const ClassDetails = () => {
                 'Content-Type': 'application/json',
                 'Authorization': token ?? ""
             },
-            body: JSON.stringify({ id }),
+            body: JSON.stringify({ id, feedback }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -74,7 +78,10 @@ export const ClassDetails = () => {
                 }
                 return response.json();
             })
-            .then(() => getClassLogDataById({ id }).then(res => setClassLog(res)))
+            .then(() => getClassLogDataById({ id }).then(res => {
+                setClassLog(res)
+                setShowFeedbackModal(false)
+            }))
             .catch(() => {
                 notification.add({
                     title: "Error Occured",
@@ -83,6 +90,10 @@ export const ClassDetails = () => {
                 })
             })
             .finally(() => setIsLoading(false));
+    }
+
+    const handleFinishClass = () => {
+        setShowFeedbackModal(true)
     }
 
     return (
@@ -119,9 +130,9 @@ export const ClassDetails = () => {
                                 <Link to={classLog.expand?.student.class_link ?? ""} target='_blank' className="btn btn-info">Open Class</Link>
                             )}
                             {classLog.started && !classLog.completed && (
-                                <button className="btn btn-icon btn-success btn-icon" disabled={isLoading} onClick={finishClass}>
+                                <button className="btn btn-icon btn-success btn-icon" disabled={isLoading} onClick={handleFinishClass}>
                                     {isLoading && <div className="loading w-5 h-5" />}
-                                    Finish Class
+                                    Submit Report
                                 </button>
                             )}
                             {classLog.completed && (
@@ -133,6 +144,39 @@ export const ClassDetails = () => {
                         </div>
                     </div>
                 )}
+                <Dialog open={showFeedbackModal} onClose={() => { }} className="relative z-20">
+                    <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
+                    <div className="fixed inset-0 flex w-screen items-center justify-center">
+                        <DialogPanel className="card p-4 bg-base-100 min-w-96 max-w-md">
+                            <div className='flex flex-col gap-3 p-5'>
+                                <div className='flex justify-center'>
+                                    <div className="text-6xl">📣</div>
+                                </div>
+                                <div className='text-center text-xl font-medium'>Class Report Required</div>
+                                <div className='text-center'>Please submit the class feedback before finishing class.</div>
+                                <div className="flex flex-col gap-3">
+                                    <div className='flex flex-col gap-1'>
+                                        <textarea
+                                            className="textarea textarea-bordered w-full textarea-sm resize-none"
+                                            rows={5}
+                                            value={feedback}
+                                            onChange={e => setFeedback(e.target.value)}
+                                            placeholder="Write feedback here..."
+                                        />
+                                        <div className="text-xs">Minimum 10 characters required</div>
+                                    </div>
+                                    <div className='flex gap-3 justify-between w-full'>
+                                        <button className="btn btn-neutral" disabled={isLoading} onClick={() => notification.remove()}>Go Back</button>
+                                        <button className="btn btn-icon btn-success w-44" disabled={feedback.length <= 10 || isLoading} onClick={finishClass}>
+                                            {isLoading && <div className="loading w-5 h-5" />}
+                                            Submit & Finish
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </div>
+                </Dialog>
             </div>
         </NavLayout>
     )
