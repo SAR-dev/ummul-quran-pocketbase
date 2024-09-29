@@ -43,19 +43,17 @@ export interface ErrorMessageType {
 
 export interface InvoiceListResponseType {
   id: string
-  year: number
-  month: number
+  created: string
   total_classes: number
   due_amount: number
-  paid: boolean
+  paid_amount: number
 }
 
 export interface StudentInvoiceResponseType {
   id: string
-  year: number
-  month: number
+  created: string
   due_amount: number
-  paid: boolean
+  paid_amount: number
   class_logs: {
     class_mins: number
     total_classes: number
@@ -65,10 +63,9 @@ export interface StudentInvoiceResponseType {
 
 export interface TeacherInvoiceResponseType {
   id: string
-  year: number
-  month: number
+  created: string
   due_amount: number
-  paid: boolean
+  paid_amount: number
   class_logs: {
     class_mins: number
     total_classes: number

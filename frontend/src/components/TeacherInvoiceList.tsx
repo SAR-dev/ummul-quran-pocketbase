@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usePocket } from '../contexts/PocketContext'
-import { months } from '../helpers/calendar'
+import { getDateFromString } from '../helpers/calendar';
 import { InvoiceListResponseType } from '../types/extend'
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
@@ -49,12 +49,12 @@ const TeacherInvoiceList = () => {
                 {invoices.map((invoice, i) => (
                     <div className="grid grid-cols-5" key={i}>
                         <div className='py-3 px-5 font-semibold'>
-                            {months.find(e => e.index == invoice.month)?.shortName} {invoice.year}
+                            {getDateFromString(invoice.created)}
                         </div>
                         <div className='py-3 px-5'>{invoice.total_classes} Classes</div>
                         <div className='py-3 px-5'>{invoice.due_amount} TK</div>
                         <div className='py-3 px-5'>
-                            {invoice.paid ? (
+                            {invoice.paid_amount > 0 ? (
                                 <div className='uppercase w-20 btn btn-success btn-sm no-animation'>Paid</div>
                             ) : (
                                 <div className='uppercase w-20 btn btn-error btn-sm no-animation'>Unpaid</div>

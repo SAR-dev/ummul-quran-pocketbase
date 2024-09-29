@@ -71,7 +71,6 @@ export type StudentInvoicesRecord = {
 	due_amount?: number
 	message_status?: StudentInvoicesMessageStatusOptions
 	note?: string
-	paid?: boolean
 	paid_amount?: number
 	student: RecordIdString
 }
@@ -94,7 +93,6 @@ export type TeacherInvoicesRecord = {
 	due_amount?: number
 	message_status?: TeacherInvoicesMessageStatusOptions
 	note?: string
-	paid?: boolean
 	paid_amount?: number
 	teacher: RecordIdString
 }

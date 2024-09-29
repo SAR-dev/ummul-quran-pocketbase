@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePocket } from '../contexts/PocketContext'
 import NavLayout from '../layouts/NavLayout'
-import { months } from '../helpers/calendar'
+import { getDateFromString } from '../helpers/calendar';
 import { StudentInvoiceResponseType } from '../types/extend';
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
@@ -78,8 +78,8 @@ const StudentInvoice = () => {
                                 <div>{student.nickname}</div>
                             </div>
                             <div className="flex flex-col text-sm">
-                                <div className="font-semibold">Month</div>
-                                <div>{months.find(e => e.index == invoice.month)?.shortName} {invoice.year}</div>
+                                <div className="font-semibold">Billed AT</div>
+                                <div>{getDateFromString(invoice.created)}</div>
                             </div>
                         </div>
                         <div className="mt-8 flow-root">
