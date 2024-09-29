@@ -13,14 +13,15 @@ import { usePocket } from "../../contexts/PocketContext"
 
 const ClassCalendar = () => {
   const { width = 0 } = useWindowSize()
-  const { refresh, user, getClassLogsData } = usePocket();
+  const { refresh, user, students, getClassLogsData } = usePocket();
   const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [date, setDate] = useState(new Date().getDate())
+  const [studentId, setStudentId] = useState("")
 
   const [view, setView] = useLocalStorage('event-calendar-view', CalendarViewTypes.MONTH)
-  
+
   useEffect(() => {
     if (!user) return;
 
@@ -30,8 +31,8 @@ const ClassCalendar = () => {
     const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
     const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
 
-    getClassLogsData({ start, end }).then(res => setClassLogs(res))
-  }, [user, year, month, refresh])
+    getClassLogsData({ start, end, studentId }).then(res => setClassLogs(res))
+  }, [user, year, month, studentId, refresh])
 
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {
     return classLogs
@@ -43,18 +44,18 @@ const ClassCalendar = () => {
         class_mins: log.expand?.student.expand.monthly_package.class_mins ?? 0,
         start_at: log.start_at,
         finish_at: log.finish_at,
-        completed: log.completed,
+        finished: log.finished,
         teachers_price: log.cp_teachers_price,
         students_price: log.cp_students_price
       }));
   }, [classLogs]);
 
   useEffect(() => {
-    if(width < 600 && view == CalendarViewTypes.MONTH){
+    if (width < 600 && view == CalendarViewTypes.MONTH) {
       setView(CalendarViewTypes.LOGS)
     }
   }, [width])
-  
+
 
   return (
     <div className='card border-2 border-base-300 bg-base-100 p-5'>
@@ -90,25 +91,37 @@ const ClassCalendar = () => {
             ))}
           </select>
         </div>
-        <div className="join join-horizontal">
-          <button
-            className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.DAY ? "btn-active" : ""}`}
-            onClick={() => setView(CalendarViewTypes.DAY)}
+        <div className="flex gap-3">
+          <select
+            className="select select-bordered select-sm w-full md:max-w-xs"
+            value={studentId}
+            onChange={e => setStudentId(e.target.value)}
           >
-            Day
-          </button>
-          <button
-            className={`hidden md:btn md:btn-sm join-item ${view === CalendarViewTypes.MONTH ? "btn-active" : ""}`}
-            onClick={() => setView(CalendarViewTypes.MONTH)}
-          >
-            Month
-          </button>
-          <button
-            className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.LOGS ? "btn-active" : ""}`}
-            onClick={() => setView(CalendarViewTypes.LOGS)}
-          >
-            Logs
-          </button>
+            <option value="" selected>All Students</option>
+            {students.map((student, i) => (
+              <option value={student.id} key={i}>{student.nickname}</option>
+            ))}
+          </select>
+          <div className="join join-horizontal">
+            <button
+              className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.DAY ? "btn-active" : ""}`}
+              onClick={() => setView(CalendarViewTypes.DAY)}
+            >
+              Day
+            </button>
+            <button
+              className={`hidden md:btn md:btn-sm join-item ${view === CalendarViewTypes.MONTH ? "btn-active" : ""}`}
+              onClick={() => setView(CalendarViewTypes.MONTH)}
+            >
+              Month
+            </button>
+            <button
+              className={`btn btn-sm join-item flex-1 md:flex-auto ${view === CalendarViewTypes.LOGS ? "btn-active" : ""}`}
+              onClick={() => setView(CalendarViewTypes.LOGS)}
+            >
+              Logs
+            </button>
+          </div>
         </div>
       </div>
       {view == CalendarViewTypes.DAY && <DayView year={year} month={month} date={date} data={sortedClassLogs} />}

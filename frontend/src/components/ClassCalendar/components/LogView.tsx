@@ -1,6 +1,6 @@
 import { getDateFromString } from "../../../helpers/calendar";
 import { CalendarDataType } from "../../../types/calendar";
-import { CalendarIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon, NoSymbolIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
 import ClassLogView from "../../ClassLogView";
 
@@ -24,6 +24,12 @@ const LogView = ({
 
     return (
         <div className="grid grid-cols-1">
+            {sortedKeys.length == 0 && (
+                <div className="card border border-base-300 p-3 bg-base-200 text-sm font-semibold flex-row gap-2 items-center">
+                    <NoSymbolIcon className="h-5 w-5 text-error" />
+                    No Class
+                </div>
+            )}
             {sortedKeys.map((key, i) => (
                 <div className="w-full my-5" key={i}>
                     <div className="text-sm flex items-center gap-2 mb-2"><CalendarIcon className="h-5 w-5" /> {key}</div>
@@ -31,7 +37,7 @@ const LogView = ({
                         {groupedData[key].map((e, i) => (
                             <ClassLogView 
                                 id={e.id}
-                                completed={e.completed}
+                                finished={e.finished}
                                 start_at={e.start_at}
                                 finish_at={e.finish_at}
                                 student={e.student}

@@ -192,8 +192,8 @@ routerAdd("POST", "/api/class-logs/create-by-routine", (c) => {
 
             const records = $app.dao().findRecordsByFilter(
                 "class_logs",
-                // `start_at >= '${start_at_str}' && start_at <= '${finish_at_str}' && completed = false`
-                `start_at >= '${start_at_str}' && completed = false`
+                // `start_at >= '${start_at_str}' && start_at <= '${finish_at_str}' && finished = false`
+                `start_at >= '${start_at_str}' && finished = false`
             )
             for (let record of records) {
                 txDao.deleteRecord(record)
@@ -360,7 +360,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
         record.set("cp_teachers_price", monthly_package.get("teachers_price"))
         record.set("cp_students_price", monthly_package.get("students_price"))
         record.set("started", true)
-        record.set("completed", true)
+        record.set("finished", true)
         record.set("finish_at", getCurrentTime())
 
         txDao.saveRecord(record)
@@ -378,7 +378,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     return c.json(200, { "message": "Class log finished" })
 })
 
-routerAdd("POST", "/api/generate-invoices", (c) => {
+routerAdd("POST", "/api/generate-student-invoices", (c) => {
     const payload = $apis.requestInfo(c).data
 
     // allow admin only
@@ -386,83 +386,128 @@ routerAdd("POST", "/api/generate-invoices", (c) => {
     const admin = !!c.get("admin")
     if (!admin) throw ForbiddenError()
 
+    const dateObject = payload.last_date?.length > 0 ? new Date(payload.last_date) : new Date();
+    const yyyy_mm_dd = dateObject.toISOString().slice(0, 10)
+    const hh_mm_ss = dateObject.toISOString().slice(11, 23)
+    const date = `${yyyy_mm_dd} ${hh_mm_ss}Z`;
+
     // check if the year and month is in past
 
-    const year = Number(payload.year)
-    const month = Number(payload.month)
-
-    if (!year || !month || year > new Date().getFullYear() || month >= new Date().getMonth() + 1) {
+    if (dateObject > new Date()) {
         throw new ApiError(500, "You need to select a past date.", {});
     }
-
-    // check if already generated
-
-    const student_invoices = $app.dao().findRecordsByFilter(
-        "student_invoices",
-        `year = '${year}' && month = '${month}'`
-    )
-    if (student_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
-
-    const teacher_invoices = $app.dao().findRecordsByFilter(
-        "teacher_invoices",
-        `year = '${year}' && month = '${month}'`
-    )
-    if (teacher_invoices.length > 0) throw new ApiError(500, "This month has already been Invoiced", {});
-
 
     $app.dao().runInTransaction((txDao) => {
         // delete incomplete classes of the year and month
 
-        const cd = new Date(year, month - 1, 1);
-        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
-
-        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
-        const records = $app.dao().findRecordsByFilter(
+        const unfinished_class_logs = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && completed = false`
+            `start_at < '${date}' && finished = false`
         )
-        for (let record of records) {
+        for (let record of unfinished_class_logs) {
             txDao.deleteRecord(record)
         }
 
-        const classLogs = $app.dao().findRecordsByFilter(
+        const finished_class_logs = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && completed = true`
+            `start_at < '${date}' && finished = true && student_invoice = ''`
         )
 
         // insert into student invoices
 
-        const student_collection = $app.dao().findCollectionByNameOrId("student_invoices")
+        const student_invoices = $app.dao().findCollectionByNameOrId("student_invoices")
         const students = $app.dao().findRecordsByFilter("students", `id != '0'`)
         for (let student of students) {
-            const record = new Record(student_collection)
-
-            const due_amount = classLogs.filter(e => e.publicExport().student == student.get("id")).reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
+            const record = new Record(student_invoices)
+            const student_class_logs = finished_class_logs.filter(e => e.publicExport().student == student.get("id"))
+            const due_amount = student_class_logs.reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
 
             record.set("student", student.get("id"))
-            record.set("year", year)
-            record.set("month", month)
             record.set("due_amount", due_amount)
 
             txDao.saveRecord(record)
+
+            const invoices = txDao.findRecordsByFilter(
+                "student_invoices",
+                `student = '${student.get("id")}'`,
+                "-created",
+                1,
+                0,
+            )
+            
+            for(let class_log of student_class_logs){
+                const found = txDao.findRecordById("class_logs", class_log.get("id"))
+                found.set("student_invoice", invoices[0].id)
+                txDao.saveRecord(found)
+            }
+        }
+    })
+
+    return c.json(200, { "message": "Invoices Issued" })
+})
+
+routerAdd("POST", "/api/generate-teacher-invoices", (c) => {
+    const payload = $apis.requestInfo(c).data
+
+    // allow admin only
+
+    // const admin = !!c.get("admin")
+    // if (!admin) throw ForbiddenError()
+
+    const dateObject = payload.last_date?.length > 0 ? new Date(payload.last_date) : new Date();
+    const yyyy_mm_dd = dateObject.toISOString().slice(0, 10)
+    const hh_mm_ss = dateObject.toISOString().slice(11, 23)
+    const date = `${yyyy_mm_dd} ${hh_mm_ss}Z`;
+
+    // check if the year and month is in past
+
+    if (dateObject > new Date()) {
+        throw new ApiError(500, "You need to select a past date.", {});
+    }
+    
+    $app.dao().runInTransaction((txDao) => {
+        // delete incomplete classes of the year and month
+
+        const unfinished_class_logs = $app.dao().findRecordsByFilter(
+            "class_logs",
+            `start_at < '${date}' && finished = false`
+        )
+        for (let record of unfinished_class_logs) {
+            txDao.deleteRecord(record)
         }
 
-        // insert into teacher invoices
+        const finished_class_logs = $app.dao().findRecordsByFilter(
+            "class_logs",
+            `start_at < '${date}' && finished = true && teacher_invoice = ''`
+        )
 
-        const teacher_collection = $app.dao().findCollectionByNameOrId("teacher_invoices")
+        // insert into ieacher invoices
+
+        const teacher_invoices = $app.dao().findCollectionByNameOrId("teacher_invoices")
         const teachers = $app.dao().findRecordsByFilter("teachers", `id != '0'`)
         for (let teacher of teachers) {
-            const record = new Record(teacher_collection)
-
-            const due_amount = classLogs.filter(e => e.publicExport().cp_teacher == teacher.get("id")).reduce((sum, record) => sum + record.publicExport().cp_teachers_price, 0);
+            const record = new Record(teacher_invoices)
+            const teacher_class_logs = finished_class_logs.filter(e => e.publicExport().cp_teacher == teacher.get("id"))
+            const due_amount = teacher_class_logs.reduce((sum, record) => sum + record.publicExport().cp_teachers_price, 0);
 
             record.set("teacher", teacher.get("id"))
-            record.set("year", year)
-            record.set("month", month)
             record.set("due_amount", due_amount)
 
             txDao.saveRecord(record)
+
+            const invoices = txDao.findRecordsByFilter(
+                "teacher_invoices",
+                `teacher = '${teacher.get("id")}'`,
+                "-created",
+                1,
+                0,
+            )
+            
+            for(let class_log of teacher_class_logs){
+                const found = txDao.findRecordById("class_logs", class_log.get("id"))
+                found.set("teacher_invoice", invoices[0].id)
+                txDao.saveRecord(found)
+            }
         }
     })
 
@@ -489,7 +534,7 @@ routerAdd("GET", "/api/get-student-invoices", (c) => {
         const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && completed = true`
+            `start_at >= '${start}' && start_at < '${end}' && finished = true`
         )
 
         res.push({
@@ -525,7 +570,7 @@ routerAdd("GET", "/api/get-teacher-invoices", (c) => {
         const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && completed = true`
+            `start_at >= '${start}' && start_at < '${end}' && finished = true`
         )
 
         res.push({
@@ -564,7 +609,7 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
     const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
-        `start_at >= '${start}' && start_at < '${end}' && completed = true`
+        `start_at >= '${start}' && start_at < '${end}' && finished = true`
     )
     $app.dao().expandRecords(records, ["student"], null)
 
@@ -625,7 +670,7 @@ routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
     const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
-        `start_at >= '${start}' && start_at < '${end}' && completed = true`
+        `start_at >= '${start}' && start_at < '${end}' && finished = true`
     )
     $app.dao().expandRecords(records, ["student"], null)
 

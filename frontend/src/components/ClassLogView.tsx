@@ -9,7 +9,7 @@ import { NotificationType } from '../types/notification'
 
 export interface ClassLogType {
     id: string | number
-    completed?: boolean
+    finished?: boolean
     start_at: string
     finish_at?: string
     student: string
@@ -45,7 +45,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                 <div className="flex justify-between items-center p-3 border-b border-base-300">
                     <div className='flex items-center'>
                         <div className="w-8 flex-shrink-0">
-                            {props.completed ? (
+                            {props.finished ? (
                                 <CheckCircleIcon className='w-5 h-5 text-success' />
                             ) : (
                                 <>
@@ -84,7 +84,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
             </div>
             <div className='hidden md:card bg-base-200 p-3 md:flex-row items-center border border-base-300 text-sm'>
                 <div className="w-10 flex-shrink-0">
-                    {props.completed ? (
+                    {props.finished ? (
                         <CheckCircleIcon className='w-5 h-5 text-success' />
                     ) : (
                         <>

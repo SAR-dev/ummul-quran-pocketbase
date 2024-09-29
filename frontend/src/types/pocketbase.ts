@@ -41,17 +41,18 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type ClassLogsRecord = {
-	completed?: boolean
 	cp_class_mins?: number
 	cp_students_price?: number
 	cp_teacher?: RecordIdString
 	cp_teachers_price?: number
 	feedback?: string
 	finish_at?: IsoDateString
+	finished?: boolean
 	start_at?: IsoDateString
 	started?: boolean
 	student: RecordIdString
-	topic?: string
+	student_invoice?: RecordIdString
+	teacher_invoice?: RecordIdString
 }
 
 export type MonthlyPackagesRecord = {
@@ -62,19 +63,17 @@ export type MonthlyPackagesRecord = {
 	teachers_price: number
 }
 
-export enum StudentInvoicesStatusOptions {
+export enum StudentInvoicesMessageStatusOptions {
 	"SUCCESS" = "SUCCESS",
 	"ERROR" = "ERROR",
 }
 export type StudentInvoicesRecord = {
 	due_amount?: number
-	month: number
+	message_status?: StudentInvoicesMessageStatusOptions
 	note?: string
 	paid?: boolean
 	paid_amount?: number
-	status?: StudentInvoicesStatusOptions
 	student: RecordIdString
-	year: number
 }
 
 export type StudentsRecord = {
@@ -87,19 +86,17 @@ export type StudentsRecord = {
 	user: RecordIdString
 }
 
-export enum TeacherInvoicesStatusOptions {
+export enum TeacherInvoicesMessageStatusOptions {
 	"SUCCESS" = "SUCCESS",
 	"ERROR" = "ERROR",
 }
 export type TeacherInvoicesRecord = {
 	due_amount?: number
-	month: number
+	message_status?: TeacherInvoicesMessageStatusOptions
 	note?: string
 	paid?: boolean
 	paid_amount?: number
-	status?: TeacherInvoicesStatusOptions
 	teacher: RecordIdString
-	year: number
 }
 
 export type TeachersRecord = {

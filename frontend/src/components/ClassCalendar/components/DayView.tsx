@@ -46,7 +46,7 @@ const DayView = ({
                                 style={{ backgroundColor: `${stringToColor(e.title, .3)}` }} 
                                 key={i}
                             >
-                                {e.completed ? (
+                                {e.finished ? (
                                     <CheckCircleIcon className='w-4 h-4 text-info' />
                                 ) : (
                                     <>

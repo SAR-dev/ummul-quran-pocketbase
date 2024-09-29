@@ -10,7 +10,7 @@ export interface CalendarDataType {
     student_mobile: string;
     class_mins: number;
     finish_at?: string;
-    completed?: boolean;
+    finished?: boolean;
     teachers_price?: number;
     students_price?: number;
 }

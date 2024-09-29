@@ -174,7 +174,7 @@ const AdminStudentInvoiceList = () => {
                             <button className="btn btn-sm btn-outline border-base-300 btn-square mr-2" onClick={() => setUpdateInvoice({ ...invoice })}>
                                 <PencilIcon className='h-4 w-4' />
                             </button>
-                            <WhatsAppInvoiceButton id={invoice.id} message={message} status={invoice.status} />
+                            <WhatsAppInvoiceButton id={invoice.id} message={message} status={invoice.message_status} />
                         </div>
                     </div>
                 ))}
@@ -186,7 +186,7 @@ const AdminStudentInvoiceList = () => {
                         <DialogPanel className="card p-4 bg-base-100 w-full max-w-md">
                             <div className='p-5'>
                                 <div className='flex justify-between items-center'>
-                                    <div>Invoice of <b>{updateInvoice.expand?.student.nickname}</b> for <b>{months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</b></div>
+                                    {/* <div>Invoice of <b>{updateInvoice.expand?.student.nickname}</b> for <b>{months.find(e => e.index == updateInvoice.month)?.shortName} {updateInvoice.year}</b></div> */}
                                     <button className="btn btn-sm btn-square" onClick={() => setUpdateInvoice(undefined)}>
                                         <XMarkIcon className='h-4 w-4' />
                                     </button>

@@ -33,7 +33,7 @@ export const TodayClassList = () => {
                     {todayClassLogs.map((e, i) => (
                         <ClassLogView
                             id={e.id}
-                            completed={e.completed}
+                            finished={e.finished}
                             start_at={e.start_at}
                             finish_at={e.finish_at}
                             student={e.expand?.student.nickname ?? ""}

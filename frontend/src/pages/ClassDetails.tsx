@@ -120,22 +120,22 @@ export const ClassDetails = () => {
                             {getDateFromString(classLog.start_at)} ({getTimeIn12HourFormat(classLog.start_at)} - {classLog.finish_at ? getTimeIn12HourFormat(classLog.finish_at) : "Pending"})
                         </div>
                         <div className="flex mt-5 gap-3 justify-center">
-                            {!classLog.started && !classLog.completed && (
+                            {!classLog.started && !classLog.finished && (
                                 <button className="btn btn-icon btn-primary" disabled={isLoading} onClick={startClass}>
                                     {isLoading && <div className="loading w-5 h-5" />}
                                     Start Class
                                 </button>
                             )}
-                            {classLog.started && !classLog.completed && (
+                            {classLog.started && !classLog.finished && (
                                 <Link to={classLog.expand?.student.class_link ?? ""} target='_blank' className="btn btn-info">Open Class</Link>
                             )}
-                            {classLog.started && !classLog.completed && (
+                            {classLog.started && !classLog.finished && (
                                 <button className="btn btn-icon btn-success btn-icon" disabled={isLoading} onClick={handleFinishClass}>
                                     {isLoading && <div className="loading w-5 h-5" />}
                                     Submit Report
                                 </button>
                             )}
-                            {classLog.completed && (
+                            {classLog.finished && (
                                 <button className="btn btn-info btn-icon" onClick={() => navigate(-1)}>
                                     <ArrowLeftIcon className='h-4 w-4' />
                                     Go Back

@@ -41,7 +41,7 @@ interface PocketContextType {
     student?: StudentsResponse<TexpandUser>;
     students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
-    getClassLogsData: ({ start, end, key }: { start: string, end: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogsData: ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
     getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
@@ -160,7 +160,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return dateToUtc(date)
     }
 
-    const getClassLogsData = useCallback(async ({ start, end, key }: { start: string, end: string, key?: string }) => {
+    const getClassLogsData = useCallback(async ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => {
         const userId = user?.id;
         if (!userId) {
             return [];
@@ -168,13 +168,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
-
+        
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
-                filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}"`,
+                filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}" ${studentId && studentId?.length > 0 ? `&& student.id = "${studentId}"` : ""}`,
                 expand: "student, student.user, student.monthly_package",
-                requestKey: `${userId}${startUTC}${endUTC}${key}`
+                requestKey: `${userId}${startUTC}${endUTC}${studentId}${key}`
             });
         return res
     }, [pb]);
