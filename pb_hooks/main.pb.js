@@ -516,34 +516,26 @@ routerAdd("POST", "/api/generate-teacher-invoices", (c) => {
 
 routerAdd("GET", "/api/get-student-invoices", (c) => {
     const userId = c.get("authRecord").get("id");
-
+    
     const invoices = $app.dao().findRecordsByFilter(
         "student_invoices",
         `student.user.id = '${userId}'`
     )
 
     const res = []
-
+    
     for (let invoice of invoices) {
-        const year = invoice.get("year")
-        const month = invoice.get("month")
-        const cd = new Date(year, month - 1, 1);
-        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
-
-        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && finished = true`
+            `student_invoice = '${invoice.get("id")}'`
         )
 
         res.push({
             "id": invoice.get("id"),
-            "year": invoice.get("year"),
-            "month": invoice.get("month"),
-            "paid": invoice.get("paid"),
-            "total_classes": records.length,
-            "due_amount": invoice.get("due_amount")
+            "due_amount": invoice.get("due_amount"),
+            "paid_amount": invoice.get("paid_amount"),
+            "created": invoice.get("created"),
+            "total_classes": records.length
         })
     }
 
@@ -561,25 +553,17 @@ routerAdd("GET", "/api/get-teacher-invoices", (c) => {
     const res = []
 
     for (let invoice of invoices) {
-        const year = invoice.get("year")
-        const month = invoice.get("month")
-        const cd = new Date(year, month - 1, 1);
-        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
-
-        const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
-        const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
         const records = $app.dao().findRecordsByFilter(
             "class_logs",
-            `start_at >= '${start}' && start_at < '${end}' && finished = true`
+            `teacher_invoice = '${invoice.get("id")}'`
         )
 
         res.push({
             "id": invoice.get("id"),
-            "year": invoice.get("year"),
-            "month": invoice.get("month"),
-            "paid": invoice.get("paid"),
-            "total_classes": records.length,
-            "due_amount": invoice.get("due_amount")
+            "due_amount": invoice.get("due_amount"),
+            "paid_amount": invoice.get("paid_amount"),
+            "created": invoice.get("created"),
+            "total_classes": records.length
         })
     }
 
@@ -600,16 +584,9 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
         throw new ForbiddenError()
     }
 
-    const year = invoice.get("year")
-    const month = invoice.get("month")
-    const cd = new Date(year, month - 1, 1);
-    const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
-
-    const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
-    const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
-        `start_at >= '${start}' && start_at < '${end}' && finished = true`
+        `student_invoice = '${c.pathParam("id")}'`
     )
     $app.dao().expandRecords(records, ["student"], null)
 
@@ -639,11 +616,10 @@ routerAdd("GET", "/api/get-student-invoices/:id", (c) => {
 
     return c.json(200, {
         "id": invoice.get("id"),
-        "year": invoice.get("year"),
-        "month": invoice.get("month"),
-        "paid": invoice.get("paid"),
+        "paid_amount": invoice.get("paid_amount"),
+        "due_amount": invoice.get("due_amount"),
+        "created": invoice.get("created"),
         "class_logs": uniqueLogsArray,
-        "due_amount": invoice.get("due_amount")
     })
 })
 
@@ -661,16 +637,9 @@ routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
         throw new ForbiddenError()
     }
 
-    const year = invoice.get("year")
-    const month = invoice.get("month")
-    const cd = new Date(year, month - 1, 1);
-    const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
-
-    const start = `${cd.toISOString().slice(0, 10)} 00:00:00.000Z`
-    const end = `${nd.toISOString().slice(0, 10)} 00:00:00.000Z`
     const records = $app.dao().findRecordsByFilter(
         "class_logs",
-        `start_at >= '${start}' && start_at < '${end}' && finished = true`
+        `teacher_invoice = '${c.pathParam("id")}'`
     )
     $app.dao().expandRecords(records, ["student"], null)
 
@@ -700,10 +669,9 @@ routerAdd("GET", "/api/get-teacher-invoices/:id", (c) => {
 
     return c.json(200, {
         "id": invoice.get("id"),
-        "year": invoice.get("year"),
-        "month": invoice.get("month"),
-        "paid": invoice.get("paid"),
+        "paid_amount": invoice.get("paid_amount"),
+        "due_amount": invoice.get("due_amount"),
+        "created": invoice.get("created"),
         "class_logs": uniqueLogsArray,
-        "due_amount": invoice.get("due_amount")
     })
 })
