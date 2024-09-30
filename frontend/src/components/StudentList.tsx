@@ -23,10 +23,16 @@ const StudentList = () => {
                                     <div className="text-sm">{e.expand.user.location}</div>
                                 </div>
                             </div>
-                            <div className="flex-col">
-                                <div className="font-semibold">{e.expand.monthly_package.class_mins} Mins</div>
-                                <div className="text-sm">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
+                            <div className="flex gap-3">
+                                <div className="flex-col">
+                                    <div className="font-semibold">{e.expand.monthly_package.class_mins} Mins</div>
+                                    <div className="text-sm">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
+                                </div>
+                                <div className="flex h-auto items-center">
+                                    <WhatsAppButton mobile_no={e.mobile_no} icon_only />
+                                </div>
                             </div>
+
                         </div>
                         <div className='hidden md:flex gap-5 items-center p-5'>
                             <div className="w-16 flex-shrink-0">

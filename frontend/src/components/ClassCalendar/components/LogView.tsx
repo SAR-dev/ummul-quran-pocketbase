@@ -23,7 +23,7 @@ const LogView = ({
     const sortedKeys = Object.keys(groupedData).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
     return (
-        <div className="grid grid-cols-1">
+        <div className="grid grid-cols-1 max-h-[30rem] overflow-y-auto scrollbar-thin">
             {sortedKeys.length == 0 && (
                 <div className="card border border-base-300 p-3 bg-base-200 text-sm font-semibold flex-row gap-2 items-center">
                     <NoSymbolIcon className="h-5 w-5 text-error" />
