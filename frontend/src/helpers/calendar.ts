@@ -277,7 +277,7 @@ export const getTimeIn12HourFormat = (val: string) => {
 }
 
 export const getDateFromString = (dateString?: string) => {
-    if(!dateString) return "";
+    if(!dateString || dateString.length == 0) return "";
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = months[date.getMonth()].shortName

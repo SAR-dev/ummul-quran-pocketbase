@@ -72,3 +72,10 @@ export interface TeacherInvoiceResponseType {
     teachers_price: number
   }[]
 }
+
+export interface InvoicedListType {
+  id: string;
+  last_invoiced_at: string;
+  mobile_no: string;
+  nickname: string;
+}

@@ -14,7 +14,8 @@ import StudentInvoice from "./pages/StudentInvoice";
 import TeacherSelfInvoices from "./pages/TeacherSelfInvoices";
 import TeacherInvoice from "./pages/TeacherInvoice";
 import { RequireAdminAuth } from "./components/RequireAdminAuth";
-import AdminSelf from "./pages/AdminSelf";
+import AdminInvoiceGenerator from "./pages/AdminInvoiceGenerator";
+import AdminInvoiceViewer from "./pages/AdminInvoiceViewer";
 
 const App = () => {
   return (
@@ -38,7 +39,9 @@ const App = () => {
               <Route path="/student/invoices/:id" element={<StudentInvoice />} />
             </Route>
             <Route element={<RequireAdminAuth />}>
-              <Route path="/admin" element={<AdminSelf />} />
+              <Route path="/admin" element={<AdminInvoiceGenerator />} />
+              <Route path="/admin/invoices/generate" element={<AdminInvoiceGenerator />} />
+              <Route path="/admin/invoices/manage" element={<AdminInvoiceViewer />} />
             </Route>
           </Routes>
         </BrowserRouter>

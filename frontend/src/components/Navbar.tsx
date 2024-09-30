@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
-import { Bars3Icon, PlusIcon, WalletIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, BoltIcon, CircleStackIcon, PlusIcon, WalletIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react'
 import ThemeSwitcher from './ThemeSwitcher';
 import SignInButton from './SignInButton';
 import { usePocket } from '../contexts/PocketContext';
 
 const Navbar = () => {
-    const { teacher } = usePocket()
+    const { teacher, isAdmin } = usePocket()
     const [showMenu, setShowMenu] = useState(false)
 
     return (
@@ -25,6 +25,16 @@ const Navbar = () => {
                     {teacher && (
                         <Link to="/teacher/invoices" className="btn btn-ghost">
                             Invoices
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link to="/admin/invoices/generate" className="btn btn-ghost">
+                            Invoice Generator
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link to="/admin/invoices/manage" className="btn btn-ghost">
+                            Manage Invoices
                         </Link>
                     )}
                     <ThemeSwitcher />
@@ -48,6 +58,18 @@ const Navbar = () => {
                         <Link to="/teacher/invoices" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
                             <WalletIcon className='h-5 w-5' />
                             Invoices
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link to="/admin/invoices/generate" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                            <BoltIcon className='h-5 w-5' />
+                            Invoice Generator
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link to="/admin/invoices/manage" className="btn btn-icon btn-ghost rounded-none justify-start hover:no-animation">
+                            <CircleStackIcon className='h-5 w-5' />
+                            Manage Invoices
                         </Link>
                     )}
                     <ThemeSwitcher asMobile={true} />

@@ -33,6 +33,7 @@ interface PocketContextType {
     pb: TypedPocketBase;
     isAdmin: boolean;
     refresh: number;
+    incRefresh: () => void;
     login: ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => Promise<void>;
     logout: () => void;
     user?: AuthModel;
@@ -45,10 +46,10 @@ interface PocketContextType {
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
     getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
-    getStudentInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
-    updateStudentInvoiceData: ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => Promise<void>;
-    getTeacherInvoiceListData: ({ year, month }: { year: number, month: number }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
-    updateTeacherInvoiceData: ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => Promise<void>;
+    getStudentInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    updateStudentInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
+    getTeacherInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
+    updateTeacherInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -81,6 +82,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         fetchStudentListData()
         fetchTimezoneListData()
     }, [pb]);
+
+    const incRefresh = () => setRefresh(refresh + 1)
 
     const fetchTeacherData = useCallback(async () => {
         const userId = user?.id;
@@ -210,54 +213,58 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
-    const getStudentInvoiceListData = useCallback(async ({ year, month }: { year: number, month: number }) => {
+    const getStudentInvoiceListData = useCallback(async ({ start, end }: { start: string, end: string }) => {
         if (!isAdmin) {
             return [];
         }
+
+        const startUTC = formatDateToCustomString(new Date(start));
+        const endUTC = formatDateToCustomString(new Date(end));
 
         const res = await pb
             .collection(Collections.StudentInvoices)
             .getFullList<StudentInvoicesResponse<TexpandStudent>>({
                 expand: "student",
-                filter: `year = "${year}" && month = "${month}"`
+                filter: `created >= "${startUTC}" && created < "${endUTC}"`
             });
         return res
     }, [pb]);
 
-    const updateStudentInvoiceData = useCallback(async ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => {
+    const updateStudentInvoiceData = useCallback(async ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => {
         if (!isAdmin) return;
 
         await pb
             .collection(Collections.StudentInvoices)
             .update(id, {
-                paid, 
                 paid_amount, 
                 note
             });
         setRefresh(refresh + 1)
     }, [pb]);
 
-    const getTeacherInvoiceListData = useCallback(async ({ year, month }: { year: number, month: number }) => {
+    const getTeacherInvoiceListData = useCallback(async ({ start, end }: { start: string, end: string }) => {
         if (!isAdmin) {
             return [];
         }
+
+        const startUTC = formatDateToCustomString(new Date(start));
+        const endUTC = formatDateToCustomString(new Date(end));
 
         const res = await pb
             .collection(Collections.TeacherInvoices)
             .getFullList<TeacherInvoicesResponse<TexpandTeacher>>({
                 expand: "teacher",
-                filter: `year = "${year}" && month = "${month}"`
+                filter: `created >= "${startUTC}" && created < "${endUTC}"`
             });
         return res
     }, [pb]);
 
-    const updateTeacherInvoiceData = useCallback(async ({ id, paid, paid_amount, note }: { id: string, paid: boolean, paid_amount: number, note: string }) => {
+    const updateTeacherInvoiceData = useCallback(async ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => {
         if (!isAdmin) return;
 
         await pb
             .collection(Collections.TeacherInvoices)
             .update(id, {
-                paid, 
                 paid_amount, 
                 note
             });
@@ -271,6 +278,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             pb,
             isAdmin,
             refresh,
+            incRefresh,
             login,
             logout,
             user,
