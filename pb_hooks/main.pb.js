@@ -393,10 +393,10 @@ routerAdd("POST", "/api/generate-student-invoices", (c) => {
 
     const student_invoices = $app.dao().findCollectionByNameOrId("student_invoices")
     const students = $app.dao().findRecordsByFilter(
-        "students", 
+        "students",
         filter
     )
-    
+
     $app.dao().runInTransaction((txDao) => {
         for (let student of students) {
             // clear unfinished class logs
@@ -407,7 +407,7 @@ routerAdd("POST", "/api/generate-student-invoices", (c) => {
             for (let r of unfinished_class_logs) {
                 txDao.deleteRecord(r)
             }
-    
+
             // filter class logs by date and student
             const student_class_logs = txDao.findRecordsByFilter(
                 "class_logs",
@@ -416,7 +416,7 @@ routerAdd("POST", "/api/generate-student-invoices", (c) => {
 
             // calculate due amount
             const due_amount = student_class_logs.reduce((sum, record) => sum + record.publicExport().cp_students_price, 0);
-            
+
             // create invoice
             const record = new Record(student_invoices)
             record.set("student", student.get("id"))
@@ -459,7 +459,7 @@ routerAdd("POST", "/api/generate-teacher-invoices", (c) => {
 
     const teacher_invoices = $app.dao().findCollectionByNameOrId("teacher_invoices")
     const teachers = $app.dao().findRecordsByFilter(
-        "teachers", 
+        "teachers",
         filter
     )
 
@@ -473,7 +473,7 @@ routerAdd("POST", "/api/generate-teacher-invoices", (c) => {
             for (let r of unfinished_class_logs) {
                 txDao.deleteRecord(r)
             }
-    
+
             // filter class logs by date and student
             const teacher_class_logs = txDao.findRecordsByFilter(
                 "class_logs",
@@ -482,7 +482,7 @@ routerAdd("POST", "/api/generate-teacher-invoices", (c) => {
 
             // calculate due amount
             const due_amount = teacher_class_logs.reduce((sum, record) => sum + record.publicExport().cp_teachers_price, 0);
-            
+
             // create invoice
             const record = new Record(teacher_invoices)
             record.set("teacher", teacher.get("id"))
@@ -710,4 +710,130 @@ routerAdd("GET", "/api/get-invoiced-teachers", (c) => {
         .all(result)
 
     return c.json(200, result)
+})
+
+routerAdd("GET", "/student-receipt/:id", (c) => {
+    const invoice = $app.dao().findFirstRecordByFilter(
+        "student_invoices",
+        `id = '${c.pathParam("id")}'`
+    )
+
+    if (invoice == null) {
+        throw new ForbiddenError()
+    }
+
+    $app.dao().expandRecord(invoice, ["student"], null)
+    
+    const records = $app.dao().findRecordsByFilter(
+        "class_logs",
+        `student_invoice = '${c.pathParam("id")}'`
+    )
+
+    const logs = []
+    records.forEach(record => logs.push({
+        class_mins: record.publicExport().cp_class_mins,
+        students_price: record.publicExport().cp_students_price
+    }))
+
+    // Map to store unique combinations of class_mins and students_price
+    const uniqueLogsMap = new Map();
+
+    logs.forEach(log => {
+        const key = `${log.class_mins}-${log.students_price}`;
+        if (uniqueLogsMap.has(key)) {
+            uniqueLogsMap.set(key, uniqueLogsMap.get(key) + 1);
+        } else {
+            uniqueLogsMap.set(key, 1);
+        }
+    });
+
+    // Convert the map into an array of unique combinations and their counts
+    const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
+        const [class_mins, students_price] = key.split('-');
+        return {
+            class_mins: Number(class_mins),
+            unit_price: Number(students_price),
+            total_classes: count,
+            total_price: count * Number(students_price)
+        };
+    });
+
+    const html = $template.loadFiles(
+        `${__hooks}/views/layout.html`,
+        `${__hooks}/views/student-receipt.html`,
+    ).render({
+        "id": invoice.get("id"),
+        "date": invoice.publicExport().created.toString().slice(0,10),
+        "nickname": invoice.publicExport().expand.student.publicExport().nickname,
+        "paid_amount": invoice.get("paid_amount"),
+        "due_amount": invoice.get("due_amount"),
+        "created": invoice.get("created"),
+        "class_logs": uniqueLogsArray,
+        "type": "Student"
+    })
+
+    return c.html(200, html)
+})
+
+routerAdd("GET", "/teacher-receipt/:id", (c) => {
+    const invoice = $app.dao().findFirstRecordByFilter(
+        "teacher_invoices",
+        `id = '${c.pathParam("id")}'`
+    )
+
+    if (invoice == null) {
+        throw new ForbiddenError()
+    }
+
+    $app.dao().expandRecord(invoice, ["teacher"], null)
+
+    const records = $app.dao().findRecordsByFilter(
+        "class_logs",
+        `teacher_invoice = '${c.pathParam("id")}'`
+    )
+
+    const logs = []
+    records.forEach(record => logs.push({
+        class_mins: record.publicExport().cp_class_mins,
+        teachers_price: record.publicExport().cp_teachers_price
+    }))
+
+    // Map to store unique combinations of class_mins and students_price
+    const uniqueLogsMap = new Map();
+
+    logs.forEach(log => {
+        const key = `${log.class_mins}-${log.teachers_price}`;
+        if (uniqueLogsMap.has(key)) {
+            uniqueLogsMap.set(key, uniqueLogsMap.get(key) + 1);
+        } else {
+            uniqueLogsMap.set(key, 1);
+        }
+    });
+
+    // Convert the map into an array of unique combinations and their counts
+    const uniqueLogsArray = Array.from(uniqueLogsMap, ([key, count]) => {
+        const [class_mins, teachers_price] = key.split('-');
+        return { 
+            class_mins: Number(class_mins), 
+            unit_price: Number(teachers_price), 
+            total_classes: count,
+            total_price: count * Number(teachers_price)
+        };
+    });
+
+    const html = $template.loadFiles(
+        `${__hooks}/views/layout.html`,
+        `${__hooks}/views/teacher-receipt.html`,
+    ).render({
+        "id": invoice.get("id"),
+        "date": invoice.publicExport().created.toString().slice(0,10),
+        "nickname": invoice.publicExport().expand.teacher.publicExport().nickname,
+        "paid_amount": invoice.get("paid_amount"),
+        "due_amount": invoice.get("due_amount"),
+        "created": invoice.get("created"),
+        "class_logs": uniqueLogsArray,
+        "type": "Teacher"
+    })
+
+    return c.html(200, html)
 })

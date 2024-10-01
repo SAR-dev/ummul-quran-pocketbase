@@ -10,9 +10,7 @@ import TeacherSelf from "./pages/TeacherSelf";
 import StudentSelf from "./pages/StudentSelf";
 import { RequireStudentAuth } from "./components/RequireStudentAuth";
 import HomePage from "./pages/HomePage";
-import StudentInvoice from "./pages/StudentInvoice";
 import TeacherSelfInvoices from "./pages/TeacherSelfInvoices";
-import TeacherInvoice from "./pages/TeacherInvoice";
 import { RequireAdminAuth } from "./components/RequireAdminAuth";
 import AdminInvoiceGenerator from "./pages/AdminInvoiceGenerator";
 import AdminInvoiceViewer from "./pages/AdminInvoiceViewer";
@@ -32,11 +30,9 @@ const App = () => {
               <Route path="/teacher/class-planner" element={<ClassPlanner />} />
               <Route path="/teacher/class-details/:id" element={<ClassDetails />} />
               <Route path="/teacher/invoices" element={<TeacherSelfInvoices />} />
-              <Route path="/teacher/invoices/:id" element={<TeacherInvoice />} />
             </Route>
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
-              <Route path="/student/invoices/:id" element={<StudentInvoice />} />
             </Route>
             <Route element={<RequireAdminAuth />}>
               <Route path="/admin" element={<AdminInvoiceGenerator />} />

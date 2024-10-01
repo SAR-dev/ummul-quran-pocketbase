@@ -5,7 +5,7 @@
   "scripts": {
     "typegen": "npx pocketbase-typegen --db ./pb_data/data.db --out frontend/src/types/pocketbase.ts",
     "start": "pocketbase serve",
-    "dev": "nodemon --watch pb_hooks --ext js,json --exec npm run start"
+    "dev": "nodemon --watch pb_hooks --ext js,json,html --exec npm run start"
   },
   "keywords": [],
   "author": "",
