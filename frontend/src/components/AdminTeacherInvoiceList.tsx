@@ -20,7 +20,7 @@ const AdminTeacherInvoiceList = () => {
     const [isLoading, setIsLoading] = useState(false)
 
     const [updateInvoice, setUpdateInvoice] = useState<TeacherInvoicesResponse<TexpandTeacher> | undefined>(undefined)
-    const [message, setMessage] = useState(constants.DEFAULT_WH_STUDENT_INVOICE)
+    const [message, setMessage] = useState(constants.DEFAULT_WH_TEACHER_INVOICE)
     const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
 
     useEffect(() => {

@@ -18,7 +18,18 @@ This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}
 You have paid {{paid_amount}} TK. Please pay by the end of this month.
 Please contact us if you have any questions.
 
-You can get the invoice at: ${window.location.origin}/teacher/invoices/{{id}}
+You can get the invoice at: ${import.meta.env.VITE_API_URL}/student-receipt/{{id}}
+
+Thank you!`,
+    DEFAULT_WH_TEACHER_INVOICE:
+        `Hi {{nickname}},
+
+We hope you're doing well! 
+This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
+You have paid {{paid_amount}} TK. Please pay by the end of this month.
+Please contact us if you have any questions.
+
+You can get the invoice at: ${import.meta.env.VITE_API_URL}/teacher-receipt/{{id}}
 
 Thank you!`,
     DEFAULT_INVOICE_MSG_FIELDS: ["{{nickname}}", "{{whatsapp_no}}", "{{year}}", "{{month}}", "{{due_amount}}", "{{paid_amount}}", "{{id}}"]
