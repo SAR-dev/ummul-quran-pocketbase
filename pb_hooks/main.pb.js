@@ -339,6 +339,8 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     const feedback = payload.feedback
     if (!feedback || feedback.length < 10) throw ForbiddenError();
 
+    const monthly_package_id = payload.monthly_package_id ?? "";
+
     // helpers
 
     function getCurrentTime() {
@@ -351,7 +353,7 @@ routerAdd("POST", "/api/class-logs/finish", (c) => {
     const record = $app.dao().findRecordById("class_logs", id)
 
     const student = $app.dao().findRecordById("students", record.get("student"))
-    const monthly_package = $app.dao().findRecordById("monthly_packages", student.get("monthly_package"))
+    const monthly_package = $app.dao().findRecordById("monthly_packages", monthly_package_id.length > 0 ? monthly_package_id : student.get("monthly_package"))
 
     $app.dao().runInTransaction((txDao) => {
         record.set("feedback", feedback)

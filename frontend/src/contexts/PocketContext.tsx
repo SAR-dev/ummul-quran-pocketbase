@@ -13,6 +13,7 @@ import { jwtDecode } from "jwt-decode";
 import {
     ClassLogsResponse,
     Collections,
+    MonthlyPackagesResponse,
     StudentInvoicesResponse,
     StudentsResponse,
     TeacherInvoicesResponse,
@@ -42,6 +43,7 @@ interface PocketContextType {
     student?: StudentsResponse<TexpandUser>;
     students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
+    packages: MonthlyPackagesResponse[];
     getClassLogsData: ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
@@ -63,6 +65,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [isAdmin, setIsAdmin] = useState(getTokenPayload(pb.authStore.token).type == "admin")
     const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
+    const [packages, setPackages] = useState<MonthlyPackagesResponse[]>([])
     const [student, setStudent] = useLocalStorage<StudentsResponse<TexpandUser> | undefined>('student', undefined)
     const [teacher, setTeacher] = useLocalStorage<TeachersResponse<TexpandUser> | undefined>('teacher', undefined)
 
@@ -81,6 +84,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         fetchStudentData()
         fetchStudentListData()
         fetchTimezoneListData()
+        fetchMonthlyPackages()
     }, [pb]);
 
     const incRefresh = () => setRefresh(refresh + 1)
@@ -135,6 +139,13 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setTimeZones(res)
     }, [pb]);
 
+    const fetchMonthlyPackages = useCallback(async () => {
+        const res = await pb
+            .collection(Collections.MonthlyPackages)
+            .getFullList<MonthlyPackagesResponse>();
+        setPackages(res)
+    }, [pb]);
+
     const login = useCallback(async ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => {
         if (asAdmin) {
             await pb.admins.authWithPassword(email, password);
@@ -171,7 +182,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
-        
+
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
@@ -236,7 +247,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         await pb
             .collection(Collections.StudentInvoices)
             .update(id, {
-                paid_amount, 
+                paid_amount,
                 note
             });
         setRefresh(refresh + 1)
@@ -265,7 +276,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         await pb
             .collection(Collections.TeacherInvoices)
             .update(id, {
-                paid_amount, 
+                paid_amount,
                 note
             });
         setRefresh(refresh + 1)
@@ -287,6 +298,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             student,
             students,
             timeZones,
+            packages,
             getClassLogsData,
             getClassLogDataById,
             deleteClassLogById,

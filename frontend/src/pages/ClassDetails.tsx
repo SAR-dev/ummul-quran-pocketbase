@@ -1,10 +1,10 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import NavLayout from '../layouts/NavLayout'
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ClassLogsResponse } from '../types/pocketbase';
 import { TexpandStudentWithPackage } from '../types/extend';
 import { usePocket } from '../contexts/PocketContext';
-import { formatTimezoneOffset, getDateFromString, getTimeIn12HourFormat } from '../helpers/calendar';
+import { getDateFromString, getTimeIn12HourFormat } from '../helpers/calendar';
 import { getImageUrl } from '../helpers/base';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
@@ -17,23 +17,23 @@ export const ClassDetails = () => {
     const navigate = useNavigate()
     const notification = useNotification()
     const [isLoading, setIsLoading] = useState(false)
-    const { getClassLogDataById, token, timeZones } = usePocket()
+    const { getClassLogDataById, token, incRefresh, refresh, packages } = usePocket()
 
     const [classLog, setClassLog] = useState<ClassLogsResponse<TexpandStudentWithPackage>>()
+    const [packageId, setpackageId] = useState("")
 
     const [feedback, setFeedback] = useState("")
     const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+    const [editPackage, setEditPackage] = useState(false)
 
     useEffect(() => {
         if (id.length == 0) return;
 
-        getClassLogDataById({ id }).then(res => setClassLog(res))
-    }, [id])
-
-    const timezone = useMemo(() => {
-        if (!classLog) return;
-        return timeZones.find(e => e.id == classLog.expand?.student.expand.user.timezone)
-    }, [classLog]);
+        getClassLogDataById({ id }).then(res => {
+            setClassLog(res)
+            setpackageId(res.expand?.student.monthly_package ?? "")
+        })
+    }, [id, refresh])
 
     const startClass = () => {
         setIsLoading(true)
@@ -51,7 +51,7 @@ export const ClassDetails = () => {
                 }
                 return response.json();
             })
-            .then(() => getClassLogDataById({ id }).then(res => setClassLog(res)))
+            .then(() => incRefresh())
             .catch(() => {
                 notification.add({
                     title: "Error Occured",
@@ -70,7 +70,7 @@ export const ClassDetails = () => {
                 'Content-Type': 'application/json',
                 'Authorization': token ?? ""
             },
-            body: JSON.stringify({ id, feedback }),
+            body: JSON.stringify({ id, feedback, monthly_package_id: packageId }),
         })
             .then(response => {
                 if (!response.ok) {
@@ -78,10 +78,10 @@ export const ClassDetails = () => {
                 }
                 return response.json();
             })
-            .then(() => getClassLogDataById({ id }).then(res => {
-                setClassLog(res)
+            .then(() => {
+                incRefresh()
                 setShowFeedbackModal(false)
-            }))
+            })
             .catch(() => {
                 notification.add({
                     title: "Error Occured",
@@ -94,6 +94,7 @@ export const ClassDetails = () => {
 
     const handleFinishClass = () => {
         setShowFeedbackModal(true)
+        setEditPackage(false)
     }
 
     return (
@@ -104,69 +105,94 @@ export const ClassDetails = () => {
                         <div className="w-full flex justify-center">
                             <img className='h-28 w-28 object-cover rounded-full ring-2 ring-base-300 ring-offset-8' src={getImageUrl({ collectionId: classLog.expand?.student.expand.user.collectionId, dataId: classLog.expand?.student.expand.user.id, image: classLog.expand?.student.expand.user.avatar })} alt="" />
                         </div>
-                        <div className="w-full text-center mt-3 text-xl font-semibold">
-                            {classLog.expand?.student.nickname}
+                        <div className="flex flex-col gap-3 mt-5">
+                            <div className="w-full text-center text-xl font-semibold">
+                                {classLog.expand?.student.nickname}
+                            </div>
+                            <div className="flex justify-center">
+                                <WhatsAppButton mobile_no={classLog.expand?.student.mobile_no} />
+                            </div>
+                            <div className="flex justify-center">
+                                {classLog.expand?.student.expand.user.location}
+                            </div>
                         </div>
-                        <div className="my-5 flex justify-center">
-                            <WhatsAppButton mobile_no={classLog.expand?.student.mobile_no} />
-                        </div>
-                        <div className="w-full text-center">
-                            {classLog.expand?.student.expand.user.location}
-                        </div>
-                        <div className="w-full text-center">
-                            UTC {formatTimezoneOffset(timezone?.offset)}
-                        </div>
-                        <div className="w-full flex justify-center mt-5">
-                            {getDateFromString(classLog.start_at)} ({getTimeIn12HourFormat(classLog.start_at)} - {classLog.finish_at ? getTimeIn12HourFormat(classLog.finish_at) : "Pending"})
-                        </div>
-                        <div className="flex mt-5 gap-3 justify-center">
-                            {!classLog.started && !classLog.finished && (
-                                <button className="btn btn-icon btn-primary" disabled={isLoading} onClick={startClass}>
-                                    {isLoading && <div className="loading w-5 h-5" />}
-                                    Start Class
-                                </button>
-                            )}
-                            {classLog.started && !classLog.finished && (
-                                <Link to={classLog.expand?.student.class_link ?? ""} target='_blank' className="btn btn-info">Open Class</Link>
-                            )}
-                            {classLog.started && !classLog.finished && (
-                                <button className="btn btn-icon btn-success btn-icon" disabled={isLoading} onClick={handleFinishClass}>
-                                    {isLoading && <div className="loading w-5 h-5" />}
-                                    Submit Report
-                                </button>
-                            )}
-                            {classLog.finished && (
-                                <button className="btn btn-info btn-icon" onClick={() => navigate(-1)}>
-                                    <ArrowLeftIcon className='h-4 w-4' />
-                                    Go Back
-                                </button>
-                            )}
+
+                        <div className="flex flex-col gap-3 mt-8">
+                            <div className="flex justify-center">
+
+                            </div>
+                            <div className="flex justify-center">
+                                {getDateFromString(classLog.start_at)} ({getTimeIn12HourFormat(classLog.start_at)} - {classLog.finish_at ? getTimeIn12HourFormat(classLog.finish_at) : "Pending"})
+                            </div>
+                            <div className="flex gap-3 justify-center">
+                                {!classLog.started && !classLog.finished && (
+                                    <button className="btn btn-icon btn-primary" disabled={isLoading} onClick={startClass}>
+                                        {isLoading && <div className="loading w-5 h-5" />}
+                                        Start Class
+                                    </button>
+                                )}
+                                {classLog.started && !classLog.finished && (
+                                    <Link to={classLog.expand?.student.class_link ?? ""} target='_blank' className="btn btn-info">Open Class</Link>
+                                )}
+                                {classLog.started && !classLog.finished && (
+                                    <button className="btn btn-icon btn-success btn-icon" disabled={isLoading} onClick={handleFinishClass}>
+                                        {isLoading && <div className="loading w-5 h-5" />}
+                                        Submit Report
+                                    </button>
+                                )}
+                                {classLog.finished && (
+                                    <button className="btn btn-info btn-icon" onClick={() => navigate(-1)}>
+                                        <ArrowLeftIcon className='h-4 w-4' />
+                                        Go Back
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
                 <Dialog open={showFeedbackModal} onClose={() => { }} className="relative z-20">
                     <DialogBackdrop className="fixed inset-0 bg-base-content/25" />
                     <div className="fixed inset-0 flex w-screen items-center justify-center">
-                        <DialogPanel className="card p-4 bg-base-100 min-w-96 max-w-md">
+                        <DialogPanel className="card p-4 bg-base-100 w-3/4 md:w-[30rem]">
                             <div className='flex flex-col gap-3 p-5'>
                                 <div className='flex justify-center'>
-                                    <div className="text-6xl">📣</div>
+                                    <div className="text-4xl">📣</div>
                                 </div>
                                 <div className='text-center text-xl font-medium'>Class Report Required</div>
-                                <div className='text-center'>Please submit the class feedback before finishing class.</div>
                                 <div className="flex flex-col gap-3">
                                     <div className='flex flex-col gap-1'>
                                         <textarea
-                                            className="textarea textarea-bordered w-full textarea-sm resize-none"
-                                            rows={5}
+                                            className="textarea textarea-bordered w-full textarea-sm resize-none leading-7"
+                                            rows={7}
                                             value={feedback}
                                             onChange={e => setFeedback(e.target.value)}
                                             placeholder="Write feedback here..."
                                         />
                                         <div className="text-xs">Minimum 10 characters required</div>
                                     </div>
+                                    <div className="flex w-full items-center gap-2">
+                                        <select
+                                            value={packageId}
+                                            onChange={(e) => setpackageId(e.target.value)}
+                                            className="select select-bordered select-sm flex-1"
+                                            disabled={!editPackage}
+                                        >
+                                            <option disabled selected>Select Package</option>
+                                            {packages.map((e, i) => (
+                                                <option value={e.id} key={i}>{e.name} - {e.class_mins} Min</option>
+                                            ))}
+                                        </select>
+                                        {!editPackage ? (
+                                            <button className="btn btn-sm w-36" onClick={() => setEditPackage(true)}>Change Package</button>
+                                        ) : (
+                                            <button className="btn btn-sm w-36" onClick={() => {
+                                                setEditPackage(false)
+                                                setpackageId(classLog?.expand?.student.monthly_package ?? "")
+                                            }}>Reset Package</button>
+                                        )}
+                                    </div>
                                     <div className='flex gap-3 justify-between w-full'>
-                                        <button className="btn btn-neutral" disabled={isLoading} onClick={() => notification.remove()}>Go Back</button>
+                                        <button className="btn btn-neutral" disabled={isLoading} onClick={() => setShowFeedbackModal(false)}>Go Back</button>
                                         <button className="btn btn-icon btn-success w-44" disabled={feedback.length <= 10 || isLoading} onClick={finishClass}>
                                             {isLoading && <div className="loading w-5 h-5" />}
                                             Submit & Finish
