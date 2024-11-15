@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: ummul-quran-frontend
+    image: ummul-quran-frontend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "2020:80"
