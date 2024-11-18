@@ -8,4 +8,4 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "2020:80"
+      - "80:80"
