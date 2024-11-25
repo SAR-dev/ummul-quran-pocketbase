@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ThemeSwitcher from './ThemeSwitcher';
 import SignInButton from './SignInButton';
 import { usePocket } from '../contexts/PocketContext';
+import Logo from "../assets/logo.png";
 
 const Navbar = () => {
     const { teacher, isAdmin } = usePocket()
@@ -13,7 +14,7 @@ const Navbar = () => {
         <>
             <nav className="border-b border-base-300 w-full flex justify-between items-center px-5 py-4 bg-base-100">
                 <Link className="flex gap-3 items-center" to="/teacher">
-                    <img className="h-6" src="https://merakiui.com/images/logo.svg" alt="" />
+                    <img className="h-6" src={Logo} alt="" />
                 </Link>
 
                 <div className="gap-3 hidden md:flex">
