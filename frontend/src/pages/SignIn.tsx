@@ -38,7 +38,7 @@ export const SignIn = () => {
       <div className="w-full max-w-sm p-6 m-auto mx-auto bg-base-200 rounded-lg shadow-md">
         <div className="flex justify-center mx-auto">
           <img
-            className="w-auto h-7 sm:h-8"
+            className="w-auto h-8 sm:h-16"
             src={Logo}
             alt=""
           />
