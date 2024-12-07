@@ -269,12 +269,12 @@ export const filterDayViewData = ({
 export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}.000Z`
 
 export const getTimeIn12HourFormat = (val: string) => {
-    const date = new Date(val);
-    const hours = date.getHours() % 12 || 12;
-    const minutes = date.getMinutes()
-    const ampm = hours >= 12 ? 'PM' : 'AM'
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`
-}
+    const date = new Date(val); // Automatically converts to local time
+    const hours = date.getHours() % 12 || 12; // Convert to 12-hour format
+    const minutes = date.getMinutes(); // Get minutes
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM'; // Determine AM/PM
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+};
 
 export const getDateFromString = (dateString?: string) => {
     if(!dateString || dateString.length == 0) return "";
