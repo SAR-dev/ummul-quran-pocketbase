@@ -9,12 +9,14 @@ import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
 import { constants } from '../stores/constantStore';
 import WhatsAppInvoiceButton from './WhatsAppInvoiceButton';
+import { Link } from 'react-router-dom';
 
 const AdminStudentInvoiceList = () => {
     const notification = useNotification()
 
     const { refresh, updateStudentInvoiceData, getStudentInvoiceListData } = usePocket()
     const [invoices, setInvoices] = useState<StudentInvoicesResponse<TexpandStudent>[]>([])
+    const [invoicesCopy, setInvoicesCopy] = useState<StudentInvoicesResponse<TexpandStudent>[]>([])
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +24,7 @@ const AdminStudentInvoiceList = () => {
     const [updateInvoice, setUpdateInvoice] = useState<StudentInvoicesResponse<TexpandStudent> | undefined>(undefined)
     const [message, setMessage] = useState(constants.DEFAULT_WH_STUDENT_INVOICE)
     const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
+    const [searchText, setSearchText] = useState("")
 
     useEffect(() => {
         const cd = new Date(year, month - 1, 1);
@@ -30,7 +33,10 @@ const AdminStudentInvoiceList = () => {
         const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
         const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
 
-        getStudentInvoiceListData({ start, end }).then(res => setInvoices(res))
+        getStudentInvoiceListData({ start, end }).then(res => {
+            setInvoices(res)
+            setInvoicesCopy(res)
+        })
     }, [year, month, refresh])
 
     const handleUpdate = async () => {
@@ -52,8 +58,20 @@ const AdminStudentInvoiceList = () => {
         }
     }
 
+    const handleSearch = () => {
+        if (searchText.length == 0) {
+            setInvoicesCopy([...invoices])
+            return;
+        }
+        setInvoicesCopy([...invoices
+            .filter(e =>
+                e.expand?.student.nickname.toLowerCase().includes(searchText.toLowerCase()) ||
+                e.expand?.student.mobile_no.toLowerCase().includes(searchText.toLowerCase())
+            )])
+    }
+
     return (
-        <div className="p-5 max-w-[50rem]">
+        <div className="p-5 max-w-[60rem]">
             <div className='font-semibold mb-5'>Select month to view generated invoices of that month</div>
             <div className="flex justify-between items-center mb-5">
                 <div className="flex gap-5">
@@ -71,16 +89,42 @@ const AdminStudentInvoiceList = () => {
                     </select>
                 </div>
                 <div className="flex gap-5">
-                    <div className="w-32">
-                        Total Due: {invoices.reduce((sum, record) => sum + record.due_amount, 0)} TK
+                    <div>
+                        Due: {invoices.reduce((sum, record) => sum + record.due_amount, 0)} TK
                     </div>
-                    <div className="w-32">
-                        Total Paid: {invoices.reduce((sum, record) => sum + record.paid_amount, 0)} TK
+                    <div>
+                        Paid: {invoices.reduce((sum, record) => sum + record.paid_amount, 0)} TK
                     </div>
                 </div>
             </div>
-            <div className="card flex-col divide-y divide-base-300 border border-base-300">
-                <div className="grid grid-cols-8 gap-3 text-base-content/50">
+            <div className="flex justify-between">
+                <div className='flex gap-1'>
+                    <input
+                        type="text"
+                        placeholder="Type here"
+                        value={searchText}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        onChange={e => setSearchText(e.target.value)}
+                        className="input input-sm input-bordered w-full max-w-xs"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        className="btn btn-sm btn-icon btn-square border-base-content/25"
+                    >🔎</button>
+                </div>
+                <button className="btn btn-sm btn-outline border-base-300" onClick={() => setShowMsgUpdateModal(true)}>
+                    Edit Message Template
+                </button>
+            </div>
+            <div className="card flex-col divide-y divide-base-300 border border-base-300 mt-5">
+                <div className="grid grid-cols-10 gap-3 text-base-content/50">
+                    <div className="p-3 col-span-2 font-semibold">
+                        Invoice
+                    </div>
                     <div className="p-3 col-span-3 font-semibold">
                         Student
                     </div>
@@ -88,11 +132,16 @@ const AdminStudentInvoiceList = () => {
                         Paid/Due Amount
                     </div>
                     <div className="p-3 col-span-3">
-                        <button className="btn btn-sm btn-outline border-base-300" onClick={() => setShowMsgUpdateModal(true)}>Template</button>
+                        Message
                     </div>
                 </div>
-                {invoices.map((e, i) => (
-                    <div className="grid grid-cols-8 gap-3" key={i}>
+                {invoicesCopy.map((e, i) => (
+                    <div className="grid grid-cols-10 gap-3" key={i}>
+                        <div className="col-span-2 p-3">
+                            <Link to={`/admin/student-invoices/${e.id}`} className="btn btn-sm uppercase">
+                                {e.id}
+                            </Link>
+                        </div>
                         <div className="col-span-3 p-3 font-semibold">
                             {e.expand?.student.nickname}
                         </div>

@@ -16,7 +16,7 @@ const HomePage = () => {
         )
     } else if (isAdmin) {
         return (
-            <Navigate to={{ pathname: "/admin" }} state={{ location }} replace />
+            <Navigate to={{ pathname: "/admin/generate-student-invoices" }} state={{ location }} replace />
         );
     } else if (teacher) {
         return (

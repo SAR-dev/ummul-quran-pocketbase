@@ -168,7 +168,7 @@ export const ClassDetails = () => {
                                             onChange={e => setFeedback(e.target.value)}
                                             placeholder="Write feedback here..."
                                         />
-                                        <div className="text-xs">Minimum 10 characters required</div>
+                                        <div className="text-xs text-red-500">Minimum 10 characters required</div>
                                     </div>
                                     <div className="flex w-full items-center gap-2">
                                         <select

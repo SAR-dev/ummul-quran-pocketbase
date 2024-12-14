@@ -21,7 +21,7 @@ import {
     TimezonesResponse,
     TypedPocketBase,
 } from "../types/pocketbase";
-import { TexpandStudent, TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandTeacher, TexpandUser } from "../types/extend";
+import { TexpandStudent, TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandStudentWithPackageTeacher, TexpandTeacher, TexpandUser } from "../types/extend";
 import { dateToUtc } from "../helpers/calendar";
 
 interface DecodedToken {
@@ -45,12 +45,15 @@ interface PocketContextType {
     timeZones: TimezonesResponse[];
     packages: MonthlyPackagesResponse[];
     getClassLogsData: ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogsByStudentInvoiceId: ({ student_invoice, key }: { student_invoice: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackageTeacher>[]>;
+    getClassLogsByTeacherInvoiceId: ({ teacher_invoice, key }: { teacher_invoice: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
-    getStudentInvoiceData: () => Promise<StudentInvoicesResponse[]>;
     getStudentInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    getStudentInvoiceById: ({ id } : { id: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
     updateStudentInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
     getTeacherInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
+    getTeacherInvoiceById: ({ id } : { id: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     updateTeacherInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
 }
 
@@ -193,6 +196,69 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
+    const getClassLogsByStudentInvoiceId = useCallback(async ({ student_invoice, key }: { student_invoice: string, key?: string }) => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getFullList<ClassLogsResponse<TexpandStudentWithPackageTeacher>>({
+                filter: `student_invoice = "${student_invoice}" ${isAdmin ? "" : `&& student.user.id = "${userId}"`}`,
+                expand: "cp_teacher, student, student.monthly_package",
+                requestKey: `${userId}${student_invoice}${key}`
+            });
+        return res
+    }, [pb]);
+
+    const getStudentInvoiceById = useCallback(async ({ id }: { id: string }) => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.StudentInvoices)
+            .getFullList<StudentInvoicesResponse<TexpandStudent>>({
+                filter: `id = "${id}" ${isAdmin ? "" : `&& student.user.id = "${userId}"`}`,
+                expand: "student"
+            });
+        return res
+    }, [pb]);
+
+    const getTeacherInvoiceById = useCallback(async ({ id }: { id: string }) => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+
+        const res = await pb
+            .collection(Collections.TeacherInvoices)
+            .getFullList<TeacherInvoicesResponse<TexpandTeacher>>({
+                filter: `id = "${id}" ${isAdmin ? "" : `&& teacher.user.id = "${userId}"`}`,
+                expand: "teacher"
+            });
+        return res
+    }, [pb]);
+
+    const getClassLogsByTeacherInvoiceId = useCallback(async ({ teacher_invoice, key }: { teacher_invoice: string, key?: string }) => {
+        const userId = user?.id;
+        if (!userId) {
+            return [];
+        }
+        
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
+                filter: `teacher_invoice = "${teacher_invoice}" ${isAdmin ? "" : `&& student.teacher.user.id = "${userId}"`}`,
+                expand: "student, student.user, student.monthly_package",
+                requestKey: `${userId}${teacher_invoice}${key}`
+            });
+        console.log(res)
+        return res
+    }, [pb]);
+
     const getClassLogDataById = useCallback(async ({ id }: { id: string }) => {
         const res = await pb
             .collection(Collections.ClassLogs)
@@ -208,20 +274,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .collection(Collections.ClassLogs)
             .delete(id);
         setRefresh(refresh + 1)
-    }, [pb]);
-
-    const getStudentInvoiceData = useCallback(async () => {
-        const userId = user?.id;
-        if (!userId) {
-            return [];
-        }
-
-        const res = await pb
-            .collection(Collections.StudentInvoices)
-            .getFullList<StudentInvoicesResponse>({
-                filter: `student.user.id = "${userId}"`
-            });
-        return res
     }, [pb]);
 
     const getStudentInvoiceListData = useCallback(async ({ start, end }: { start: string, end: string }) => {
@@ -240,6 +292,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             });
         return res
     }, [pb]);
+
 
     const updateStudentInvoiceData = useCallback(async ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => {
         if (!isAdmin) return;
@@ -300,12 +353,15 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             timeZones,
             packages,
             getClassLogsData,
+            getClassLogsByStudentInvoiceId,
+            getClassLogsByTeacherInvoiceId,
             getClassLogDataById,
             deleteClassLogById,
-            getStudentInvoiceData,
             getStudentInvoiceListData,
+            getStudentInvoiceById,
             updateStudentInvoiceData,
             getTeacherInvoiceListData,
+            getTeacherInvoiceById,
             updateTeacherInvoiceData
         }}>
             {children}

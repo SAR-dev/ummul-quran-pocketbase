@@ -11,8 +11,11 @@ const StudentInvoiceGenerator = () => {
     const { token, refresh, incRefresh } = usePocket()
 
     const [invoicedStudents, setInvoicedStudents] = useState<InvoicedListType[]>([])
+    const [invoicedStudentsCopy, setInvoicedStudentsCopy] = useState<InvoicedListType[]>([])
+
     const [selectedStudents, setSelectedStudents] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [searchText, setSearchText] = useState("")
 
     useEffect(() => {
         fetchStudentInvoices()
@@ -32,7 +35,10 @@ const StudentInvoiceGenerator = () => {
                 }
                 return response.json();
             })
-            .then(res => setInvoicedStudents(res))
+            .then(res => {
+                setInvoicedStudents(res)
+                setInvoicedStudentsCopy(res)
+            })
             .catch(() => {
                 notification.add({
                     title: "Error Occured",
@@ -91,10 +97,52 @@ const StudentInvoiceGenerator = () => {
             .finally(() => setIsLoading(false));
     }
 
+    const handleSelectAll = () => {
+        setSelectedStudents([...invoicedStudents.map(e => e.id)])
+    }
+
+    const handleSelectNone = () => {
+        setSelectedStudents([])
+    }
+
+    const handleSearch = () => {
+        if(searchText.length == 0) {
+            setInvoicedStudentsCopy([...invoicedStudents])
+            return;
+        }
+        setSelectedStudents([])
+        setInvoicedStudentsCopy([...invoicedStudents
+            .filter(e => 
+                e.nickname.toLowerCase().includes(searchText.toLowerCase()) ||
+                e.mobile_no.toLowerCase().includes(searchText.toLowerCase())
+            )])
+    }
+
     return (
         <div className="p-5 max-w-[50rem]">
             <div className="flex items-center w-full justify-between font-semibold mb-5">
-                <div>Student list with last invoiced date</div>
+                <div className='flex gap-3'>
+                    <button className='btn btn-sm btn-neutral btn-icon' onClick={handleSelectAll}>Select All</button>
+                    <button className='btn btn-sm btn-neutral btn-icon' onClick={handleSelectNone}>Select None</button>
+                </div>
+                <div className='flex gap-1'>
+                    <input 
+                        type="text" 
+                        placeholder="Type here" 
+                        value={searchText}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                handleSearch();
+                            }
+                        }}
+                        onChange={e => setSearchText(e.target.value)}
+                        className="input input-sm input-bordered w-full max-w-xs" 
+                    />
+                    <button 
+                        onClick={handleSearch} 
+                        className="btn btn-sm btn-icon btn-square border-base-content/25"
+                    >🔎</button>
+                </div>
                 <button className='btn btn-sm btn-neutral btn-icon w-48' disabled={selectedStudents.length == 0 || isLoading} onClick={handleSubmit}>
                     {isLoading && <div className="loading w-4 h-4" />}
                     Generate Invoice
@@ -112,7 +160,7 @@ const StudentInvoiceGenerator = () => {
                         Last Invoiced Date
                     </div>
                 </div>
-                {invoicedStudents.map((e, i) => (
+                {invoicedStudentsCopy.map((e, i) => (
                     <div className="grid grid-cols-7 gap-3" key={i}>
                         <div className="col-span-3 p-3 font-semibold">
                             <div className="form-control">

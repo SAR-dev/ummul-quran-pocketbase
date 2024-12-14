@@ -21,6 +21,15 @@ export type TexpandStudentWithPackage = {
   };
 };
 
+export type TexpandStudentWithPackageTeacher = {
+  cp_teacher: TeachersResponse
+  student: StudentsResponse & {
+    expand: {
+      monthly_package: MonthlyPackagesResponse;
+    };
+  };
+};
+
 export type TexpandStudentListWithPackage = StudentsResponse & {
   expand: {
     monthly_package: MonthlyPackagesResponse;

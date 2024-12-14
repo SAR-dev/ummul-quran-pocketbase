@@ -12,8 +12,14 @@ import { RequireStudentAuth } from "./components/RequireStudentAuth";
 import HomePage from "./pages/HomePage";
 import TeacherSelfInvoices from "./pages/TeacherSelfInvoices";
 import { RequireAdminAuth } from "./components/RequireAdminAuth";
-import AdminInvoiceGenerator from "./pages/AdminInvoiceGenerator";
-import AdminInvoiceViewer from "./pages/AdminInvoiceViewer";
+import AdminStudentInvoiceGenerator from "./pages/AdminStudentInvoiceGenerator";
+import AdminTeacherInvoiceGenerator from "./pages/AdminTeacherInvoiceGenerator";
+import AdminStudentInvoiceViewer from "./pages/AdminStudentInvoiceViewer";
+import AdminTeacherInvoiceViewer from "./pages/AdminTeacherInvoiceViewer";
+import TeacherSelfInvoiceDetails from "./pages/TeacherSelfInvoiceDetails";
+import StudentSelfInvoiceDetails from "./pages/StudentSelfInvoiceDetails";
+import StudentInvoiceDetails from "./pages/StudentInvoiceDetails";
+import TeacherInvoiceDetails from "./pages/TeacherInvoiceDetails";
 
 const App = () => {
   return (
@@ -30,15 +36,20 @@ const App = () => {
               <Route path="/teacher/class-planner" element={<ClassPlanner />} />
               <Route path="/teacher/class-details/:id" element={<ClassDetails />} />
               <Route path="/teacher/invoices" element={<TeacherSelfInvoices />} />
-            </Route>
+              <Route path="/teacher/invoices/:id" element={<TeacherSelfInvoiceDetails />} />
+              </Route>
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
+              <Route path="/student/invoices/:id" element={<StudentSelfInvoiceDetails />} />
             </Route>
             <Route element={<RequireAdminAuth />}>
-              <Route path="/admin" element={<AdminInvoiceGenerator />} />
-              <Route path="/admin/invoices/generate" element={<AdminInvoiceGenerator />} />
-              <Route path="/admin/invoices/manage" element={<AdminInvoiceViewer />} />
-            </Route>
+              <Route path="/admin/generate-student-invoices" element={<AdminStudentInvoiceGenerator />} />
+              <Route path="/admin/generate-teacher-invoices" element={<AdminTeacherInvoiceGenerator />} />
+              <Route path="/admin/manage-student-invoices" element={<AdminStudentInvoiceViewer />} />
+              <Route path="/admin/manage-teacher-invoices" element={<AdminTeacherInvoiceViewer />} />
+              <Route path="/admin/student-invoices/:id" element={<StudentInvoiceDetails />} />
+              <Route path="/admin/teacher-invoices/:id" element={<TeacherInvoiceDetails />} />
+              </Route>
           </Routes>
         </BrowserRouter>
       </NotificationProvider>

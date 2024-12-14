@@ -4,6 +4,7 @@ import { getDateFromString } from '../helpers/calendar';
 import { InvoiceListResponseType } from '../types/extend'
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
+import { Link } from 'react-router-dom';
 
 const StudentInvoiceList = () => {
     const { token } = usePocket()
@@ -59,8 +60,9 @@ const StudentInvoiceList = () => {
                                 <div className='uppercase w-20 btn btn-error btn-sm no-animation'>Unpaid</div>
                             )}
                         </div>
-                        <div className='py-3 px-5 flex justify-end'>
-                        <a target='_blank' href={`${import.meta.env.VITE_API_URL}/student-receipt/${invoice.id}`} className="btn btn-info btn-sm">View Receipt</a>
+                        <div className='py-3 px-5 gap-3 flex justify-end'>
+                            <Link to={`/student/invoices/${invoice.id}`} className="btn btn-sm">See Details</Link>
+                            <a target='_blank' href={`${import.meta.env.VITE_API_URL}/student-receipt/${invoice.id}`} className="btn btn-info btn-sm">View Receipt</a>
                         </div>
                     </div>
                 ))}
