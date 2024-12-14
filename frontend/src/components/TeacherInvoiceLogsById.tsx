@@ -3,7 +3,7 @@ import { ClassLogsResponse, TeacherInvoicesResponse } from "../types/pocketbase"
 import { TexpandStudentWithPackage, TexpandTeacher } from "../types/extend";
 import { usePocket } from "../contexts/PocketContext";
 import { useParams } from "react-router-dom";
-import { getDateFromString, getTimeIn12HourFormat } from "../helpers/calendar";
+import { getDateInDayMonthYearFormat, getTimeIn12HourFormat } from "../helpers/calendar";
 
 const TeacherInvoiceLogsById = () => {
     const { id = "" } = useParams();
@@ -47,7 +47,7 @@ const TeacherInvoiceLogsById = () => {
                             {invoice.id}
                         </div>
                         <div className="p-3">
-                            {getDateFromString(invoice.created)}
+                            {getDateInDayMonthYearFormat(invoice.created)}
                         </div>
                         <div className="p-3">
                             {invoice.paid_amount} / {invoice.due_amount} TK
@@ -86,10 +86,10 @@ const TeacherInvoiceLogsById = () => {
                             {e.expand?.student.nickname}
                         </div>
                         <div className="p-3">
-                            {getDateFromString(e.start_at)} {getTimeIn12HourFormat(e.start_at)}
+                            {getDateInDayMonthYearFormat(e.start_at)} {getTimeIn12HourFormat(e.start_at)}
                         </div>
                         <div className="p-3">
-                            {getDateFromString(e.finish_at)} {getTimeIn12HourFormat(e.finish_at)}
+                            {getDateInDayMonthYearFormat(e.finish_at)} {getTimeIn12HourFormat(e.finish_at)}
                         </div>
                         <div className="p-3">
                             {e.expand?.student.expand.monthly_package.name}, {e.expand?.student.expand.monthly_package.class_mins} Mins

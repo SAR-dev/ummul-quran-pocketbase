@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usePocket } from '../contexts/PocketContext'
-import { getDateFromString } from '../helpers/calendar';
+import { getDateInDayMonthYearFormat } from '../helpers/calendar';
 import { InvoiceListResponseType } from '../types/extend'
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
@@ -49,7 +49,7 @@ const StudentInvoiceList = () => {
                 {invoices.map((invoice, i) => (
                     <div className="grid grid-cols-5" key={i}>
                         <div className='py-3 px-5 font-semibold'>
-                            {getDateFromString(invoice.created)}
+                            {getDateInDayMonthYearFormat(invoice.created)}
                         </div>
                         <div className='py-3 px-5'>{invoice.total_classes} Classes</div>
                         <div className='py-3 px-5'>{invoice.due_amount} TK</div>

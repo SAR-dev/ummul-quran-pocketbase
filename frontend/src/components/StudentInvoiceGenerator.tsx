@@ -4,7 +4,7 @@ import { usePocket } from '../contexts/PocketContext';
 import { NotificationType } from '../types/notification';
 import { ErrorMessageType, InvoicedListType } from '../types/extend';
 import WhatsAppButton from '../components/WhatsAppButton';
-import { getDateFromString } from '../helpers/calendar';
+import { getDateInDayMonthYearFormat } from '../helpers/calendar';
 
 const StudentInvoiceGenerator = () => {
     const notification = useNotification()
@@ -174,7 +174,7 @@ const StudentInvoiceGenerator = () => {
                             <WhatsAppButton mobile_no={e.mobile_no} />
                         </div>
                         <div className="col-span-2 p-3">
-                            {getDateFromString(e.last_invoiced_at)}
+                            {getDateInDayMonthYearFormat(e.last_invoiced_at)}
                         </div>
                     </div>
                 ))}

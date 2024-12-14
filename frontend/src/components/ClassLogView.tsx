@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { usePocket } from '../contexts/PocketContext'
 import { useNotification } from '../contexts/NotificationContext'
 import { NotificationType } from '../types/notification'
+import TimeViewer from './TimeViewer'
 
 export interface ClassLogType {
     id: string | number
@@ -70,7 +71,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                 </div>
                 <div className="flex justify-between items-center p-3">
                     <div>
-                        From <b>{getTimeIn12HourFormat(props.start_at)}</b>
+                        From <b><TimeViewer dateString={props.start_at}>{getTimeIn12HourFormat(props.start_at)}</TimeViewer></b>
                     </div>
                     <div className='flex gap-2'>
                         <button className="btn btn-xs btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>
@@ -112,7 +113,7 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                     <b>{props.class_mins} Mins</b> class
                 </div>
                 <div className="w-40 flex-shrink-0">
-                    <b>{getTimeIn12HourFormat(props.start_at)}</b> - {props.finish_at ? <b>{getTimeIn12HourFormat(props.finish_at)}</b> : "Not set yet"}
+                    <b><TimeViewer dateString={props.start_at}>{getTimeIn12HourFormat(props.start_at)}</TimeViewer></b> - {props.finish_at ? <b><TimeViewer dateString={props.finish_at}>{getTimeIn12HourFormat(props.finish_at)}</TimeViewer></b> : "Not set yet"}
                 </div>
                 <div className='flex gap-2 items-center ml-auto'>
                     <button className="btn btn-sm btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>

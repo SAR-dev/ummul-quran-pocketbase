@@ -1,4 +1,4 @@
-import { getDateFromString } from "../../../helpers/calendar";
+import { getDateInDayMonthYearFormat } from "../../../helpers/calendar";
 import { CalendarDataType } from "../../../types/calendar";
 import { CalendarIcon, NoSymbolIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
@@ -11,7 +11,7 @@ const LogView = ({
 }) => {
     const groupedData = useMemo(() => {
         return data.reduce((acc, item) => {
-            const date = getDateFromString(item.start_at);
+            const date = getDateInDayMonthYearFormat(item.start_at);
             if (!acc[date]) {
                 acc[date] = [];
             }

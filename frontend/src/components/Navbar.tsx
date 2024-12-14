@@ -5,6 +5,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 import SignInButton from './SignInButton';
 import { usePocket } from '../contexts/PocketContext';
 import Logo from "../assets/logo.png";
+import TzCodeSwitcher from './TzCodeSwitcher';
 
 const Navbar = () => {
     const { teacher } = usePocket()
@@ -28,6 +29,7 @@ const Navbar = () => {
                             Invoices
                         </Link>
                     )}
+                    <TzCodeSwitcher />
                     <ThemeSwitcher />
                     <SignInButton />
                 </div>
@@ -51,6 +53,7 @@ const Navbar = () => {
                             Invoices
                         </Link>
                     )}
+                    <TzCodeSwitcher asMobile={true} />
                     <ThemeSwitcher asMobile={true} />
                     <SignInButton asMobile={true} />
                 </div>

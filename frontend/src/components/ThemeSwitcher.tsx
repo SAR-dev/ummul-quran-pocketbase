@@ -9,8 +9,6 @@ const ThemeSwitcher = ({ asMobile }: { asMobile?: boolean }) => {
         setTheme(theme)
     }, [])
 
-
-
     if (!asMobile) {
         return (
             <div className='flex items-center'>

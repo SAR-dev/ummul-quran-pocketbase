@@ -1,5 +1,5 @@
 import { usePocket } from '../contexts/PocketContext';
-import { getDateFromString } from '../helpers/calendar';
+import { getDateInDayMonthYearFormat } from '../helpers/calendar';
 
 const StudentInfo = () => {
   const { student } = usePocket();
@@ -20,7 +20,7 @@ const StudentInfo = () => {
         <div className='py-3 border-b border-base-300 pl-5 font-semibold'>Location</div>
         <div className='py-3 border-b border-base-300 col-span-2 pl-5 border-l'>{student?.expand?.user.location}</div>
         <div className='py-3 pl-5 font-semibold'>Joined</div>
-        <div className='py-3 border-base-300 col-span-2 pl-5 border-l'>{getDateFromString(student?.expand?.user.created)}</div>
+        <div className='py-3 border-base-300 col-span-2 pl-5 border-l'>{student?.expand?.user.created ? getDateInDayMonthYearFormat(student.expand.user.created) : ""}</div>
       </div>
     </div>
   )

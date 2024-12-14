@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { ClassLogsResponse } from '../types/pocketbase';
 import { TexpandStudentWithPackage } from '../types/extend';
 import { usePocket } from '../contexts/PocketContext';
-import { getDateFromString, getTimeIn12HourFormat } from '../helpers/calendar';
+import { getDateInDayMonthYearFormat, getTimeIn12HourFormat } from '../helpers/calendar';
 import { getImageUrl } from '../helpers/base';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { useNotification } from '../contexts/NotificationContext';
 import { NotificationType } from '../types/notification';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
+import TimeViewer from '../components/TimeViewer';
 
 export const ClassDetails = () => {
     const { id = "" } = useParams();
@@ -118,11 +119,37 @@ export const ClassDetails = () => {
                         </div>
 
                         <div className="flex flex-col gap-3 mt-8">
-                            <div className="flex justify-center">
-
-                            </div>
-                            <div className="flex justify-center">
-                                {getDateFromString(classLog.start_at)} ({getTimeIn12HourFormat(classLog.start_at)} - {classLog.finish_at ? getTimeIn12HourFormat(classLog.finish_at) : "Pending"})
+                            <div className="card border border-base-300">
+                                <div className="grid grid-cols-2 divide-x divide-base-300 border-b border-base-300">
+                                    <div className='p-3 font-semibold text-center'>Start Time</div>
+                                    <div className='p-3 font-semibold text-center'>Finish Time</div>
+                                </div>
+                                <div className="grid grid-cols-2 divide-x divide-base-300">
+                                    <div className='p-3 text-center'>
+                                        <div>
+                                            <TimeViewer dateString={classLog.finish_at}>
+                                                {getDateInDayMonthYearFormat(classLog.start_at)}
+                                            </TimeViewer>
+                                        </div>
+                                        <div>
+                                            <TimeViewer dateString={classLog.finish_at}>
+                                                {getTimeIn12HourFormat(classLog.start_at)}
+                                            </TimeViewer>
+                                        </div>
+                                    </div>
+                                    <div className='p-3 font-semibold text-center'>
+                                        <div>
+                                            <TimeViewer dateString={classLog.finish_at}>
+                                                {classLog.finish_at ? getDateInDayMonthYearFormat(classLog.finish_at) : "Pending"}
+                                            </TimeViewer>
+                                        </div>
+                                        <div>
+                                            <TimeViewer dateString={classLog.finish_at}>
+                                                {classLog.finish_at ? getTimeIn12HourFormat(classLog.finish_at) : ""}
+                                            </TimeViewer>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex gap-3 justify-center">
                                 {!classLog.started && !classLog.finished && (

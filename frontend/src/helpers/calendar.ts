@@ -268,16 +268,15 @@ export const filterDayViewData = ({
 
 export const dateToUtc = (date: Date) => `${date.toISOString().slice(0, 10)} ${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}.000Z`
 
-export const getTimeIn12HourFormat = (val: string) => {
-    const date = new Date(val); // Automatically converts to local time
+export const getTimeIn12HourFormat = (dateString: string) => {
+    const date = new Date(dateString); // Automatically converts to local time
     const hours = date.getHours() % 12 || 12; // Convert to 12-hour format
     const minutes = date.getMinutes(); // Get minutes
     const ampm = date.getHours() >= 12 ? 'PM' : 'AM'; // Determine AM/PM
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 };
 
-export const getDateFromString = (dateString?: string) => {
-    if(!dateString || dateString.length == 0) return "";
+export const getDateInDayMonthYearFormat = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = months[date.getMonth()].shortName
