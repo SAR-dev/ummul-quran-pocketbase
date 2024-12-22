@@ -14,6 +14,8 @@ const AdminPageMenu = () => {
             <option value="generate-teacher-invoices">Generate Teacher Invoices</option>
             <option value="manage-student-invoices">Manage Student Invoices</option>
             <option value="manage-teacher-invoices">Manage Teacher Invoices</option>
+            <option value="student-invoice-history">Student Invoice History</option>
+            <option value="teacher-invoice-history">Teacher Invoice History</option>
         </select>
     )
 }

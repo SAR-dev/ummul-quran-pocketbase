@@ -10,6 +10,7 @@ import { NotificationType } from '../types/notification';
 import { constants } from '../stores/constantStore';
 import WhatsAppInvoiceButton from './WhatsAppInvoiceButton';
 import { Link } from 'react-router-dom';
+import { InvoiceStatusFilter } from '../types/enums';
 
 const AdminStudentInvoiceList = () => {
     const notification = useNotification()
@@ -25,6 +26,7 @@ const AdminStudentInvoiceList = () => {
     const [message, setMessage] = useState(constants.DEFAULT_WH_STUDENT_INVOICE)
     const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
     const [searchText, setSearchText] = useState("")
+    const [status, setStatus] = useState<InvoiceStatusFilter>(InvoiceStatusFilter.UNPAID)
 
     useEffect(() => {
         const cd = new Date(year, month - 1, 1);
@@ -33,11 +35,11 @@ const AdminStudentInvoiceList = () => {
         const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
         const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
 
-        getStudentInvoiceListData({ start, end }).then(res => {
+        getStudentInvoiceListData({ start, end, status }).then(res => {
             setInvoices(res)
             setInvoicesCopy(res)
         })
-    }, [year, month, refresh])
+    }, [year, month, status, refresh])
 
     const handleUpdate = async () => {
         if (!updateInvoice) return;
@@ -84,6 +86,11 @@ const AdminStudentInvoiceList = () => {
                     <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="select select-bordered select-sm w-32">
                         <option disabled selected>Select Year</option>
                         {getYearsRange().map((e, i) => (
+                            <option value={e} key={i}>{e}</option>
+                        ))}
+                    </select>
+                    <select value={status} onChange={e => setStatus(e.target.value as InvoiceStatusFilter)} className="select select-bordered select-sm w-32">
+                        {Object.values(InvoiceStatusFilter).map((e, i) => (
                             <option value={e} key={i}>{e}</option>
                         ))}
                     </select>

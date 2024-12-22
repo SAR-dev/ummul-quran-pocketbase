@@ -23,6 +23,7 @@ import {
 } from "../types/pocketbase";
 import { TexpandStudent, TexpandStudentListWithPackage, TexpandStudentWithPackage, TexpandStudentWithPackageTeacher, TexpandTeacher, TexpandUser } from "../types/extend";
 import { dateToUtc } from "../helpers/calendar";
+import { InvoiceStatusFilter } from "../types/enums";
 
 interface DecodedToken {
     exp: number;
@@ -49,10 +50,10 @@ interface PocketContextType {
     getClassLogsByTeacherInvoiceId: ({ teacher_invoice, key }: { teacher_invoice: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
-    getStudentInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    getStudentInvoiceListData: ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
     getStudentInvoiceById: ({ id } : { id: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
     updateStudentInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
-    getTeacherInvoiceListData: ({ start, end }: { start: string, end: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
+    getTeacherInvoiceListData: ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     getTeacherInvoiceById: ({ id } : { id: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     updateTeacherInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
 }
@@ -276,10 +277,14 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setRefresh(refresh + 1)
     }, [pb]);
 
-    const getStudentInvoiceListData = useCallback(async ({ start, end }: { start: string, end: string }) => {
+    const getStudentInvoiceListData = useCallback(async ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => {
         if (!isAdmin) {
             return [];
         }
+
+        let status_filter = "";
+        if(status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
+        if(status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
@@ -288,11 +293,24 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .collection(Collections.StudentInvoices)
             .getFullList<StudentInvoicesResponse<TexpandStudent>>({
                 expand: "student",
-                filter: `created >= "${startUTC}" && created < "${endUTC}"`
+                filter: `created >= "${startUTC}" && created < "${endUTC}" ${status_filter}`
             });
         return res
     }, [pb]);
 
+    // const getStudentInvoiceHistory = useCallback(async () => {
+    //     if (!isAdmin) {
+    //         return [];
+    //     }
+
+    //     const res = await pb
+    //         .collection(Collections.StudentInvoices)
+    //         .getFullList<StudentInvoicesResponse<TexpandStudent>>({
+    //             expand: "student",
+    //             filter: `created >= "${startUTC}" && created < "${endUTC}" ${status_filter}`
+    //         });
+    //     return res
+    // }, [pb]);
 
     const updateStudentInvoiceData = useCallback(async ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => {
         if (!isAdmin) return;
@@ -306,10 +324,14 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setRefresh(refresh + 1)
     }, [pb]);
 
-    const getTeacherInvoiceListData = useCallback(async ({ start, end }: { start: string, end: string }) => {
+    const getTeacherInvoiceListData = useCallback(async ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => {
         if (!isAdmin) {
             return [];
         }
+
+        let status_filter = "";
+        if(status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
+        if(status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
@@ -318,7 +340,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .collection(Collections.TeacherInvoices)
             .getFullList<TeacherInvoicesResponse<TexpandTeacher>>({
                 expand: "teacher",
-                filter: `created >= "${startUTC}" && created < "${endUTC}"`
+                filter: `created >= "${startUTC}" && created < "${endUTC}"  ${status_filter}`
             });
         return res
     }, [pb]);

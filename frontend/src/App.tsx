@@ -20,6 +20,8 @@ import TeacherSelfInvoiceDetails from "./pages/TeacherSelfInvoiceDetails";
 import StudentSelfInvoiceDetails from "./pages/StudentSelfInvoiceDetails";
 import StudentInvoiceDetails from "./pages/StudentInvoiceDetails";
 import TeacherInvoiceDetails from "./pages/TeacherInvoiceDetails";
+import TeacherInvoiceListManage from "./pages/TeacherInvoiceListManage";
+import StudentInvoiceHistory from "./pages/StudentInvoiceHistory";
 
 const App = () => {
   return (
@@ -37,7 +39,7 @@ const App = () => {
               <Route path="/teacher/class-details/:id" element={<ClassDetails />} />
               <Route path="/teacher/invoices" element={<TeacherSelfInvoices />} />
               <Route path="/teacher/invoices/:id" element={<TeacherSelfInvoiceDetails />} />
-              </Route>
+            </Route>
             <Route element={<RequireStudentAuth />}>
               <Route path="/student" element={<StudentSelf />} />
               <Route path="/student/invoices/:id" element={<StudentSelfInvoiceDetails />} />
@@ -49,7 +51,9 @@ const App = () => {
               <Route path="/admin/manage-teacher-invoices" element={<AdminTeacherInvoiceViewer />} />
               <Route path="/admin/student-invoices/:id" element={<StudentInvoiceDetails />} />
               <Route path="/admin/teacher-invoices/:id" element={<TeacherInvoiceDetails />} />
-              </Route>
+              <Route path="/admin/student-invoice-history" element={<StudentInvoiceHistory />} />
+              <Route path="/admin/teacher-invoice-history" element={<TeacherInvoiceListManage />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </NotificationProvider>

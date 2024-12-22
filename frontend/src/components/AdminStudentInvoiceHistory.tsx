@@ -1,80 +1,33 @@
-import { useEffect, useState } from 'react';
-import { getYearsRange, months } from '../helpers/calendar';
-import { usePocket } from '../contexts/PocketContext';
-import { TeacherInvoicesResponse } from '../types/pocketbase';
-import { ErrorResponseType, TexpandTeacher } from '../types/extend';
-import { PencilIcon, ServerIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
-import { useNotification } from '../contexts/NotificationContext';
-import { NotificationType } from '../types/notification';
-import { constants } from '../stores/constantStore';
-import WhatsAppInvoiceButton from './WhatsAppInvoiceButton';
-import { Link } from 'react-router-dom';
-import { InvoiceStatusFilter } from '../types/enums';
+const AdminStudentInvoiceHistory = () => {
+    // const notification = useNotification()
 
-const AdminTeacherInvoiceList = () => {
-    const notification = useNotification()
+    // const { refresh, updateStudentInvoiceData, getStudentInvoiceListData } = usePocket()
+    // const [invoices, setInvoices] = useState<StudentInvoicesResponse<TexpandStudent>[]>([])
+    // const [invoicesCopy, setInvoicesCopy] = useState<StudentInvoicesResponse<TexpandStudent>[]>([])
+    // const [year, setYear] = useState(new Date().getFullYear())
+    // const [month, setMonth] = useState(new Date().getMonth() + 1)
+    // const [isLoading, setIsLoading] = useState(false)
 
-    const { refresh, updateTeacherInvoiceData, getTeacherInvoiceListData } = usePocket()
-    const [invoices, setInvoices] = useState<TeacherInvoicesResponse<TexpandTeacher>[]>([])
-    const [invoicesCopy, setInvoicesCopy] = useState<TeacherInvoicesResponse<TexpandTeacher>[]>([])
-    const [year, setYear] = useState(new Date().getFullYear())
-    const [month, setMonth] = useState(new Date().getMonth() + 1)
-    const [isLoading, setIsLoading] = useState(false)
+    // const [updateInvoice, setUpdateInvoice] = useState<StudentInvoicesResponse<TexpandStudent> | undefined>(undefined)
+    // const [message, setMessage] = useState(constants.DEFAULT_WH_STUDENT_INVOICE)
+    // const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
+    // const [searchText, setSearchText] = useState("")
+    // const [status, setStatus] = useState<InvoiceStatusFilter>(InvoiceStatusFilter.UNPAID)
 
-    const [updateInvoice, setUpdateInvoice] = useState<TeacherInvoicesResponse<TexpandTeacher> | undefined>(undefined)
-    const [message, setMessage] = useState(constants.DEFAULT_WH_TEACHER_INVOICE)
-    const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
-    const [searchText, setSearchText] = useState("")
-    const [status, setStatus] = useState<InvoiceStatusFilter>(InvoiceStatusFilter.UNPAID)
+    // useEffect(() => {
+    // }, [refresh])
 
-    useEffect(() => {
-        const cd = new Date(year, month - 1, 1);
-        const nd = new Date(new Date(year, month - 1, 1).setMonth(new Date(year, month - 1, 1).getMonth() + 1));
+    // const handleUpdate = async () => {
+        
+    // }
 
-        const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
-        const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
-
-        getTeacherInvoiceListData({ start, end, status }).then(res => {
-            setInvoices(res)
-            setInvoicesCopy(res)
-        })
-    }, [year, month, status, refresh])
-
-    const handleUpdate = async () => {
-        if (!updateInvoice) return;
-        const { id, paid_amount, note } = updateInvoice
-        setIsLoading(true)
-        try {
-            await updateTeacherInvoiceData({ id, paid_amount, note });
-            setIsLoading(false)
-            setUpdateInvoice(undefined)
-        } catch (err) {
-            const error = err as ErrorResponseType;
-            notification.add({
-                title: "Error Occured",
-                message: error.response.message ?? "An error occured. Please try again later!",
-                status: NotificationType.ERROR,
-            })
-            setIsLoading(false)
-        }
-    }
-
-    const handleSearch = () => {
-        if (searchText.length == 0) {
-            setInvoicesCopy([...invoices])
-            return;
-        }
-        setInvoicesCopy([...invoices
-            .filter(e =>
-                e.expand?.teacher.nickname.toLowerCase().includes(searchText.toLowerCase()) ||
-                e.expand?.teacher.mobile_no.toLowerCase().includes(searchText.toLowerCase())
-            )])
-    }
+    // const handleSearch = () => {
+        
+    // }
 
     return (
         <div className="p-5 max-w-[60rem]">
-            <div className='font-semibold mb-5'>Select month to view generated invoices of that month</div>
+            {/* <div className='font-semibold mb-5'>Select month to view generated invoices of that month</div>
             <div className="flex justify-between items-center mb-5">
                 <div className="flex gap-5">
                     <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="select select-bordered select-sm w-32">
@@ -145,12 +98,12 @@ const AdminTeacherInvoiceList = () => {
                 {invoicesCopy.map((e, i) => (
                     <div className="grid grid-cols-10 gap-3" key={i}>
                         <div className="col-span-2 p-3">
-                            <Link to={`/admin/teacher-invoices/${e.id}`} className="btn btn-sm uppercase">
+                            <Link to={`/admin/student-invoices/${e.id}`} className="btn btn-sm uppercase">
                                 {e.id}
                             </Link>
                         </div>
                         <div className="col-span-3 p-3 font-semibold">
-                            {e.expand?.teacher.nickname}
+                            {e.expand?.student.nickname}
                         </div>
                         <div className="col-span-2 p-3">
                             {e.paid_amount ?? 0} / {e.due_amount} TK
@@ -160,7 +113,7 @@ const AdminTeacherInvoiceList = () => {
                                 <button className="btn btn-sm btn-outline border-base-300 btn-square mr-2" onClick={() => setUpdateInvoice({ ...e })}>
                                     <PencilIcon className='h-4 w-4' />
                                 </button>
-                                <WhatsAppInvoiceButton id={e.id} message={message} status={e.message_status} type='TEACHER' />
+                                <WhatsAppInvoiceButton id={e.id} message={message} status={e.message_status} type='STUDENT' />
                             </div>
                         </div>
                     </div>
@@ -239,9 +192,9 @@ const AdminTeacherInvoiceList = () => {
                         </div>
                     </DialogPanel>
                 </div>
-            </Dialog>
+            </Dialog> */}
         </div>
     )
 }
 
-export default AdminTeacherInvoiceList
+export default AdminStudentInvoiceHistory

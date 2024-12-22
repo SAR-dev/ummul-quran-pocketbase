@@ -18,6 +18,7 @@ const TeacherInvoiceLogsById = () => {
         getTeacherInvoiceById({ id }).then(res => setInvoice(res[0]));
         getClassLogsByTeacherInvoiceId({ teacher_invoice: id }).then(res => setClassLogs(res))
     }, [id, refresh])
+
     return (
         <div className="grid grid-cols-1 gap-5">
             {invoice && (
@@ -63,7 +64,7 @@ const TeacherInvoiceLogsById = () => {
                 </div>
             )}
             <div className="card flex-col divide-y divide-base-300 border border-base-300 mt-5">
-                <div className="grid grid-cols-5 gap-3 text-base-content/50">
+                <div className="grid grid-cols-6 gap-3 text-base-content/50">
                     <div className="p-3 font-semibold">
                         Student
                     </div>
@@ -79,9 +80,12 @@ const TeacherInvoiceLogsById = () => {
                     <div className="p-3">
                         Price
                     </div>
+                    <div className="p-3">
+                        Feedback
+                    </div>
                 </div>
                 {classLogs.map((e, i) => (
-                    <div className="grid grid-cols-5 gap-3" key={i}>
+                    <div className="grid grid-cols-6 gap-3" key={i}>
                         <div className="p-3 font-semibold">
                             {e.expand?.student.nickname}
                         </div>
@@ -97,8 +101,14 @@ const TeacherInvoiceLogsById = () => {
                         <div className="p-3">
                             {e.expand?.student.expand.monthly_package.teachers_price} TK
                         </div>
+                        <div className="p-3">
+                            {e.feedback}
+                        </div>
                     </div>
                 ))}
+                {classLogs.length == 0 && (
+                    <div className="w-full text-center p-5">No results found</div>
+                )}
             </div>
         </div>
     )
