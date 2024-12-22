@@ -13,6 +13,7 @@ import { jwtDecode } from "jwt-decode";
 import {
     ClassLogsResponse,
     Collections,
+    InvoicesResponse,
     MonthlyPackagesResponse,
     StudentInvoicesResponse,
     StudentsResponse,
@@ -56,6 +57,7 @@ interface PocketContextType {
     getTeacherInvoiceListData: ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     getTeacherInvoiceById: ({ id } : { id: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     updateTeacherInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
+    getInvoiceHistory: () => Promise<InvoicesResponse[]>
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -298,19 +300,16 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return res
     }, [pb]);
 
-    // const getStudentInvoiceHistory = useCallback(async () => {
-    //     if (!isAdmin) {
-    //         return [];
-    //     }
+    const getInvoiceHistory = useCallback(async () => {
+        if (!isAdmin) {
+            return [];
+        }
 
-    //     const res = await pb
-    //         .collection(Collections.StudentInvoices)
-    //         .getFullList<StudentInvoicesResponse<TexpandStudent>>({
-    //             expand: "student",
-    //             filter: `created >= "${startUTC}" && created < "${endUTC}" ${status_filter}`
-    //         });
-    //     return res
-    // }, [pb]);
+        const res = await pb
+            .collection(Collections.Invoices)
+            .getFullList<InvoicesResponse>();
+        return res
+    }, [pb]);
 
     const updateStudentInvoiceData = useCallback(async ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => {
         if (!isAdmin) return;
@@ -384,7 +383,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             updateStudentInvoiceData,
             getTeacherInvoiceListData,
             getTeacherInvoiceById,
-            updateTeacherInvoiceData
+            updateTeacherInvoiceData,
+            getInvoiceHistory
         }}>
             {children}
         </PocketContext.Provider>

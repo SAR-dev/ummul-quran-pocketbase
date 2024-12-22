@@ -7,6 +7,7 @@ import type { RecordService } from 'pocketbase'
 
 export enum Collections {
 	ClassLogs = "class_logs",
+	Invoices = "invoices",
 	MonthlyPackages = "monthly_packages",
 	StudentInvoices = "student_invoices",
 	Students = "students",
@@ -55,6 +56,15 @@ export type ClassLogsRecord = {
 	teacher_invoice?: RecordIdString
 }
 
+export enum InvoicesTypeOptions {
+	"STUDENT" = "STUDENT",
+	"TEACHER" = "TEACHER",
+}
+export type InvoicesRecord = {
+	type: InvoicesTypeOptions
+	unq_id?: string
+}
+
 export type MonthlyPackagesRecord = {
 	class_mins: number
 	memo?: string
@@ -69,6 +79,7 @@ export enum StudentInvoicesMessageStatusOptions {
 }
 export type StudentInvoicesRecord = {
 	due_amount?: number
+	invoice: RecordIdString
 	message_status?: StudentInvoicesMessageStatusOptions
 	note?: string
 	paid_amount?: number
@@ -79,7 +90,7 @@ export type StudentsRecord = {
 	class_link?: string
 	mobile_no?: string
 	monthly_package: RecordIdString
-	monthly_package_price?: number
+	monthly_package_price: number
 	nickname: string
 	teacher: RecordIdString
 	user: RecordIdString
@@ -91,6 +102,7 @@ export enum TeacherInvoicesMessageStatusOptions {
 }
 export type TeacherInvoicesRecord = {
 	due_amount?: number
+	invoice: RecordIdString
 	message_status?: TeacherInvoicesMessageStatusOptions
 	note?: string
 	paid_amount?: number
@@ -116,6 +128,7 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type ClassLogsResponse<Texpand = unknown> = Required<ClassLogsRecord> & BaseSystemFields<Texpand>
+export type InvoicesResponse<Texpand = unknown> = Required<InvoicesRecord> & BaseSystemFields<Texpand>
 export type MonthlyPackagesResponse<Texpand = unknown> = Required<MonthlyPackagesRecord> & BaseSystemFields<Texpand>
 export type StudentInvoicesResponse<Texpand = unknown> = Required<StudentInvoicesRecord> & BaseSystemFields<Texpand>
 export type StudentsResponse<Texpand = unknown> = Required<StudentsRecord> & BaseSystemFields<Texpand>
@@ -128,6 +141,7 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 
 export type CollectionRecords = {
 	class_logs: ClassLogsRecord
+	invoices: InvoicesRecord
 	monthly_packages: MonthlyPackagesRecord
 	student_invoices: StudentInvoicesRecord
 	students: StudentsRecord
@@ -139,6 +153,7 @@ export type CollectionRecords = {
 
 export type CollectionResponses = {
 	class_logs: ClassLogsResponse
+	invoices: InvoicesResponse
 	monthly_packages: MonthlyPackagesResponse
 	student_invoices: StudentInvoicesResponse
 	students: StudentsResponse
@@ -153,6 +168,7 @@ export type CollectionResponses = {
 
 export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'class_logs'): RecordService<ClassLogsResponse>
+	collection(idOrName: 'invoices'): RecordService<InvoicesResponse>
 	collection(idOrName: 'monthly_packages'): RecordService<MonthlyPackagesResponse>
 	collection(idOrName: 'student_invoices'): RecordService<StudentInvoicesResponse>
 	collection(idOrName: 'students'): RecordService<StudentsResponse>

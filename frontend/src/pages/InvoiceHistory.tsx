@@ -1,18 +1,18 @@
 import NavLayout from '../layouts/NavLayout'
 import AdminPageMenu from '../components/AdminPageMenu';
-import AdminStudentInvoiceHistory from '../components/AdminStudentInvoiceHistory';
+import AdminInvoiceHistory from '../components/AdminInvoiceHistory';
 
-const StudentInvoiceHistory = () => {
+const InvoiceHistory = () => {
     return (
         <NavLayout>
             <section className="p-5 md:p-16 w-full">
                 <AdminPageMenu />
                 <div className="card border-2 border-base-300 w-full bg-base-100 mt-5">
-                    <AdminStudentInvoiceHistory />
+                    <AdminInvoiceHistory />
                 </div>
             </section>
         </NavLayout>
     )
 }
 
-export default StudentInvoiceHistory
+export default InvoiceHistory

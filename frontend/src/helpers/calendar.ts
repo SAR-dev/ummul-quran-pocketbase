@@ -278,6 +278,7 @@ export const getTimeIn12HourFormat = (dateString: string) => {
 
 export const getDateInDayMonthYearFormat = (dateString: string) => {
     const date = new Date(dateString);
+    if(isNaN(date.getTime())) return "";
     const year = date.getFullYear();
     const month = months[date.getMonth()].shortName
     const day = String(date.getDate()).padStart(2, '0');
