@@ -7,25 +7,29 @@ import { NotificationType } from "../types/notification"
 
 const AdminInvoiceHistory = () => {
     const notification = useNotification()
-
     const { token, refresh, getInvoiceHistory } = usePocket()
     const [invoices, setInvoices] = useState<InvoicesResponse[]>([])
-    // const [invoicesCopy, setInvoicesCopy] = useState<StudentInvoicesResponse<TexpandStudent>[]>([])
-    // const [year, setYear] = useState(new Date().getFullYear())
-    // const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [isLoading, setIsLoading] = useState(false)
-
-    // const [updateInvoice, setUpdateInvoice] = useState<StudentInvoicesResponse<TexpandStudent> | undefined>(undefined)
-    // const [message, setMessage] = useState(constants.DEFAULT_WH_STUDENT_INVOICE)
-    // const [showMsgUpdateModal, setShowMsgUpdateModal] = useState(false)
-    // const [searchText, setSearchText] = useState("")
-    // const [status, setStatus] = useState<InvoiceStatusFilter>(InvoiceStatusFilter.UNPAID)
 
     useEffect(() => {
         getInvoiceHistory().then(res => {
             setInvoices(res)
         })
     }, [refresh])
+
+    const handleDeleteClick = (id: string) => {
+        notification.add({
+            title: "Confirmation Required",
+            message: "Are you sure you want to Delete ? This can not be undone.",
+            status: NotificationType.INFO,
+            body: (
+                <div className='flex gap-3 justify-center w-full'>
+                    <button className="btn btn-error" onClick={() => handleDelete(id)}>Yes, I am Sure</button>
+                    <button className="btn btn-success" onClick={() => notification.remove()}>No, I won't</button>
+                </div>
+            )
+        })
+    }
 
     const handleDelete = async (id: string) => {
         setIsLoading(true)
@@ -63,10 +67,6 @@ const AdminInvoiceHistory = () => {
             .finally(() => setIsLoading(false));
     }
 
-    // const handleSearch = () => {
-
-    // }
-
     return (
         <div className="p-5 max-w-[60rem]">
             <div className="card flex-col divide-y divide-base-300 border border-base-300 mt-5">
@@ -96,7 +96,9 @@ const AdminInvoiceHistory = () => {
                             {e.type}
                         </div>
                         <div className="p-3">
-                            <button className="btn btn-sm btn-error" disabled={isLoading} onClick={() => handleDelete(e.id)}>Delete</button>
+                            <button className="btn btn-sm btn-error" disabled={isLoading} onClick={() => handleDeleteClick(e.id)}>
+                                Delete
+                            </button>
                         </div>
                     </div>
                 ))}
