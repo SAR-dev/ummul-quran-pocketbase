@@ -201,7 +201,7 @@ export const ClassDetails = () => {
                                         <select
                                             value={packageId}
                                             onChange={(e) => setpackageId(e.target.value)}
-                                            className="select select-bordered select-sm flex-1"
+                                            className="select select-bordered select-sm flex-1 w-[inherit]"
                                             disabled={!editPackage}
                                         >
                                             <option disabled selected>Select Package</option>
