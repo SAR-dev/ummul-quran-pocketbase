@@ -46,18 +46,21 @@ interface PocketContextType {
     students: TexpandStudentListWithPackage[];
     timeZones: TimezonesResponse[];
     packages: MonthlyPackagesResponse[];
-    getClassLogsData: ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogsDataForTeacher: ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
+    getClassLogsDataForAdmin: ({ start, end, key, studentId, teacherId }: { start: string, end: string, key?: string, studentId?: string, teacherId?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackageTeacher>[]>;
     getClassLogsByStudentInvoiceId: ({ student_invoice, key }: { student_invoice: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackageTeacher>[]>;
     getClassLogsByTeacherInvoiceId: ({ teacher_invoice, key }: { teacher_invoice: string, key?: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>[]>;
     getClassLogDataById: ({ id }: { id: string }) => Promise<ClassLogsResponse<TexpandStudentWithPackage>>;
     deleteClassLogById: ({ id }: { id: string }) => Promise<void>;
     getStudentInvoiceListData: ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
-    getStudentInvoiceById: ({ id } : { id: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
+    getStudentInvoiceById: ({ id }: { id: string }) => Promise<StudentInvoicesResponse<TexpandStudent>[]>;
     updateStudentInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
     getTeacherInvoiceListData: ({ start, end, status }: { start: string, end: string, status: InvoiceStatusFilter }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
-    getTeacherInvoiceById: ({ id } : { id: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
+    getTeacherInvoiceById: ({ id }: { id: string }) => Promise<TeacherInvoicesResponse<TexpandTeacher>[]>;
     updateTeacherInvoiceData: ({ id, paid_amount, note }: { id: string, paid_amount: number, note: string }) => Promise<void>;
-    getInvoiceHistory: () => Promise<InvoicesResponse[]>
+    getInvoiceHistory: () => Promise<InvoicesResponse[]>;
+    getTeacherListData: () => Promise<TeachersResponse[]>;
+    getStudentListData: ({ teacherId }: { teacherId: string }) => Promise<StudentsResponse[]>;
 }
 
 const PocketContext = createContext<PocketContextType | undefined>(undefined);
@@ -180,7 +183,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         return dateToUtc(date)
     }
 
-    const getClassLogsData = useCallback(async ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => {
+    const getClassLogsDataForTeacher = useCallback(async ({ start, end, key, studentId }: { start: string, end: string, key?: string, studentId?: string }) => {
         const userId = user?.id;
         if (!userId) {
             return [];
@@ -195,6 +198,36 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
                 filter: `student.teacher.user.id = "${userId}" && start_at >= "${startUTC}" && start_at < "${endUTC}" ${studentId && studentId?.length > 0 ? `&& student.id = "${studentId}"` : ""}`,
                 expand: "student, student.user, student.monthly_package",
                 requestKey: `${userId}${startUTC}${endUTC}${studentId}${key}`
+            });
+        return res
+    }, [pb]);
+
+    const getClassLogsDataForAdmin = useCallback(async ({
+        start,
+        end,
+        key,
+        studentId,
+        teacherId
+    }: {
+        start: string,
+        end: string,
+        key?: string,
+        studentId?: string,
+        teacherId?: string
+    }) => {
+        if (!isAdmin) {
+            return [];
+        }
+
+        const startUTC = formatDateToCustomString(new Date(start));
+        const endUTC = formatDateToCustomString(new Date(end));
+
+        const res = await pb
+            .collection(Collections.ClassLogs)
+            .getFullList<ClassLogsResponse<TexpandStudentWithPackageTeacher>>({
+                filter: `start_at >= "${startUTC}" && start_at < "${endUTC}" ${studentId && studentId?.length > 0 ? `&& student.id = "${studentId}"` : ""} ${teacherId && teacherId?.length > 0 ? `&& student.teacher.id = "${teacherId}"` : ""}`,
+                expand: "student, cp_teacher, student.monthly_package",
+                requestKey: `${startUTC}${endUTC}${studentId}${teacherId}${key}`
             });
         return res
     }, [pb]);
@@ -250,7 +283,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         if (!userId) {
             return [];
         }
-        
+
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
@@ -258,7 +291,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
                 expand: "student, student.user, student.monthly_package",
                 requestKey: `${userId}${teacher_invoice}${key}`
             });
-        console.log(res)
         return res
     }, [pb]);
 
@@ -285,8 +317,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         }
 
         let status_filter = "";
-        if(status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
-        if(status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
+        if (status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
+        if (status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
@@ -329,8 +361,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         }
 
         let status_filter = "";
-        if(status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
-        if(status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
+        if (status == InvoiceStatusFilter.UNPAID) status_filter = " && paid_amount = 0";
+        if (status == InvoiceStatusFilter.PAID) status_filter = " && paid_amount > 0";
 
         const startUTC = formatDateToCustomString(new Date(start));
         const endUTC = formatDateToCustomString(new Date(end));
@@ -356,6 +388,28 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         setRefresh(refresh + 1)
     }, [pb]);
 
+    const getTeacherListData = useCallback(async () => {
+        if (!isAdmin) {
+            return [];
+        }
+        const res = await pb
+            .collection(Collections.Teachers)
+            .getFullList<TeachersResponse>();
+        return res;
+    }, [pb]);
+
+    const getStudentListData = useCallback(async ({ teacherId }: { teacherId: string }) => {
+        if (!isAdmin || teacherId.length == 0) {
+            return [];
+        }
+        const res = await pb
+            .collection(Collections.Students)
+            .getFullList<TexpandStudentListWithPackage>({
+                filter: `teacher.id = "${teacherId}"`
+            });
+        return res;
+    }, [pb]);
+
     useInterval(refreshSession, token ? 2 * oneMinInMs : null);
 
     return (
@@ -373,7 +427,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             students,
             timeZones,
             packages,
-            getClassLogsData,
+            getClassLogsDataForTeacher,
+            getClassLogsDataForAdmin,
             getClassLogsByStudentInvoiceId,
             getClassLogsByTeacherInvoiceId,
             getClassLogDataById,
@@ -384,7 +439,9 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             getTeacherInvoiceListData,
             getTeacherInvoiceById,
             updateTeacherInvoiceData,
-            getInvoiceHistory
+            getInvoiceHistory,
+            getTeacherListData,
+            getStudentListData
         }}>
             {children}
         </PocketContext.Provider>

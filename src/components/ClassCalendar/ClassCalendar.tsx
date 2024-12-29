@@ -13,7 +13,7 @@ import { usePocket } from "../../contexts/PocketContext"
 
 const ClassCalendar = () => {
   const { width = 0 } = useWindowSize()
-  const { refresh, user, students, getClassLogsData } = usePocket();
+  const { refresh, user, students, getClassLogsDataForTeacher } = usePocket();
   const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
   const [year, setYear] = useState(new Date().getFullYear())
   const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -31,7 +31,7 @@ const ClassCalendar = () => {
     const start = `${cd.getFullYear()}-${cd.getMonth() + 1}-01`;
     const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
 
-    getClassLogsData({ start, end, studentId }).then(res => setClassLogs(res))
+    getClassLogsDataForTeacher({ start, end, studentId }).then(res => setClassLogs(res))
   }, [user, year, month, studentId, refresh])
 
   const sortedClassLogs = useMemo<CalendarDataType[]>(() => {

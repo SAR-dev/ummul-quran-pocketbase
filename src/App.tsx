@@ -21,6 +21,7 @@ import StudentSelfInvoiceDetails from "./pages/StudentSelfInvoiceDetails";
 import StudentInvoiceDetails from "./pages/StudentInvoiceDetails";
 import TeacherInvoiceDetails from "./pages/TeacherInvoiceDetails";
 import InvoiceHistory from "./pages/InvoiceHistory";
+import AdminClassLogs from "./pages/AdminClassLogs";
 
 const App = () => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
               <Route path="/admin/student-invoices/:id" element={<StudentInvoiceDetails />} />
               <Route path="/admin/teacher-invoices/:id" element={<TeacherInvoiceDetails />} />
               <Route path="/admin/invoice-history" element={<InvoiceHistory />} />
+              <Route path="/admin/class-logs" element={<AdminClassLogs />} />
             </Route>
           </Routes>
         </BrowserRouter>

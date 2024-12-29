@@ -6,7 +6,7 @@ import { BellAlertIcon } from '@heroicons/react/24/solid';
 import ClassLogView from './ClassLogView';
 
 export const TodayClassList = () => {
-    const { refresh, user, getClassLogsData } = usePocket();
+    const { refresh, user, getClassLogsDataForTeacher } = usePocket();
     const [todayClassLogs, setTodayClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
 
     useEffect(() => {
@@ -19,7 +19,7 @@ export const TodayClassList = () => {
         const start = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
         const end = `${tomorrow.getFullYear()}-${tomorrow.getMonth() + 1}-${tomorrow.getDate()}`
 
-        getClassLogsData({ start, end }).then(res => setTodayClassLogs(res))
+        getClassLogsDataForTeacher({ start, end }).then(res => setTodayClassLogs(res))
     }, [refresh])
 
     return (

@@ -5,7 +5,7 @@ import { TexpandStudentWithPackage } from '../types/extend';
 import { getYearsRange, months } from '../helpers/calendar';
 
 const ClassStats = () => {
-    const { refresh, user, getClassLogsData } = usePocket();
+    const { refresh, user, getClassLogsDataForTeacher } = usePocket();
     const [classLogs, setClassLogs] = useState<ClassLogsResponse<TexpandStudentWithPackage>[]>([])
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -20,7 +20,7 @@ const ClassStats = () => {
         const end = `${nd.getFullYear()}-${nd.getMonth() + 1}-01`;
         const key = "stat"
 
-        getClassLogsData({ start, end, key }).then(res => setClassLogs(res))
+        getClassLogsDataForTeacher({ start, end, key }).then(res => setClassLogs(res))
     }, [user, year, month, refresh])
 
     return (

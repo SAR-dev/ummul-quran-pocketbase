@@ -15,6 +15,7 @@ const AdminPageMenu = () => {
             <option value="manage-student-invoices">Manage Student Invoices</option>
             <option value="manage-teacher-invoices">Manage Teacher Invoices</option>
             <option value="invoice-history">Invoice History</option>
+            <option value="class-logs">Class Logs</option>
         </select>
     )
 }

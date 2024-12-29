@@ -1,7 +1,7 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "ummul-quran",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,14 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@headlessui/react": "^2.1.8",
-    "@heroicons/react": "^2.1.5",
+    "@headlessui/react": "2.2.0",
+    "@heroicons/react": "2.2.0",
     "@types/ms": "^0.7.34",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "jwt-decode": "^4.0.0",
-    "pocketbase": "^0.21.5",
-    "react": "^18.3.1",
+    "pocketbase": "0.24.0",
+    "react": "19.0.0",
     "react-countdown": "^2.3.6",
     "react-dom": "^18.3.1",
     "react-multi-date-picker": "^4.5.2",
@@ -26,7 +26,7 @@
     "react-to-print": "^2.15.1",
     "tailwind-scrollbar": "^3.1.0",
     "usehooks-ts": "^3.1.0",
-    "zustand": "^5.0.0-rc.2"
+    "zustand": "5.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
