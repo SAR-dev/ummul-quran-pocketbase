@@ -47,22 +47,22 @@ const StudentInvoiceList = () => {
             </div>
             <div className="flex flex-col divide-y divide-base-300 w-full">
                 {invoices.map((invoice, i) => (
-                    <div className="grid grid-cols-5" key={i}>
-                        <div className='py-3 px-5 font-semibold'>
+                    <div className="grid grid-cols-2 xl:grid-cols-5 gap-2 px-5 py-3" key={i}>
+                        <div className='font-semibold'>
                             {getDateInDayMonthYearFormat(invoice.created)}
                         </div>
-                        <div className='py-3 px-5'>{invoice.total_classes} Classes</div>
-                        <div className='py-3 px-5'>{invoice.due_amount} TK</div>
-                        <div className='py-3 px-5'>
+                        <div className='hidden xl:block'>{invoice.total_classes} Classes</div>
+                        <div className=''>{invoice.due_amount} TK</div>
+                        <div className=''>
                             {invoice.paid_amount > 0 ? (
                                 <div className='uppercase w-20 btn btn-success btn-sm no-animation'>Paid</div>
                             ) : (
                                 <div className='uppercase w-20 btn btn-error btn-sm no-animation'>Unpaid</div>
                             )}
                         </div>
-                        <div className='py-3 px-5 gap-3 flex justify-end'>
-                            <Link to={`/student/invoices/${invoice.id}`} className="btn btn-sm">See Details</Link>
-                            <a target='_blank' href={`${import.meta.env.VITE_API_URL}/student-receipt/${invoice.id}`} className="btn btn-info btn-sm">View Receipt</a>
+                        <div className='gap-3 flex xl:justify-end'>
+                            <Link to={`/student/invoices/${invoice.id}`} className="btn btn-sm">Details</Link>
+                            <a target='_blank' href={`${import.meta.env.VITE_API_URL}/student-receipt/${invoice.id}`} className="btn btn-info btn-sm">Receipt</a>
                         </div>
                     </div>
                 ))}

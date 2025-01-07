@@ -7,7 +7,7 @@ import {
     useMemo,
     ReactNode,
 } from "react";
-import PocketBase, { AuthModel, getTokenPayload } from "pocketbase";
+import PocketBase, { AuthRecord } from "pocketbase";
 import { useInterval, useLocalStorage } from "usehooks-ts";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -35,11 +35,12 @@ const oneMinInMs = 60000;
 interface PocketContextType {
     pb: TypedPocketBase;
     isAdmin: boolean;
+    isSuperAdmin: boolean;
     refresh: number;
     incRefresh: () => void;
     login: ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => Promise<void>;
     logout: () => void;
-    user?: AuthModel;
+    user?: AuthRecord;
     token: string | null;
     teacher?: TeachersResponse<TexpandUser>;
     student?: StudentsResponse<TexpandUser>;
@@ -70,8 +71,15 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const [refresh, setRefresh] = useState(1)
 
     const [token, setToken] = useState<string | null>(pb.authStore.token);
-    const [user, setUser] = useState(pb.authStore.model);
-    const [isAdmin, setIsAdmin] = useState(getTokenPayload(pb.authStore.token).type == "admin")
+    const [user, setUser] = useState(pb.authStore.record);
+    const isAdmin = useMemo(
+        () => pb.authStore.isSuperuser,
+        [pb]
+    );
+    const isSuperAdmin = useMemo(
+        () => isAdmin && !!user && "superadmin" in user && user.superadmin,
+        [user, isAdmin]
+    );
     const [students, setStudents] = useState<TexpandStudentListWithPackage[]>([])
     const [timeZones, setTimeZones] = useState<TimezonesResponse[]>([])
     const [packages, setPackages] = useState<MonthlyPackagesResponse[]>([])
@@ -82,10 +90,8 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         if (!pb.authStore.isValid) logout()
     }, [])
 
-
     useEffect(() => {
         pb.authStore.onChange((newToken, model) => {
-            setIsAdmin(getTokenPayload(newToken).type == "admin")
             setToken(newToken);
             setUser(model);
         });
@@ -123,6 +129,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .getFirstListItem<StudentsResponse<TexpandUser>>(`user.id = "${userId}"`, {
                 expand: "user",
             });
+        console.log(res)
         setStudent(res)
     }, [pb]);
 
@@ -151,13 +158,15 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const fetchMonthlyPackages = useCallback(async () => {
         const res = await pb
             .collection(Collections.MonthlyPackages)
-            .getFullList<MonthlyPackagesResponse>();
+            .getFullList<MonthlyPackagesResponse>({
+                filter: `private = false`
+            });
         setPackages(res)
     }, [pb]);
 
     const login = useCallback(async ({ email, password, asAdmin }: { email: string; password: string, asAdmin?: boolean }) => {
         if (asAdmin) {
-            await pb.admins.authWithPassword(email, password);
+            await pb.collection(Collections.Superusers).authWithPassword(email, password);
         } else {
             await pb.collection(Collections.Users).authWithPassword(email, password);
         }
@@ -416,6 +425,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         <PocketContext.Provider value={{
             pb,
             isAdmin,
+            isSuperAdmin,
             refresh,
             incRefresh,
             login,

@@ -3,7 +3,7 @@ import { usePocket } from "../contexts/PocketContext";
 import NavLayout from "../layouts/NavLayout";
 
 const HomePage = () => {
-    const { user, student, teacher, isAdmin } = usePocket();
+    const { user, student, teacher, isAdmin, isSuperAdmin } = usePocket();
     const location = useLocation();
 
     if (user && (!teacher && !student && !isAdmin)) {
@@ -14,9 +14,13 @@ const HomePage = () => {
                 </div>
             </NavLayout>
         )
-    } else if (isAdmin) {
+    } else if (isSuperAdmin) {
         return (
             <Navigate to={{ pathname: "/admin/generate-student-invoices" }} state={{ location }} replace />
+        );
+    } else if (isAdmin) {
+        return (
+            <Navigate to={{ pathname: "/admin/class-logs" }} state={{ location }} replace />
         );
     } else if (teacher) {
         return (

@@ -1,6 +1,5 @@
 import { UserIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { ArrowRightIcon, CheckCircleIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
-import WhatsAppButton from './WhatsAppButton'
 import { getTimeIn12HourFormat } from '../helpers/calendar'
 import { Link } from 'react-router-dom'
 import { usePocket } from '../contexts/PocketContext'
@@ -105,9 +104,6 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                         <UserIcon className='h-4 w-4' />
                         {props.student}
                     </div>
-                </div>
-                <div className="w-48 flex-shrink-0">
-                    <WhatsAppButton mobile_no={props.student_mobile} />
                 </div>
                 <div className="w-32 flex-shrink-0">
                     <b>{props.class_mins} Mins</b> class

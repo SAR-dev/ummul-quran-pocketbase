@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom"
+import { usePocket } from "../contexts/PocketContext"
 
 const AdminPageMenu = () => {
+    const { isSuperAdmin } = usePocket()
+
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -10,11 +13,15 @@ const AdminPageMenu = () => {
 
     return (
         <select className="select select-bordered w-full max-w-xs" value={location.pathname.split("/")[2]} onChange={e => handleOptionChange(e.target.value)}>
-            <option value="generate-student-invoices">Generate Student Invoices</option>
-            <option value="generate-teacher-invoices">Generate Teacher Invoices</option>
-            <option value="manage-student-invoices">Manage Student Invoices</option>
-            <option value="manage-teacher-invoices">Manage Teacher Invoices</option>
-            <option value="invoice-history">Invoice History</option>
+            {isSuperAdmin && (
+                <>
+                    <option value="generate-student-invoices">Generate Student Invoices</option>
+                    <option value="generate-teacher-invoices">Generate Teacher Invoices</option>
+                    <option value="manage-student-invoices">Manage Student Invoices</option>
+                    <option value="manage-teacher-invoices">Manage Teacher Invoices</option>
+                    <option value="invoice-history">Invoice History</option>
+                </>
+            )}
             <option value="class-logs">Class Logs</option>
         </select>
     )

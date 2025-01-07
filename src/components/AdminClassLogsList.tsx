@@ -129,7 +129,7 @@ const AdminClassLogsList = () => {
                                     {e.id}
                                 </td>
                                 <td className="py-3 text-left text-sm">
-                                    {e.expand?.cp_teacher.nickname}
+                                    {e.expand?.cp_teacher?.nickname}
                                 </td>
                                 <td className="py-3 text-left text-sm">
                                     {e.expand?.student.nickname}

@@ -22,6 +22,7 @@ import StudentInvoiceDetails from "./pages/StudentInvoiceDetails";
 import TeacherInvoiceDetails from "./pages/TeacherInvoiceDetails";
 import InvoiceHistory from "./pages/InvoiceHistory";
 import AdminClassLogs from "./pages/AdminClassLogs";
+import { RequireSuperAdminAuth } from "./components/RequireSuperAdminAuth";
 
 const App = () => {
   return (
@@ -44,7 +45,7 @@ const App = () => {
               <Route path="/student" element={<StudentSelf />} />
               <Route path="/student/invoices/:id" element={<StudentSelfInvoiceDetails />} />
             </Route>
-            <Route element={<RequireAdminAuth />}>
+            <Route element={<RequireSuperAdminAuth />}>
               <Route path="/admin/generate-student-invoices" element={<AdminStudentInvoiceGenerator />} />
               <Route path="/admin/generate-teacher-invoices" element={<AdminTeacherInvoiceGenerator />} />
               <Route path="/admin/manage-student-invoices" element={<AdminStudentInvoiceViewer />} />
@@ -52,6 +53,8 @@ const App = () => {
               <Route path="/admin/student-invoices/:id" element={<StudentInvoiceDetails />} />
               <Route path="/admin/teacher-invoices/:id" element={<TeacherInvoiceDetails />} />
               <Route path="/admin/invoice-history" element={<InvoiceHistory />} />
+            </Route>
+            <Route element={<RequireAdminAuth />}>
               <Route path="/admin/class-logs" element={<AdminClassLogs />} />
             </Route>
           </Routes>

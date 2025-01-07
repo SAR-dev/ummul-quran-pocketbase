@@ -1,6 +1,5 @@
 import { usePocket } from '../contexts/PocketContext';
 import { getImageUrl } from '../helpers/base';
-import WhatsAppButton from './WhatsAppButton';
 
 const StudentList = () => {
     const { students } = usePocket();
@@ -28,9 +27,6 @@ const StudentList = () => {
                                     <div className="font-semibold">{e.expand.monthly_package.class_mins} Mins</div>
                                     <div className="text-sm">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
                                 </div>
-                                <div className="flex h-auto items-center">
-                                    <WhatsAppButton mobile_no={e.mobile_no} icon_only />
-                                </div>
                             </div>
 
                         </div>
@@ -42,12 +38,9 @@ const StudentList = () => {
                                 <div className="font-semibold">{e.nickname}</div>
                                 <div className="text-sm">{e.expand.user.location}</div>
                             </div>
-                            <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.name}</div>
+                            <div className="text-sm font-semibold w-64 flex-shrink-0">{e.expand.monthly_package.name}</div>
                             <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.class_mins} Mins</div>
-                            <div className="text-sm font-semibold w-32 flex-shrink-0">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
-                            <div className="ml-auto">
-                                <WhatsAppButton mobile_no={e.mobile_no} />
-                            </div>
+                            <div className="text-sm font-semibold ml-auto">{e.expand.monthly_package.teachers_price} TK / 1 Class</div>
                         </div>
                     </div>
                 ))}
