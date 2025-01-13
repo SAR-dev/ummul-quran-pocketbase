@@ -12,31 +12,42 @@ const WhatsAppInvoiceButton = ({ id, message, type, status }: { id: string, mess
     const ERROR = "ERROR"
 
     const handleSubmit = () => {
-        const payload = { type, id, message }
-
-        setIsLoading(true)
+        const payload = { type, id, message };
+    
+        setIsLoading(true);
+    
         fetch(`${import.meta.env.VITE_API_URL}/api/send-wh-message`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': token ?? ""
+                'Authorization': token ?? "",
             },
             body: JSON.stringify(payload),
         })
-            .then(async response => {
+            .then(async (response) => {
                 if (!response.ok) {
-                    setMessageStatus(ERROR)
+                    throw new Error('Failed to send message');
                 }
-                setMessageStatus(SUCCESS)
+                const result = await response.json();
+                return result;
             })
-            .then(() => {
-                setMessageStatus(SUCCESS)
+            .then((res) => {
+                if (res.link) {
+                    setMessageStatus(SUCCESS);
+                    console.log(res.link)
+                    window.open(res.link, '_blank')?.focus();
+                } else {
+                    throw new Error('Invalid response link');
+                }
             })
-            .catch(() => {
-                setMessageStatus(ERROR)
+            .catch((error) => {
+                console.error('Error:', error.message);
+                setMessageStatus(ERROR);
             })
-            .finally(() => setIsLoading(false));
-    }
+            .finally(() => {
+                setIsLoading(false);
+            });
+    };    
 
     return (
         <button
