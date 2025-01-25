@@ -12,28 +12,48 @@ export const constants = {
     THEME_STORE_KEY: "theme",
     TZCODE_STORE_KEY: "tzcode",
     DEFAULT_WH_STUDENT_INVOICE:
-        `Hi {{nickname}},
+`As-Salamu Alaikum,
+Payment Invoice: {{start_date}} - {{finish_date}}
+Student Name:   {{nickname}}
+{{bills}}
+A/C Name: Md.sohaib islam
+A/C NO: 1351050232908 
+Bank Name: Dutch-Bangla Bank Limited 
+Branch: Rajshahi 
+SWIFT Code: DBBLBDDH 
+Routing Number: 090811933
 
-We hope you're doing well! 
-This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
-You have paid {{paid_amount}} TK. Please pay by the end of this month.
-Please contact us if you have any questions.
+or
+personal Nagad/bkash no: 01782618085
+Bkash username: sohaib islam
 
-You can get the invoice at: ${import.meta.env.VITE_API_URL}/student-receipt/{{id}}
+অবশ্যই পেমেন্ট করার পর আমাদের জানাবেন বা screenshot দিবেন। 
+আমাদের স্টুডেন্টদের সংখ্যা অনেক এবং সবাই ম্যানুয়াল পদ্ধতিতে পেমেন্ট করার কারনে আমরাও সবার সহজের জন্যে ম্যানুয়াল পদ্ধতিটাই গ্রহণ করেছি। এই জন্যে আমাদের না জানালে আমরা সঠিকভাবে ট্র্যাক করতে পারবো না। 
 
-Thank you!`,
+See details at: {{url}}
+`,
     DEFAULT_WH_TEACHER_INVOICE:
-        `Hi {{nickname}},
+`As-Salamu Alaikum,
+Payment Invoice: {{start_date}} - {{finish_date}}
+Teacher Name:   {{nickname}}
+{{bills}}
+A/C Name: Md.sohaib islam
+A/C NO: 1351050232908 
+Bank Name: Dutch-Bangla Bank Limited 
+Branch: Rajshahi 
+SWIFT Code: DBBLBDDH 
+Routing Number: 090811933
 
-We hope you're doing well! 
-This is a reminder that your due amount for {{month}}, {{year}} is {{due_amount}} TK. 
-You have paid {{paid_amount}} TK. Please pay by the end of this month.
-Please contact us if you have any questions.
+or
+personal Nagad/bkash no: 01782618085
+Bkash username: sohaib islam
 
-You can get the invoice at: ${import.meta.env.VITE_API_URL}/teacher-receipt/{{id}}
+অবশ্যই পেমেন্ট করার পর আমাদের জানাবেন বা screenshot দিবেন। 
+আমাদের স্টুডেন্টদের সংখ্যা অনেক এবং সবাই ম্যানুয়াল পদ্ধতিতে পেমেন্ট করার কারনে আমরাও সবার সহজের জন্যে ম্যানুয়াল পদ্ধতিটাই গ্রহণ করেছি। এই জন্যে আমাদের না জানালে আমরা সঠিকভাবে ট্র্যাক করতে পারবো না। 
 
-Thank you!`,
-    DEFAULT_INVOICE_MSG_FIELDS: ["{{nickname}}", "{{whatsapp_no}}", "{{year}}", "{{month}}", "{{due_amount}}", "{{paid_amount}}", "{{id}}"],
+See details at: {{url}}
+`,
+    DEFAULT_INVOICE_MSG_FIELDS: ["{{nickname}}", "{{start_date}}", "{{finish_date}}", "{{bills}}", "{{url}}"],
     TIMEZONES: [
         {
             label: "Pacific/Midway (GMT-11:00)",

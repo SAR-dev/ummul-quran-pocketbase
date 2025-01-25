@@ -16,6 +16,7 @@
     "@types/ms": "^0.7.34",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
+    "firebase": "^11.1.0",
     "jwt-decode": "^4.0.0",
     "pocketbase": "^0.25.0",
     "react": "^18.3.1",

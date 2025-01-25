@@ -23,8 +23,15 @@ import TeacherInvoiceDetails from "./pages/TeacherInvoiceDetails";
 import InvoiceHistory from "./pages/InvoiceHistory";
 import AdminClassLogs from "./pages/AdminClassLogs";
 import { RequireSuperAdminAuth } from "./components/RequireSuperAdminAuth";
+import { useEffect } from "react";
+import { generateNotificationToken } from "./firebase-config";
 
 const App = () => {
+  useEffect(() => {
+    generateNotificationToken()
+  }, [])
+  
+
   return (
     <PocketProvider>
       <NotificationProvider>
