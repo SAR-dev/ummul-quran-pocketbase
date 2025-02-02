@@ -46,7 +46,8 @@ const ClassCalendar = () => {
         finish_at: log.finish_at,
         finished: log.finished,
         teachers_price: log.cp_teachers_price,
-        students_price: log.cp_students_price
+        students_price: log.cp_students_price,
+        feedback: log.feedback
       }));
   }, [classLogs]);
 

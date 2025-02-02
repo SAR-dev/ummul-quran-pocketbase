@@ -43,6 +43,7 @@ const LogView = ({
                                 student={e.student}
                                 student_mobile={e.student_mobile}
                                 class_mins={e.class_mins}
+                                feedback={e.feedback}
                                 key={i} 
                             />
                         ))}

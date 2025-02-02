@@ -129,7 +129,6 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
             .getFirstListItem<StudentsResponse<TexpandUser>>(`user.id = "${userId}"`, {
                 expand: "user",
             });
-        console.log(res)
         setStudent(res)
     }, [pb]);
 

@@ -13,6 +13,7 @@ export interface CalendarDataType {
     finished?: boolean;
     teachers_price?: number;
     students_price?: number;
+    feedback: string
 }
 
 export interface TimeRangeType {

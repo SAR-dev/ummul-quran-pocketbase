@@ -3,8 +3,12 @@ import { ClassLogsResponse, StudentsResponse, TeachersResponse } from '../types/
 import { usePocket } from '../contexts/PocketContext';
 import { TexpandStudentWithPackageTeacher } from '../types/extend';
 import { getDateInDayMonthYearFormat, getTimeIn12HourFormat } from '../helpers/calendar';
+import { useNotification } from '../contexts/NotificationContext';
+import { NotificationType } from '../types/notification';
+import { RssIcon } from '@heroicons/react/24/solid';
 
 const AdminClassLogsList = () => {
+    const notification = useNotification()
     const { refresh, user, getClassLogsDataForAdmin, getTeacherListData, getStudentListData } = usePocket();
     const [date, setDate] = useState<Date>(new Date())
     const [teacherId, setTeacherId] = useState<string>("")
@@ -49,6 +53,14 @@ const AdminClassLogsList = () => {
         setTeacherId(val)
         setStudentId("")
     }
+
+    const handleFeedbackModal = (feedback: string) => {
+            notification.add({
+                title: "Feedback Details",
+                message: feedback.length > 0 ? feedback : "N/A",
+                status: NotificationType.INFO
+            })
+        }
 
     return (
         <div className='p-5'>
@@ -143,8 +155,10 @@ const AdminClassLogsList = () => {
                                 <td className="py-3 text-left text-sm">
                                     {e.finished ? "Finished" : (e.started ? "Started" : "Pending")}
                                 </td>
-                                <td className="py-3 text-left text-sm">
-                                    {e.feedback}
+                                <td className="p-3 text-left text-sm" >
+                                    <button className="btn btn-square btn-xs" onClick={() => handleFeedbackModal(e.feedback)}>
+                                        <RssIcon className='h-4 w-4' />
+                                    </button>
                                 </td>
                                 <td className="py-3 text-left text-sm">
                                     {e.expand?.student.expand.monthly_package.name} ({e.expand?.student.expand.monthly_package.class_mins} Mins)

@@ -39,6 +39,7 @@ export const TodayClassList = () => {
                             student={e.expand?.student.nickname ?? ""}
                             student_mobile={e.expand?.student.mobile_no ?? ""}
                             class_mins={e.expand?.student.expand.monthly_package.class_mins ?? 0}
+                            feedback={e.feedback}
                             key={i}
                         />
                     ))}

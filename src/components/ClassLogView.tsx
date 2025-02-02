@@ -1,4 +1,4 @@
-import { UserIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { UserIcon, TrashIcon, RssIcon } from '@heroicons/react/24/outline'
 import { ArrowRightIcon, CheckCircleIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
 import { getTimeIn12HourFormat } from '../helpers/calendar'
 import { Link } from 'react-router-dom'
@@ -15,6 +15,7 @@ export interface ClassLogType {
     student: string
     student_mobile: string
     class_mins: number
+    feedback: string
 }
 
 const ClassLogView = ({ ...props }: ClassLogType) => {
@@ -36,6 +37,14 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                     <button className="btn btn-success" onClick={() => notification.remove()}>No, I will Keep It</button>
                 </div>
             )
+        })
+    }
+
+    const handleFeedbackModal = () => {
+        notification.add({
+            title: "Feedback Details",
+            message: props.feedback.length > 0 ? props.feedback : "N/A",
+            status: NotificationType.INFO
         })
     }
 
@@ -73,6 +82,9 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                         From <b><TimeViewer dateString={props.start_at}>{getTimeIn12HourFormat(props.start_at)}</TimeViewer></b>
                     </div>
                     <div className='flex gap-2'>
+                        <button className="btn btn-xs btn-icon btn-square bg-base-100" onClick={handleFeedbackModal}>
+                            <RssIcon className="h-4 w-4" />
+                        </button>
                         <button className="btn btn-xs btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>
                             <TrashIcon className='h-4 w-4' />
                         </button>
@@ -112,6 +124,9 @@ const ClassLogView = ({ ...props }: ClassLogType) => {
                     <b><TimeViewer dateString={props.start_at}>{getTimeIn12HourFormat(props.start_at)}</TimeViewer></b> - {props.finish_at ? <b><TimeViewer dateString={props.finish_at}>{getTimeIn12HourFormat(props.finish_at)}</TimeViewer></b> : "Not set yet"}
                 </div>
                 <div className='flex gap-2 items-center ml-auto'>
+                    <button className="btn btn-sm btn-icon btn-square bg-base-100" onClick={handleFeedbackModal}>
+                        <RssIcon className="h-5 w-5" />
+                    </button>
                     <button className="btn btn-sm btn-icon btn-square bg-base-100" onClick={() => handleDeleteModal(props.id.toString())}>
                         <TrashIcon className='h-5 w-5' />
                     </button>
