@@ -174,6 +174,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
     const logout = useCallback(() => {
         localStorage.clear()
         pb.authStore.clear();
+        window.location.reload()
     }, [pb]);
 
     const refreshSession = useCallback(async () => {

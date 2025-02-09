@@ -58,7 +58,7 @@ const TeacherInvoiceGenerator = () => {
 
     const handleSubmit = () => {
         if (selectedTeachers.length == 0) return;
-        const payload = { students: selectedTeachers }
+        const payload = { teachers: selectedTeachers }
 
         setIsLoading(true)
         fetch(`${import.meta.env.VITE_API_URL}/api/generate-teacher-invoices`, {
@@ -160,7 +160,7 @@ const TeacherInvoiceGenerator = () => {
                     </div>
                 </div>
                 {invoicedTeachersCopy.map((e, i) => (
-                    <div className="grid grid-cols-7 gap-3" key={i}>
+                    <div className="grid grid-cols-8 gap-3" key={i}>
                         <div className="col-span-3 p-3 font-semibold">
                             <div className="form-control">
                                 <label className="label cursor-pointer justify-start gap-3">
@@ -169,7 +169,7 @@ const TeacherInvoiceGenerator = () => {
                                 </label>
                             </div>
                         </div>
-                        <div className="col-span-2 p-3">
+                        <div className="col-span-3 p-3">
                             <WhatsAppButton mobile_no={e.mobile_no} />
                         </div>
                         <div className="col-span-2 p-3">

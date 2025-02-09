@@ -161,7 +161,7 @@ const StudentInvoiceGenerator = () => {
                     </div>
                 </div>
                 {invoicedStudentsCopy.map((e, i) => (
-                    <div className="grid grid-cols-7 gap-3" key={i}>
+                    <div className="grid grid-cols-8 gap-3" key={i}>
                         <div className="col-span-3 p-3 font-semibold">
                             <div className="form-control">
                                 <label className="label cursor-pointer justify-start gap-3">
@@ -170,7 +170,7 @@ const StudentInvoiceGenerator = () => {
                                 </label>
                             </div>
                         </div>
-                        <div className="col-span-2 p-3">
+                        <div className="col-span-3 p-3">
                             <WhatsAppButton mobile_no={e.mobile_no} />
                         </div>
                         <div className="col-span-2 p-3">
