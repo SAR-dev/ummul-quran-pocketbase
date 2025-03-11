@@ -295,7 +295,7 @@ export const PocketProvider = ({ children }: { children: ReactNode }) => {
         const res = await pb
             .collection(Collections.ClassLogs)
             .getFullList<ClassLogsResponse<TexpandStudentWithPackage>>({
-                filter: `teacher_invoice = "${teacher_invoice}" ${isAdmin ? "" : `&& student.teacher.user.id = "${userId}"`}`,
+                filter: `teacher_invoice = "${teacher_invoice}" ${isAdmin ? "" : `&& cp_teacher.user.id = "${userId}"`}`,
                 expand: "student, student.user, student.monthly_package",
                 requestKey: `${userId}${teacher_invoice}${key}`
             });

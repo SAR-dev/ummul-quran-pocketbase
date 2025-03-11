@@ -86,7 +86,7 @@ const StudentInvoiceLogsById = () => {
                     </div>
                 </div>
                 {classLogs.map((e, i) => (
-                    <div className="grid grid-cols-5 gap-3" key={i}>
+                    <div className="grid grid-cols-6 gap-3" key={i}>
                         <div className="p-3 font-semibold">
                             {e.expand?.cp_teacher.nickname}
                         </div>
